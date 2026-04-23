@@ -1,0 +1,16 @@
+{
+  "name": "quizblitz",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "partykit dev",
+    "deploy": "partykit deploy"
+  },
+  "dependencies": {
+    "partysocket": "^1.0.2"
+  },
+  "devDependencies": {
+    "partykit": "^0.0.95",
+    "typescript": "^5.0.0"
+  }
+}

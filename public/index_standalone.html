@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizBlitz - 实时答题竞赛</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; color: #667eea; margin-bottom: 10px; font-size: 2.5em; }
+    h2 { color: #764ba2; margin-bottom: 20px; }
+    .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5568d3; transform: translateY(-2px); }
+    .btn-success { background: #48bb78; color: white; }
+    .btn-success:hover { background: #38a169; }
+    .btn-danger { background: #f56565; color: white; }
+    .btn-danger:hover { background: #e53e3e; }
+    .btn-secondary { background: #a0aec0; color: white; }
+    .btn-secondary:hover { background: #718096; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    input:focus, textarea:focus { outline: none; border-color: #667eea; }
+    .mode-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+    .mode-btn {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #e2e8f0;
+      background: white;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .mode-btn.active { border-color: #667eea; background: #f7f7ff; }
+    .mode-btn:hover:not(.active) { border-color: #667eea; }
+    .hidden { display: none !important; }
+    .player-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .player-item {
+      background: #f7f7ff;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .player-avatar {
+      width: 36px; height: 36px;
+      background: #667eea;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .player-name { flex: 1; font-weight: 500; }
+    .player-score { color: #667eea; font-weight: bold; }
+    .question-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 16px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .question-text { font-size: 1.5em; margin-bottom: 20px; }
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+    .option-btn {
+      padding: 20px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 12px;
+      color: white;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .option-btn:hover:not(:disabled) { background: rgba(255,255,255,0.3); }
+    .option-btn.selected { background: rgba(255,255,255,0.4); border-color: white; }
+    .option-btn.correct { background: #48bb78 !important; border-color: #48bb78 !important; }
+    .option-btn.wrong { background: #f56565 !important; border-color: #f56565 !important; }
+    .timer {
+      font-size: 3em;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .timer.warning { color: #f6e05e; }
+    .timer.danger { color: #f56565; }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #f7f7ff;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .rank { font-size: 1.5em; font-weight: bold; margin-right: 15px; min-width: 40px; }
+    .rank-1 { color: #ffd700; }
+    .rank-2 { color: #c0c0c0; }
+    .rank-3 { color: #cd7f32; }
+    .ranking-name { flex: 1; font-weight: 500; }
+    .ranking-score { font-size: 1.2em; color: #667eea; font-weight: bold; }
+    .import-area { margin: 20px 0; }
+    .import-area textarea { min-height: 200px; font-family: monospace; }
+    .status { text-align: center; padding: 10px; border-radius: 8px; margin: 10px 0; }
+    .status-info { background: #bee3f8; color: #2c5282; }
+    .status-success { background: #c6f6d5; color: #276749; }
+    .status-error { background: #fed7d7; color: #c53030; }
+    .room-code {
+      font-size: 3em;
+      font-weight: bold;
+      color: #667eea;
+      letter-spacing: 8px;
+      text-align: center;
+      padding: 20px;
+      background: #f7f7ff;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .code-display {
+      font-family: monospace;
+      font-size: 1.2em;
+      background: #2d3748;
+      color: #48bb78;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 600px) {
+      .options { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>QuizBlitz</h1>
+    <p class="subtitle">实时答题竞赛平台</p>
+
+    <!-- 模式选择 -->
+    <div id="modeSelection" class="card">
+      <div class="mode-switch">
+        <div class="mode-btn" onclick="showTeacherMode()">
+          <div style="font-size: 2em;">👨‍🏫</div>
+          <div style="font-weight: 600; margin-top: 10px;">我是老师</div>
+          <div style="color: #888; font-size: 0.9em;">创建房间、添加题目、发起游戏</div>
+        </div>
+        <div class="mode-btn" onclick="showStudentMode()">
+          <div style="font-size: 2em;">👨‍🎓</div>
+          <div style="font-weight: 600; margin-top: 10px;">我是学生</div>
+          <div style="color: #888; font-size: 0.9em;">扫码或输入房间码加入游戏</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 老师模式 - 加入房间 -->
+    <div id="teacherJoin" class="card hidden">
+      <h2>👨‍🏫 老师模式</h2>
+      <div id="teacherRoomInfo" class="hidden">
+        <p>房间码：</p>
+        <div class="room-code" id="teacherRoomCode"></div>
+        <p style="text-align: center; color: #888;">将此码分享给学生，让他们加入房间</p>
+        <div style="margin-top: 20px;">
+          <button class="btn btn-secondary" onclick="showTeacherEditor()">编辑题目</button>
+          <button class="btn btn-success" onclick="startGame()">开始游戏</button>
+          <button class="btn btn-danger" onclick="resetGame()">重置游戏</button>
+        </div>
+      </div>
+      <div id="teacherCreate">
+        <button class="btn btn-primary" onclick="createRoom()">创建新房间</button>
+        <button class="btn btn-secondary" onclick="showModeSelection()">返回</button>
+      </div>
+    </div>
+
+    <!-- 老师模式 - 题目编辑 -->
+    <div id="teacherEditor" class="card hidden">
+      <h2>📝 编辑题目</h2>
+      <div class="grid-2">
+        <div>
+          <h3>手动添加</h3>
+          <input type="text" id="questionText" placeholder="题目内容">
+          <input type="text" id="option0" placeholder="选项 A">
+          <input type="text" id="option1" placeholder="选项 B">
+          <input type="text" id="option2" placeholder="选项 C">
+          <input type="text" id="option3" placeholder="选项 D">
+          <select id="correctAnswer" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
+            <option value="0">正确答案: A</option>
+            <option value="1">正确答案: B</option>
+            <option value="2">正确答案: C</option>
+            <option value="3">正确答案: D</option>
+          </select>
+          <input type="number" id="timeLimit" placeholder="答题时间(秒)" value="15" min="5" max="60">
+          <button class="btn btn-primary" onclick="addSingleQuestion()">添加题目</button>
+        </div>
+        <div class="import-area">
+          <h3>批量导入 (JSON)</h3>
+          <textarea id="jsonImport" placeholder='[{"question":"题目1","options":["A","B","C","D"],"correctAnswer":0,"timeLimit":15},...]'></textarea>
+          <button class="btn btn-success" onclick="importQuestions()">导入题目</button>
+        </div>
+      </div>
+      <div id="questionList"></div>
+      <button class="btn btn-secondary" onclick="showTeacherRoom()">返回房间</button>
+    </div>
+
+    <!-- 老师模式 - 控制面板 -->
+    <div id="teacherControl" class="card hidden">
+      <h2>🎮 游戏控制</h2>
+      <div id="gameStatus" class="status status-info">等待开始</div>
+      <div class="question-box hidden" id="currentQuestionDisplay">
+        <div id="questionNumber" style="font-size: 0.9em; opacity: 0.8;">第 0 题</div>
+        <div id="questionDisplay" class="question-text"></div>
+        <div id="timerDisplay" class="timer">15</div>
+      </div>
+      <div id="gameControls">
+        <button class="btn btn-primary" id="nextQuestionBtn" onclick="nextQuestion()">第 1 题</button>
+        <button class="btn btn-secondary" id="stopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
+        <button class="btn btn-success" id="showRankingBtn" onclick="showRanking()" disabled>显示排名</button>
+      </div>
+      <div id="teacherRankings" class="hidden" style="margin-top: 20px;"></div>
+      <h3 style="margin-top: 20px;">👥 在线玩家 (<span id="playerCount">0</span>)</h3>
+      <div id="teacherPlayerList" class="player-list"></div>
+      <button class="btn btn-secondary" onclick="showTeacherRoom()">返回</button>
+    </div>
+
+    <!-- 学生模式 -->
+    <div id="studentMode" class="card hidden">
+      <h2>👨‍🎓 加入游戏</h2>
+      <div id="studentJoin">
+        <input type="text" id="roomCode" placeholder="输入房间码 (6位)" maxlength="6" style="text-transform: uppercase;">
+        <input type="text" id="playerName" placeholder="输入你的昵称" maxlength="20">
+        <button class="btn btn-primary" onclick="joinRoom()">加入房间</button>
+        <button class="btn btn-secondary" onclick="showModeSelection()">返回</button>
+      </div>
+      <div id="studentWaiting" class="hidden">
+        <p style="text-align: center;">房间码: <span class="code-display" id="studentRoomCode"></span></p>
+        <p style="text-align: center; color: #888; margin: 20px 0;">等待老师发题...</p>
+        <div class="status status-info" id="waitingStatus">正在连接...</div>
+      </div>
+    </div>
+
+    <!-- 学生模式 - 答题界面 -->
+    <div id="studentQuiz" class="card hidden">
+      <div id="studentQuestionDisplay" class="question-box">
+        <div id="studentQuestionNumber" style="font-size: 0.9em; opacity: 0.8;">第 1 题</div>
+        <div id="studentQuestionText" class="question-text"></div>
+        <div id="studentTimer" class="timer">15</div>
+        <div class="options" id="studentOptions"></div>
+      </div>
+      <div id="studentResult" class="hidden">
+        <div class="status status-success" id="resultStatus"></div>
+        <div style="text-align: center; margin-top: 20px;">
+          <div style="font-size: 1.5em; color: #667eea;">当前得分: <span id="myScore">0</span></div>
+        </div>
+      </div>
+      <div id="studentRanking" class="hidden"></div>
+    </div>
+
+    <!-- 通用排名展示 -->
+    <div id="finalRanking" class="card hidden">
+      <h2>🏆 最终排名</h2>
+      <div id="finalRankingList"></div>
+      <button class="btn btn-primary" onclick="playAgain()">再来一轮</button>
+    </div>
+
+    <!-- QR Code 容器 -->
+    <div id="qrModal" class="card hidden">
+      <h2>📱 扫码加入</h2>
+      <div style="text-align: center;">
+        <canvas id="qrcode"></canvas>
+      </div>
+      <p style="text-align: center; color: #888; margin-top: 15px;">
+        访问 <span id="qrUrl" style="color: #667eea;"></span><br>
+        或扫描上方二维码
+      </p>
+      <button class="btn btn-secondary" onclick="closeQrModal()">关闭</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/partysocket@1.0.2/dist/global.js"></script>
+  <script>
+    // ===== 配置 =====
+    // TODO: 部署 PartyKit 后将下面的地址改为你自己的服务器地址
+    const PARTYKIT_HOST = 'quizblitz.chenfarong2022-blip.partykit.dev';
+    const BASE_URL = window.location.origin;
+
+    // ===== 状态 =====
+    let socket = null;
+    let myRole = null; // 'teacher' | 'student'
+    let myPlayerId = null;
+    let roomCode = null;
+    let isHost = false;
+    let questions = [];
+    let currentQuestionIndex = -1;
+    let gameStatus = 'waiting';
+    let timerInterval = null;
+    let timeLeft = 0;
+    let hasAnswered = false;
+    let myScore = 0;
+    let wsConnected = false;
+
+    // ===== 工具函数 =====
+    function $(id) { return document.getElementById(id); }
+    function show(id) { $(id).classList.remove('hidden'); }
+    function hide(id) { $(id).classList.add('hidden'); }
+    function qsa(sel) { return document.querySelectorAll(sel); }
+
+    // ===== QR码生成 (api.qrserver.com) =====
+    function generateQR(text) {
+      const canvas = $('qrcode');
+      const size = Math.min(250, window.innerWidth - 80);
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, size, size);
+      };
+      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
+    }
+
+    function showQrModal() {
+      const joinUrl = `${BASE_URL}?room=${roomCode}`;
+      $('qrUrl').textContent = joinUrl;
+      generateQR(joinUrl);
+      hideAllScreens();
+      show('qrModal');
+    }
+
+    function closeQrModal() {
+      if (isHost) {
+        showTeacherRoom();
+      }
+    }
+
+    // ===== 界面切换 =====
+    function hideAllScreens() {
+      qsa('.card').forEach(c => hide(c.id));
+      ['modeSelection', 'teacherJoin', 'teacherEditor', 'teacherControl',
+       'studentMode', 'studentQuiz', 'finalRanking', 'qrModal'].forEach(id => hide(id));
+    }
+
+    function showModeSelection() {
+      hideAllScreens();
+      show('modeSelection');
+    }
+
+    function showTeacherMode() {
+      hideAllScreens();
+      show('teacherJoin');
+    }
+
+    function showStudentMode() {
+      hideAllScreens();
+      show('studentMode');
+      // 检查 URL 参数
+      const params = new URLSearchParams(window.location.search);
+      const roomParam = params.get('room');
+      if (roomParam) {
+        $('roomCode').value = roomParam.toUpperCase();
+      }
+    }
+
+    function showTeacherRoom() {
+      hideAllScreens();
+      show('teacherJoin');
+      show('teacherCreate');
+      hide('teacherRoomInfo');
+    }
+
+    function showTeacherEditor() {
+      hideAllScreens();
+      show('teacherJoin');
+      show('teacherEditor');
+      show('teacherRoomInfo');
+      renderQuestionList();
+    }
+
+    function showTeacherControl() {
+      hideAllScreens();
+      show('teacherJoin');
+      show('teacherControl');
+      show('teacherRoomInfo');
+    }
+
+    function showTeacherRankings(rankings) {
+      const container = $('teacherRankings');
+      container.classList.remove('hidden');
+      container.innerHTML = rankings.map((p, i) => `
+        <div class="ranking-item">
+          <span class="rank rank-${i + 1}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
+          <span class="ranking-name">${escapeHtml(p.name)}</span>
+          <span class="ranking-score">${p.score} 分</span>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ===== WebSocket 连接 =====
+    function connect(room) {
+      if (socket) socket.close();
+
+      socket = new PartySocket({
+        host: PARTYKIT_HOST,
+        room: room,
+      });
+
+      socket.addEventListener('open', () => {
+        wsConnected = true;
+        console.log('WebSocket connected');
+      });
+
+      socket.addEventListener('message', (event) => {
+        const data = JSON.parse(event.data);
+        handleMessage(data);
+      });
+
+      socket.addEventListener('close', () => {
+        wsConnected = false;
+        console.log('WebSocket closed');
+      });
+    }
+
+    function send(message) {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(message));
+      }
+    }
+
+    // ===== 消息处理 =====
+    function handleMessage(data) {
+      switch (data.type) {
+        case 'room_created':
+          roomCode = data.roomCode;
+          isHost = data.isHost;
+          $('teacherRoomCode').textContent = roomCode;
+          hide('teacherCreate');
+          show('teacherRoomInfo');
+          showTeacherRoom();
+          showQrModal();
+          break;
+
+        case 'joined':
+          myRole = 'student';
+          myPlayerId = data.playerId;
+          roomCode = data.roomCode;
+          isHost = data.isHost;
+          $('studentRoomCode').textContent = roomCode;
+          questions = data.questions || [];
+          gameStatus = data.gameStatus;
+          updateWaitingStatus(`已加入房间，等待游戏开始 (${data.playerCount}人在线)`);
+          show('studentWaiting');
+          hide('studentJoin');
+          if (data.currentQuestion !== null && data.currentQuestion >= 0) {
+            // 游戏已经开始，显示当前题目
+          }
+          break;
+
+        case 'player_joined':
+          updatePlayerList(data.players);
+          if (myRole === 'student') {
+            updateWaitingStatus(`已加入房间，等待游戏开始 (${data.playerCount}人在线)`);
+          }
+          break;
+
+        case 'player_left':
+          updatePlayerList(data.players);
+          break;
+
+        case 'player_kicked':
+          if (data.playerId === myPlayerId) {
+            alert('你被老师移出了房间');
+            showModeSelection();
+          }
+          updatePlayerList(data.players);
+          break;
+
+        case 'questions_added':
+          questions = [...questions, ...data.questions];
+          renderQuestionList();
+          alert(`成功添加 ${data.questionCount} 道题目`);
+          break;
+
+        case 'game_started':
+          gameStatus = 'playing';
+          currentQuestionIndex = -1;
+          myScore = 0;
+          if (isHost) {
+            showTeacherControl();
+            $('gameStatus').textContent = '游戏进行中';
+            $('gameStatus').className = 'status status-success';
+            $('nextQuestionBtn').textContent = '第 1 题';
+            $('nextQuestionBtn').disabled = false;
+            hide('currentQuestionDisplay');
+            hide('teacherRankings');
+          }
+          break;
+
+        case 'question':
+          currentQuestionIndex = data.index;
+          gameStatus = 'playing';
+          const q = data.question;
+          timeLeft = q.timeLimit;
+          hasAnswered = false;
+
+          if (myRole === 'student') {
+            show('studentQuiz');
+            hide('studentWaiting');
+            hide('studentResult');
+            hide('studentRanking');
+            $('studentQuestionNumber').textContent = `第 ${data.index + 1} 题 / 共 ${data.totalQuestions} 题`;
+            $('studentQuestionText').textContent = q.question;
+            $('studentTimer').textContent = q.timeLimit;
+            $('studentTimer').className = 'timer';
+            $('studentOptions').innerHTML = q.options.map((opt, i) => `
+              <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
+                ${String.fromCharCode(65 + i)}. ${escapeHtml(opt)}
+              </button>
+            `).join('');
+            startStudentTimer(q.timeLimit);
+          } else if (isHost) {
+            $('gameStatus').textContent = `第 ${data.index + 1} 题进行中`;
+            $('questionNumber').textContent = `第 ${data.index + 1} 题 / 共 ${data.totalQuestions} 题`;
+            $('questionDisplay').textContent = q.question;
+            show('currentQuestionDisplay');
+            $('nextQuestionBtn').disabled = true;
+            $('nextQuestionBtn').textContent = `第 ${data.index + 2} 题`;
+            $('stopAnswerBtn').disabled = false;
+            startTeacherTimer(q.timeLimit);
+          }
+          break;
+
+        case 'answer_result':
+          hasAnswered = true;
+          stopTimers();
+          $('resultStatus').textContent = data.isCorrect ? `✓ 回答正确！+${data.points} 分` : '✗ 回答错误';
+          $('resultStatus').className = data.isCorrect ? 'status status-success' : 'status status-error';
+          myScore = data.totalScore;
+          $('myScore').textContent = myScore;
+          show('studentResult');
+          qsa('.option-btn').forEach(btn => btn.disabled = true);
+          break;
+
+        case 'answer_closed':
+          stopTimers();
+          if (myRole === 'student' && !hasAnswered) {
+            qsa('.option-btn').forEach(btn => btn.disabled = true);
+            if (data.correctAnswer !== undefined) {
+              const correctOpt = $(`opt-${data.correctAnswer}`);
+              if (correctOpt) correctOpt.classList.add('correct');
+            }
+          }
+          if (isHost) {
+            $('stopAnswerBtn').disabled = true;
+            $('showRankingBtn').disabled = false;
+            if (data.rankings) showTeacherRankings(data.rankings);
+          }
+          break;
+
+        case 'ranking':
+          if (myRole === 'student') {
+            showStudentRanking(data.rankings);
+          } else if (isHost) {
+            showTeacherRankings(data.rankings);
+          }
+          break;
+
+        case 'game_finished':
+          gameStatus = 'finished';
+          if (isHost) {
+            showTeacherControl();
+            $('gameStatus').textContent = '游戏结束';
+            $('gameStatus').className = 'status status-success';
+            $('nextQuestionBtn').disabled = true;
+            showTeacherRankings(data.rankings);
+          }
+          if (myRole === 'student') {
+            showFinalRanking(data.rankings);
+          }
+          break;
+
+        case 'game_reset':
+          gameStatus = 'waiting';
+          currentQuestionIndex = -1;
+          myScore = 0;
+          if (isHost) {
+            showTeacherRoom();
+            $('teacherRankings').classList.add('hidden');
+          }
+          if (myRole === 'student') {
+            show('studentWaiting');
+            hide('studentQuiz');
+            updateWaitingStatus('游戏已重置，等待再次开始');
+          }
+          break;
+
+        case 'error':
+          alert(data.message);
+          break;
+      }
+    }
+
+    // ===== 教师功能 =====
+    function createRoom() {
+      const code = generateRoomCode();
+      roomCode = code;
+      connect(code);
+      send({ type: 'create_room' });
+    }
+
+    function addSingleQuestion() {
+      const question = $('questionText').value.trim();
+      const options = [
+        $('option0').value.trim(),
+        $('option1').value.trim(),
+        $('option2').value.trim(),
+        $('option3').value.trim()
+      ];
+      const correctAnswer = parseInt($('correctAnswer').value);
+      const timeLimit = parseInt($('timeLimit').value) || 15;
+
+      if (!question || options.some(o => !o)) {
+        alert('请填写完整题目和所有选项');
+        return;
+      }
+
+      send({
+        type: 'add_questions',
+        questions: [{ question, options, correctAnswer, timeLimit }]
+      });
+
+      // 清空表单
+      $('questionText').value = '';
+      $('option0').value = '';
+      $('option1').value = '';
+      $('option2').value = '';
+      $('option3').value = '';
+    }
+
+    function importQuestions() {
+      const text = $('jsonImport').value.trim();
+      if (!text) {
+        alert('请输入 JSON 数据');
+        return;
+      }
+
+      let imported;
+      try {
+        imported = JSON.parse(text);
+      } catch (e) {
+        alert('JSON 格式错误: ' + e.message);
+        return;
+      }
+
+      if (!Array.isArray(imported)) {
+        imported = [imported];
+      }
+
+      for (const q of imported) {
+        if (!q.question || !q.options || q.correctAnswer === undefined) {
+          alert('每道题需要包含 question, options, correctAnswer 字段');
+          return;
+        }
+      }
+
+      send({ type: 'add_questions', questions: imported });
+      $('jsonImport').value = '';
+    }
+
+    function renderQuestionList() {
+      const container = $('questionList');
+      if (questions.length === 0) {
+        container.innerHTML = '<p style="color: #888; text-align: center;">暂无题目</p>';
+        return;
+      }
+
+      container.innerHTML = `
+        <h3>已添加 ${questions.length} 道题目</h3>
+        ${questions.map((q, i) => `
+          <div style="background: #f7f7ff; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+            <div style="font-weight: 600;">${i + 1}. ${escapeHtml(q.question)}</div>
+            <div style="color: #888; font-size: 0.9em; margin-top: 5px;">
+              ${q.options.map((o, j) => `<span style="${j === q.correctAnswer ? 'color: #48bb78; font-weight: bold;' : ''}">${String.fromCharCode(65 + j)}. ${escapeHtml(o)}</span>`).join(' | ')}
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function startGame() {
+      if (questions.length === 0) {
+        alert('请先添加至少一道题目');
+        return;
+      }
+      send({ type: 'start_game' });
+      showTeacherControl();
+    }
+
+    function nextQuestion() {
+      send({ type: 'next_question' });
+    }
+
+    function stopAnswer() {
+      send({ type: 'stop_answer' });
+    }
+
+    function showRanking() {
+      send({ type: 'show_ranking' });
+    }
+
+    function resetGame() {
+      if (confirm('确定要重置游戏吗？所有得分将清零。')) {
+        send({ type: 'reset_game' });
+      }
+    }
+
+    // ===== 学生功能 =====
+    function joinRoom() {
+      const code = $('roomCode').value.trim().toUpperCase();
+      const name = $('playerName').value.trim() || '匿名玩家';
+
+      if (!code || code.length < 4) {
+        alert('请输入正确的房间码');
+        return;
+      }
+
+      roomCode = code;
+      myRole = 'student';
+      connect(code);
+      send({ type: 'join', name });
+    }
+
+    function submitAnswer(index) {
+      if (hasAnswered) return;
+      hasAnswered = true;
+      send({ type: 'answer', answer: index });
+      qsa('.option-btn').forEach(btn => btn.disabled = true);
+    }
+
+    function updateWaitingStatus(text) {
+      const status = $('waitingStatus');
+      if (status) status.textContent = text;
+    }
+
+    function showStudentRanking(rankings) {
+      hide('studentQuiz');
+      show('studentRanking');
+      $('studentRanking').innerHTML = `
+        <h3 style="text-align: center; margin-bottom: 20px;">当前排名</h3>
+        ${rankings.slice(0, 5).map((p, i) => `
+          <div class="ranking-item">
+            <span class="rank rank-${i + 1}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
+            <span class="ranking-name">${escapeHtml(p.name)}${p.id === myPlayerId ? ' (你)' : ''}</span>
+            <span class="ranking-score">${p.score} 分</span>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function showFinalRanking(rankings) {
+      hideAllScreens();
+      show('finalRanking');
+      const myRank = rankings.findIndex(p => p.id === myPlayerId);
+      $('finalRankingList').innerHTML = rankings.map((p, i) => `
+        <div class="ranking-item" style="${p.id === myPlayerId ? 'background: #667eea; color: white;' : ''}">
+          <span class="rank rank-${i + 1}" style="${p.id === myPlayerId ? 'color: #ffd700;' : ''}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
+          <span class="ranking-name">${escapeHtml(p.name)}${p.id === myPlayerId ? ' (你)' : ''}</span>
+          <span class="ranking-score">${p.score} 分</span>
+        </div>
+      `).join('');
+
+      if (myRank >= 0 && myRank < 3) {
+        $('finalRankingList').innerHTML += `
+          <div style="text-align: center; margin-top: 20px; font-size: 1.5em;">
+            ${myRank === 0 ? '🎉 恭喜你获得第一名！' : myRank === 1 ? '🥈 你获得了第二名！' : '🥉 你获得了第三名！'}
+          </div>
+        `;
+      }
+    }
+
+    function playAgain() {
+      if (isHost) {
+        send({ type: 'reset_game' });
+        showTeacherRoom();
+      } else {
+        show('studentWaiting');
+        hide('finalRanking');
+        updateWaitingStatus('等待老师开始新游戏...');
+      }
+    }
+
+    // ===== 玩家列表 =====
+    function updatePlayerList(players) {
+      $('playerCount').textContent = players.length;
+      $('teacherPlayerList').innerHTML = players.map(p => `
+        <div class="player-item">
+          <div class="player-avatar">${p.name.charAt(0).toUpperCase()}</div>
+          <span class="player-name">${escapeHtml(p.name)}</span>
+          <span class="player-score">${p.score}</span>
+          ${isHost ? `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="kickPlayer('${p.id}')">踢</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function kickPlayer(playerId) {
+      if (confirm('确定要移除该玩家吗？')) {
+        send({ type: 'kick_player', playerId });
+      }
+    }
+
+    // ===== 计时器 =====
+    function startStudentTimer(seconds) {
+      stopTimers();
+      timeLeft = seconds;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        $('studentTimer').textContent = timeLeft;
+        if (timeLeft <= 5) {
+          $('studentTimer').className = 'timer danger';
+        } else if (timeLeft <= 10) {
+          $('studentTimer').className = 'timer warning';
+        }
+        if (timeLeft <= 0) {
+          stopTimers();
+          if (!hasAnswered) {
+            $('studentTimer').textContent = '时间到！';
+            qsa('.option-btn').forEach(btn => btn.disabled = true);
+          }
+        }
+      }, 1000);
+    }
+
+    function startTeacherTimer(seconds) {
+      stopTimers();
+      timeLeft = seconds;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        $('timerDisplay').textContent = timeLeft;
+        if (timeLeft <= 5) {
+          $('timerDisplay').className = 'timer danger';
+        } else if (timeLeft <= 10) {
+          $('timerDisplay').className = 'timer warning';
+        }
+        if (timeLeft <= 0) {
+          stopTimers();
+          $('timerDisplay').textContent = '时间到！';
+          $('stopAnswerBtn').disabled = false;
+        }
+      }, 1000);
+    }
+
+    function stopTimers() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    // ===== 初始化 =====
+    function init() {
+      const params = new URLSearchParams(window.location.search);
+      const roomParam = params.get('room');
+      if (roomParam) {
+        showStudentMode();
+        $('roomCode').value = roomParam.toUpperCase();
+      } else {
+        showModeSelection();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
