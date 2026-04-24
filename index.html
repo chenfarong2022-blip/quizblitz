@@ -950,7 +950,14 @@
     }
 
     function showQrModal() {
-      const joinUrl = `${window.location.origin}?room=${roomCode}`;
+      // 修复 GitHub Pages 路径问题
+      let baseUrl = window.location.origin;
+      // 如果在 GitHub Pages 下，确保路径正确
+      if (window.location.pathname.includes('/quizblitz/')) {
+        baseUrl = window.location.origin + '/quizblitz';
+      }
+      const joinUrl = `${baseUrl}?room=${roomCode}`;
+      console.log('QR URL:', joinUrl);
       $('qrUrl').textContent = joinUrl;
       generateQR(joinUrl);
       hideAllScreens();
