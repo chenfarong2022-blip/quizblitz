@@ -1195,9 +1195,28 @@
         // 检查当前题目
         if (data.currentQuestion !== undefined && data.currentQuestion >= 0) {
           const qIndex = data.currentQuestion;
-          if (qIndex !== currentQuestionIndex && data.questions && data.questions[qIndex]) {
+          console.log('Current question:', qIndex, 'currentQuestionIndex:', currentQuestionIndex);
+
+          // 获取题目 - questions 可能是一个对象，需要转换
+          let questionData = null;
+          if (data.questions) {
+            // 如果是对象，转换为数组
+            if (typeof data.questions === 'object' && !Array.isArray(data.questions)) {
+              const questionKeys = Object.keys(data.questions);
+              console.log('Question keys:', questionKeys);
+              if (questionKeys.length > qIndex) {
+                const key = questionKeys[qIndex];
+                questionData = data.questions[key];
+                console.log('Question data:', questionData);
+              }
+            } else if (Array.isArray(data.questions)) {
+              questionData = data.questions[qIndex];
+            }
+          }
+
+          if (questionData && qIndex !== currentQuestionIndex) {
             currentQuestionIndex = qIndex;
-            const q = data.questions[qIndex];
+            const q = questionData;
 
             if (myRole === 'student') {
               show('studentQuiz');
