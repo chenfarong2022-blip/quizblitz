@@ -255,7 +255,6 @@
     .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
     .option-btn.correct { background: rgba(16,185,129,0.3) !important; border-color: var(--success) !important; }
     .option-btn.wrong { background: rgba(239,68,68,0.3) !important; border-color: var(--danger) !important; }
-    .option-btn.selected { background: rgba(99,102,241,0.5) !important; border-color: var(--primary) !important; }
     .option-letter {
       width: 40px; height: 40px;
       background: rgba(255,255,255,0.2);
@@ -594,15 +593,8 @@
     </div>
   </div>
 
-  <!-- Pusher SDK -->
-  <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
   <script>
-    // ===== Pusher 配置 =====
-    const PUSHER_KEY = '2ce32a7bfb95d96cfefa';
-    const PUSHER_CLUSTER = 'ap1';
-
-    let pusher = null;
-    let channel = null;
+    // ===== 状态 =====
     let myRole = null;
     let myPlayerId = null;
     let roomCode = null;
@@ -616,170 +608,133 @@
     let myScore = 0;
     let questionStartTime = 0;
     let players = [];
+    let broadcastChannel = null;
 
-    // ===== Pusher 初始化 =====
-    function initPusher() {
-      pusher = new Pusher(PUSHER_KEY, {
-        cluster: PUSHER_CLUSTER,
-        forceTLS: true
-      });
-      console.log('Pusher initialized');
+    // ===== BroadcastChannel 实时同步 =====
+    function initBroadcast() {
+      broadcastChannel = new BroadcastChannel('quizblitz_room');
+      console.log('BroadcastChannel initialized');
+
+      broadcastChannel.onmessage = (event) => {
+        console.log('Received broadcast:', event.data);
+        const data = event.data;
+        handleRemoteEvent(data);
+      };
     }
 
-    function subscribeToRoom(room) {
-      if (channel) {
-        channel.unbind_all();
-        channel.unsubscribe();
-      }
-      channel = pusher.subscribe('quiz-' + room);
-      console.log('Subscribed to channel:', 'quiz-' + room);
-
-      channel.bind('pusher:subscription_succeeded', () => {
-        console.log('Subscription succeeded');
-      });
-
-      channel.bind('pusher:member_added', (member) => {
-        console.log('Member added:', member.id);
-      });
-
-      // 监听游戏更新
-      channel.bind('game-update', (data) => {
-        console.log('game-update received:', data);
-        handleGameUpdate(data);
-      });
-
-      // 监听题目
-      channel.bind('question', (data) => {
-        console.log('question received:', data);
-        handleQuestion(data);
-      });
-
-      // 监听停止答题
-      channel.bind('stop-question', (data) => {
-        console.log('stop-question received:', data);
-        handleStopQuestion(data);
-      });
-
-      // 监听答题结果
-      channel.bind('answer-result', (data) => {
-        console.log('answer-result received:', data);
-        handleAnswerResult(data);
-      });
-    }
-
-    function sendEvent(eventName, data) {
-      if (channel) {
-        channel.trigger('client-' + eventName, data);
-        console.log('Sent event:', eventName, data);
-      } else {
-        console.error('Channel not available');
+    function sendBroadcast(data) {
+      if (broadcastChannel) {
+        broadcastChannel.postMessage(data);
+        console.log('Sent broadcast:', data);
       }
     }
 
-    // ===== 游戏事件处理 =====
-    function handleGameUpdate(data) {
-      console.log('handleGameUpdate:', data);
+    function handleRemoteEvent(data) {
+      console.log('handleRemoteEvent:', data);
 
-      if (data.gameStatus === 'playing' && gameStatus !== 'playing') {
-        gameStatus = 'playing';
-        if (!isHost) {
-          updateWaitingStatus('游戏开始！等待发题...');
-        }
-      }
+      switch(data.type) {
+        case 'question-added':
+          questions = data.questions || [];
+          break;
 
-      if (data.gameStatus === 'waiting') {
-        gameStatus = 'waiting';
-        currentQuestionIndex = -1;
-        myScore = 0;
-        if (!isHost) {
-          show('studentWaiting');
-          hide('studentQuiz');
-          updateWaitingStatus('游戏已重置，等待再次开始');
-        } else {
-          showTeacherRoom();
-        }
-      }
+        case 'player-join':
+          if (!players.find(p => p.id === data.player.id)) {
+            players.push(data.player);
+            updatePlayerList(players);
+          }
+          break;
 
-      if (data.gameStatus === 'finished') {
-        gameStatus = 'finished';
-        showConfetti();
-        if (!isHost) {
-          showFinalRanking(players);
-        }
-      }
+        case 'game-start':
+          gameStatus = 'playing';
+          if (!isHost) {
+            updateWaitingStatus('游戏开始！等待发题...');
+          }
+          break;
 
-      if (data.players) {
-        players = data.players;
-        updatePlayerList(players);
+        case 'question':
+          const q = questions[data.questionIndex];
+          if (q && !isHost) {
+            currentQuestionIndex = data.questionIndex;
+            showQuestionToStudent(data.questionIndex, q, data.timeLimit);
+          }
+          break;
+
+        case 'stop-question':
+          if (!isHost && !hasAnswered) {
+            stopTimers();
+            qsa('.option-btn').forEach(btn => btn.disabled = true);
+            if (data.correctAnswer !== undefined) {
+              const correctOpt = $(`opt-${data.correctAnswer}`);
+              if (correctOpt) correctOpt.classList.add('correct');
+            }
+          }
+          break;
+
+        case 'answer-result':
+          // 更新所有玩家的分数显示
+          const player = players.find(p => p.id === data.playerId);
+          if (player) {
+            player.score = data.totalScore;
+            updatePlayerList(players);
+          }
+          // 显示自己的结果
+          if (data.playerId === myPlayerId) {
+            hasAnswered = true;
+            stopTimers();
+            const resultEl = $('resultStatus');
+            if (data.isCorrect) {
+              resultEl.textContent = `✓ 回答正确！+${data.points} 分`;
+              resultEl.style.color = '#10b981';
+            } else {
+              resultEl.textContent = '✗ 回答错误';
+              resultEl.style.color = '#ef4444';
+            }
+            myScore = data.totalScore;
+            $('myScore').textContent = myScore;
+            show('studentResult');
+            qsa('.option-btn').forEach(btn => btn.disabled = true);
+          }
+          break;
+
+        case 'game-reset':
+          gameStatus = 'waiting';
+          currentQuestionIndex = -1;
+          myScore = 0;
+          players.forEach(p => p.score = 0);
+          if (!isHost) {
+            show('studentWaiting');
+            hide('studentQuiz');
+            updateWaitingStatus('游戏已重置，等待再次开始');
+          }
+          break;
+
+        case 'game-finished':
+          gameStatus = 'finished';
+          showConfetti();
+          if (!isHost) {
+            showFinalRanking();
+          }
+          break;
       }
     }
 
-    function handleQuestion(data) {
-      console.log('handleQuestion:', data);
-      const qIndex = data.questionIndex;
-      const q = questions[qIndex];
-      if (!q) return;
-
-      currentQuestionIndex = qIndex;
-      questionStartTime = Date.now();
+    function showQuestionToStudent(qIndex, q, timeLimit) {
+      show('studentQuiz');
+      hide('studentWaiting');
+      hide('studentResult');
+      hide('studentRanking');
+      $('studentQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
+      $('studentTimer').textContent = timeLimit;
+      $('studentTimer').className = 'timer-display timer-normal';
       hasAnswered = false;
-
-      if (!isHost) {
-        // 学生端：只显示选项
-        show('studentQuiz');
-        hide('studentWaiting');
-        hide('studentResult');
-        hide('studentRanking');
-        $('studentQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
-        $('studentTimer').textContent = data.timeLimit;
-        $('studentTimer').className = 'timer-display timer-normal';
-        $('studentOptions').innerHTML = q.options.map((opt, i) => `
-          <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
-            <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-            <span>${escapeHtml(opt)}</span>
-          </button>
-        `).join('');
-        startStudentTimer(data.timeLimit);
-      }
-    }
-
-    function handleStopQuestion(data) {
-      console.log('handleStopQuestion:', data);
-      if (!isHost && !hasAnswered) {
-        stopTimers();
-        qsa('.option-btn').forEach(btn => btn.disabled = true);
-        if (data.correctAnswer !== undefined) {
-          const correctOpt = $(`opt-${data.correctAnswer}`);
-          if (correctOpt) correctOpt.classList.add('correct');
-        }
-      }
-    }
-
-    function handleAnswerResult(data) {
-      console.log('handleAnswerResult:', data);
-      if (data.playerId === myPlayerId) {
-        hasAnswered = true;
-        stopTimers();
-        const resultEl = $('resultStatus');
-        if (data.isCorrect) {
-          resultEl.textContent = `✓ 回答正确！+${data.points} 分`;
-          resultEl.style.color = '#10b981';
-        } else {
-          resultEl.textContent = '✗ 回答错误';
-          resultEl.style.color = '#ef4444';
-        }
-        myScore = data.totalScore;
-        $('myScore').textContent = myScore;
-        show('studentResult');
-        qsa('.option-btn').forEach(btn => btn.disabled = true);
-      }
-
-      // 更新玩家分数
-      const player = players.find(p => p.id === data.playerId);
-      if (player) {
-        player.score = data.totalScore;
-        updatePlayerList(players);
-      }
+      $('studentOptions').innerHTML = q.options.map((opt, i) => `
+        <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
+          <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+          <span>${escapeHtml(opt)}</span>
+        </button>
+      `).join('');
+      questionStartTime = Date.now();
+      startStudentTimer(timeLimit);
     }
 
     // ===== 工具函数 =====
@@ -932,8 +887,8 @@
         btn.disabled = true;
       }
 
-      initPusher();
-      subscribeToRoom(roomCode);
+      initBroadcast();
+      sendBroadcast({ type: 'room-created', roomCode: roomCode, hostId: myPlayerId });
 
       setTimeout(() => {
         $('teacherRoomCode').textContent = roomCode;
@@ -941,7 +896,7 @@
         show('teacherRoomInfo');
         showQrModal();
         updatePlayerList(players);
-      }, 500);
+      }, 300);
     }
 
     function joinRoom() {
@@ -959,18 +914,14 @@
       hide('studentJoin');
       updateWaitingStatus('正在连接房间...');
 
-      initPusher();
-      subscribeToRoom(roomCode);
+      initBroadcast();
 
-      // 等待订阅成功后加入
       setTimeout(() => {
-        sendEvent('player-join', {
-          playerId: myPlayerId,
-          name: name,
-          score: 0
-        });
-        updateWaitingStatus('已加入房间，等待游戏开始...');
-      }, 1000);
+        const newPlayer = { id: myPlayerId, name: name, score: 0 };
+        players.push(newPlayer);
+        sendBroadcast({ type: 'player-join', player: newPlayer });
+        updateWaitingStatus('已加入房间，等待老师开始游戏...');
+      }, 500);
     }
 
     // ===== 教师功能 =====
@@ -1001,6 +952,10 @@
       };
 
       questions.push(newQuestion);
+
+      // 广播新题目给学生（让他们也能看到题目）
+      sendBroadcast({ type: 'question-added', questions: questions });
+
       renderQuestionList();
 
       $('questionText').value = '';
@@ -1025,6 +980,9 @@
           timeLimit: q.timeLimit || 15
         });
       });
+
+      // 广播题目列表更新
+      sendBroadcast({ type: 'question-added', questions: questions });
 
       $('jsonImport').value = '';
       renderQuestionList();
@@ -1053,16 +1011,19 @@
     function startGame() {
       if (questions.length === 0) { showToast('请先添加至少一道题目'); return; }
       gameStatus = 'playing';
+
+      // 重置所有玩家分数
+      players.forEach(p => p.score = 0);
+
+      sendBroadcast({ type: 'game-start', players: players });
+
       showTeacherControl();
       $('gameStatus').textContent = '游戏进行中';
       $('gameStatus').className = 'status-badge status-success';
       $('nextQuestionBtn').textContent = '第 1 题';
       $('nextQuestionBtn').disabled = false;
 
-      players.forEach(p => p.score = 0);
       updatePlayerList(players);
-
-      sendEvent('game-update', { gameStatus: 'playing', players: players });
     }
 
     function nextQuestion() {
@@ -1070,7 +1031,7 @@
       console.log('nextQuestion called, nextIndex:', nextIndex, 'questions length:', questions.length);
 
       if (nextIndex >= questions.length) {
-        sendEvent('game-update', { gameStatus: 'finished' });
+        sendBroadcast({ type: 'game-finished' });
         return;
       }
 
@@ -1080,8 +1041,12 @@
       // 老师端显示题目
       showQuestionToTeacher(nextIndex, question);
 
-      // 发送题目给学生
-      sendEvent('question', {
+      // 更新数据
+      currentQuestionIndex = nextIndex;
+
+      // 广播题目给学生
+      sendBroadcast({
+        type: 'question',
         questionIndex: nextIndex,
         timeLimit: question.timeLimit
       });
@@ -1112,7 +1077,7 @@
       const q = questions[currentQuestionIndex];
       if (!q) return;
 
-      sendEvent('stop-question', { correctAnswer: q.correctAnswer });
+      sendBroadcast({ type: 'stop-question', correctAnswer: q.correctAnswer });
 
       $('stopAnswerBtn').disabled = true;
       $('showRankingBtn').disabled = false;
@@ -1130,7 +1095,7 @@
       myScore = 0;
       players.forEach(p => p.score = 0);
 
-      sendEvent('game-update', { gameStatus: 'waiting', players: players });
+      sendBroadcast({ type: 'game-reset', players: players });
 
       showTeacherRoom();
       hide('teacherRankings');
@@ -1151,8 +1116,9 @@
 
       myScore += points;
 
-      // 发送答案到老师
-      sendEvent('answer-result', {
+      // 广播答案给老师
+      sendBroadcast({
+        type: 'answer-result',
         playerId: myPlayerId,
         answer: index,
         isCorrect,
@@ -1234,13 +1200,6 @@
       `).join('');
     }
 
-    // 监听玩家加入事件
-    function initPlayerJoinListener() {
-      setInterval(() => {
-        // 定期检查玩家列表
-      }, 2000);
-    }
-
     // ===== 计时器 =====
     function startStudentTimer(seconds) {
       stopTimers();
@@ -1286,7 +1245,6 @@
 
     // ===== 初始化 =====
     function init() {
-      initPusher();
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get('room');
       if (roomParam) {
