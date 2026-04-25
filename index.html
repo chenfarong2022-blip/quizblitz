@@ -445,13 +445,16 @@
     <div id="teacherJoin" class="card hidden">
       <h2>👨‍🏫 老师控制台</h2>
       <div id="teacherRoomInfo" class="hidden">
-        <div class="section-title">房间码</div>
-        <div class="room-code-display" id="teacherRoomCode"></div>
-        <p style="text-align: center; color: rgba(255,255,255,0.6); margin-bottom: 20px;">分享给学生的加入链接</p>
         <div style="text-align: center; margin-bottom: 30px;">
-          <button class="btn btn-secondary" onclick="showQrModal()">📱 显示二维码</button>
+          <div class="section-title">房间码</div>
+          <div class="room-code-display" id="teacherRoomCode" style="font-size: 3rem; margin: 15px 0;"></div>
+          <div class="qr-container" style="background: white; border-radius: 16px; padding: 20px; display: inline-block;">
+            <canvas id="qrcode" width="180" height="180"></canvas>
+          </div>
+          <div class="qr-url" id="qrUrl" style="margin-top: 12px;"></div>
+          <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 10px;">学生扫码直接加入房间</p>
         </div>
-        <div class="game-controls">
+        <div class="game-controls" style="justify-content: center;">
           <button class="btn btn-primary" onclick="showTeacherEditor()">📝 编辑题目</button>
           <button class="btn btn-success" onclick="startGame()">🎮 开始游戏</button>
           <button class="btn btn-danger" onclick="resetGame()">🔄 重置</button>
@@ -582,15 +585,16 @@
     </div>
 
     <!-- QR弹窗 -->
-    <div id="qrModal" class="card hidden" style="text-align: center;">
+    <div id="qrModal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; min-width: 320px;">
       <h2>📱 扫码加入</h2>
       <div class="qr-container">
-        <canvas id="qrcode"></canvas>
-        <div class="qr-url" id="qrUrl"></div>
+        <canvas id="qrcodeLarge" width="200" height="200"></canvas>
+        <div class="qr-url" id="qrUrlLarge"></div>
       </div>
       <p style="color: rgba(255,255,255,0.6); margin-top: 20px;">学生扫码即可直接加入房间</p>
       <button class="btn btn-secondary" onclick="closeQrModal()" style="margin-top: 20px;">关闭</button>
     </div>
+    <div id="qrOverlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;" onclick="closeQrModal()"></div>
   </div>
 
   <script>
@@ -886,10 +890,10 @@
       setTimeout(() => container.remove(), 4000);
     }
 
-    function generateQR(text) {
-      const canvas = $('qrcode');
-      const size = 200;
-      canvas.width = size;
+    function generateQR(text, canvasId = 'qrcode') {
+      const canvas = $(canvasId);
+      if (!canvas) return;
+      const size = canvas.width || 200;
       canvas.height = size;
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -906,9 +910,9 @@
         baseUrl = window.location.origin + '/quizblitz';
       }
       const joinUrl = `${baseUrl}?room=${roomCode}`;
-      $('qrUrl').textContent = joinUrl;
-      generateQR(joinUrl);
-      hideAllScreens();
+      $('qrUrlLarge').textContent = joinUrl;
+      generateQR(joinUrl, 'qrcodeLarge');
+      show('qrOverlay');
       show('qrModal');
     }
 
@@ -922,7 +926,7 @@
 
     function hideAllScreens() {
       ['modeSelection', 'teacherJoin', 'teacherEditor', 'teacherControl',
-       'studentMode', 'studentQuiz', 'finalRanking', 'qrModal'].forEach(id => hide(id));
+       'studentMode', 'studentQuiz', 'finalRanking', 'qrModal', 'qrOverlay'].forEach(id => hide(id));
     }
 
     function showModeSelection() { hideAllScreens(); show('modeSelection'); }
@@ -1004,7 +1008,14 @@
         $('teacherRoomCode').textContent = roomCode;
         hide('teacherCreate');
         show('teacherRoomInfo');
-        showQrModal();
+        // 直接在页面显示二维码
+        let baseUrl = window.location.origin;
+        if (window.location.pathname.includes('/quizblitz/')) {
+          baseUrl = window.location.origin + '/quizblitz';
+        }
+        const joinUrl = `${baseUrl}?room=${roomCode}`;
+        $('qrUrl').textContent = joinUrl;
+        generateQR(joinUrl, 'qrcode');
         updatePlayerList(players);
         startPolling();
 
