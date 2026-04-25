@@ -1275,10 +1275,11 @@
         showTeacherControl();
         $('gameStatus').textContent = '游戏进行中';
         $('gameStatus').className = 'status-badge status-success';
-        $('nextQuestionBtn').textContent = '第 1 题';
-        $('nextQuestionBtn').disabled = false;
 
         updatePlayerList(players);
+
+        // 自动展示第一题
+        nextQuestion();
       } catch (e) {
         console.error('Start game error:', e);
         showToast('启动失败: ' + e.message);
@@ -1292,6 +1293,9 @@
       if (nextIndex >= questions.length) {
         try {
           await fbPatch(`rooms/${roomCode}`, { gameStatus: 'finished' });
+          $('nextQuestionBtn').textContent = '游戏结束';
+          $('nextQuestionBtn').disabled = true;
+          $('stopAnswerBtn').disabled = true;
         } catch (e) {
           console.error('End game error:', e);
         }
@@ -1312,8 +1316,12 @@
           stopQuestion: false
         });
 
-        $('nextQuestionBtn').disabled = true;
-        $('nextQuestionBtn').textContent = `第 ${nextIndex + 2} 题`;
+        // 更新按钮文字
+        if (nextIndex + 2 < questions.length) {
+          $('nextQuestionBtn').textContent = `第 ${nextIndex + 2} 题`;
+        } else if (nextIndex + 2 === questions.length) {
+          $('nextQuestionBtn').textContent = '最后一题';
+        }
         $('stopAnswerBtn').disabled = false;
         $('showRankingBtn').disabled = true;
         hide('teacherRankings');
