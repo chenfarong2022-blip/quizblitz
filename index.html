@@ -812,17 +812,26 @@
           console.log('currentQuestion changed from', currentQuestionIndex, 'to', qIndex);
           currentQuestionIndex = qIndex;
 
-          // 立即从Firebase获取题目
-          fbGetFull(`rooms/${roomCode}/questions`).then(questionsData => {
-            if (questionsData) {
-              questions = Object.values(questionsData);
-              console.log('Questions fetched:', questions.length, 'looking for index:', qIndex);
-              const q = questions[qIndex];
-              if (q && !isHost) {
-                showQuestionToStudent(qIndex, q);
-              }
+          // 使用poll已经返回的data.questions，不再额外请求
+          if (data.questions) {
+            questions = Object.values(data.questions);
+            console.log('Questions from poll:', questions.length, 'looking for index:', qIndex);
+            const q = questions[qIndex];
+            if (q && !isHost) {
+              showQuestionToStudent(qIndex, q);
             }
-          }).catch(e => console.error('Fetch questions error:', e));
+          } else {
+            // 如果poll没有返回questions，再用单独请求
+            fbGetFull(`rooms/${roomCode}/questions`).then(questionsData => {
+              if (questionsData) {
+                questions = Object.values(questionsData);
+                const q = questions[qIndex];
+                if (q && !isHost) {
+                  showQuestionToStudent(qIndex, q);
+                }
+              }
+            });
+          }
         }
       }
 
