@@ -921,7 +921,8 @@
       show('studentResult');
     }
 
-    function submitAnswer(index) {
+    // ===== 工具函数 =====
+    const $ = id => document.getElementById(id);
     const show = id => $(id).classList.remove('hidden');
     const hide = id => $(id).classList.add('hidden');
     const qsa = sel => document.querySelectorAll(sel);
