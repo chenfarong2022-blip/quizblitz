@@ -659,12 +659,12 @@
 
     function subscribeToRoom(room) {
       if (goEasyChannel) {
-        goEasyChannel.unbind();
+        goEasyChannel.unsubscribe();
       }
 
       initGoEasy();
       const channelName = 'quizblitz-' + room;
-      goEasyChannel = goEasy.subscribe({
+      goEasyChannel = goEasy.pubsub.subscribe({
         channel: channelName,
         onMessage: function(message) {
           console.log('GoEasy message received:', message.content);
@@ -700,7 +700,8 @@
       };
 
       console.log('Publishing:', eventName, eventData);
-      goEasyChannel.publish({
+      goEasy.pubsub.publish({
+        channel: channelName,
         content: JSON.stringify(eventData),
         onSuccess: function() {
           console.log('Published:', eventName);
