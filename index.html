@@ -1453,12 +1453,15 @@
         'currentQuestion/stopped': false,
         'currentQuestion/correctAnswer': questions[nextIndex].correctAnswer
       }).then(() => {
-        console.log('Question sent to Firebase');
+        console.log('Question sent to Firebase - update completed');
         $('nextQuestionBtn').disabled = true;
         $('stopAnswerBtn').disabled = false;
         $('showRankingBtn').disabled = true;
         hide('teacherRankings');
-      }).catch(err => showToast('发题失败: ' + err.message));
+      }).catch(err => {
+        console.error('Update failed:', err);
+        showToast('发题失败: ' + err.message);
+      });
     }
 
     function stopAnswer() {
