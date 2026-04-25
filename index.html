@@ -876,6 +876,7 @@
     let timeLeft = 0;
     let hasAnswered = false;
     let myScore = 0;
+    let questionStartTime = 0;
     let roomRef = null;
     let playerRef = null;
     let presenceRef = null;
@@ -1141,44 +1142,33 @@
 
     function setupRoomListener() {
       console.log('Setting up room listener for:', roomCode);
-      console.log('Room ref path:', roomRef.toString());
+      console.log('Room ref path:', roomRef ? roomRef.toString() : 'NULL');
 
-      // 确保 roomRef 存在
       if (!roomRef) {
         console.error('roomRef is null!');
+        updateWaitingStatus('连接错误：房间引用无效');
         return;
       }
 
-      // 先获取一次当前数据，确保连接正常
-      roomRef.once('value').then(snapshot => {
-        console.log('Initial data retrieved:', snapshot.val());
-        console.log('Exists:', snapshot.exists());
-      }).catch(err => {
-        console.error('Error getting initial data:', err);
-      });
-
-      // 监听房间数据变化
+      // 1. 监听房间数据变化（主监听器）
       roomRef.on('value', snapshot => {
-        console.log('Room data changed, type:', typeof snapshot.val(), 'value:', JSON.stringify(snapshot.val()));
+        console.log('Room data changed!');
         const data = snapshot.val();
         if (!data) {
           console.log('No data in snapshot');
           return;
         }
-        console.log('gameStatus:', data.gameStatus);
-        console.log('currentQuestion:', data.currentQuestion);
-        console.log('questions:', data.questions ? Object.keys(data.questions) : 'none');
+        console.log('gameStatus:', data.gameStatus, 'currentQuestion:', data.currentQuestion);
 
         // 更新题目列表
         if (data.questions) {
           questions = Object.values(data.questions);
-          console.log('Updated questions count:', questions.length);
         }
 
         // 检查游戏状态变化
         if (data.gameStatus === 'playing' && gameStatus !== 'playing') {
           gameStatus = 'playing';
-          console.log('Game status changed to playing!');
+          console.log('Game started!');
           if (isHost) {
             showTeacherControl();
             $('gameStatus').textContent = '游戏进行中';
@@ -1186,7 +1176,6 @@
             $('nextQuestionBtn').disabled = false;
             hide('teacherRankings');
           } else {
-            // 学生端：游戏开始了
             console.log('Student: game has started!');
             updateWaitingStatus('游戏开始！等待发题...');
           }
@@ -1195,22 +1184,15 @@
         // 检查当前题目
         if (data.currentQuestion !== undefined && data.currentQuestion >= 0) {
           const qIndex = data.currentQuestion;
-          console.log('Current question:', qIndex, 'currentQuestionIndex:', currentQuestionIndex);
+          console.log('Question index:', qIndex, 'stored:', currentQuestionIndex);
 
-          // 获取题目 - questions 可能是一个对象，需要转换
+          // 获取题目
           let questionData = null;
           if (data.questions) {
-            // 如果是对象，转换为数组
-            if (typeof data.questions === 'object' && !Array.isArray(data.questions)) {
-              const questionKeys = Object.keys(data.questions);
-              console.log('Question keys:', questionKeys);
-              if (questionKeys.length > qIndex) {
-                const key = questionKeys[qIndex];
-                questionData = data.questions[key];
-                console.log('Question data:', questionData);
-              }
-            } else if (Array.isArray(data.questions)) {
-              questionData = data.questions[qIndex];
+            const questionKeys = Object.keys(data.questions);
+            if (questionKeys.length > qIndex) {
+              const key = questionKeys[qIndex];
+              questionData = data.questions[key];
             }
           }
 
@@ -1258,14 +1240,14 @@
             $('gameStatus').textContent = '游戏结束';
             $('gameStatus').className = 'status-badge status-success';
             $('nextQuestionBtn').disabled = true;
-            showTeacherRankings(getRankings());
+            showTeacherRankings(getRankingsFromPlayers());
           } else if (myRole === 'student') {
-            showFinalRanking(getRankings());
+            showFinalRanking(getRankingsFromPlayers());
           }
         }
 
         // 检查重置
-        if (data.gameStatus === 'waiting' && gameStatus !== 'waiting') {
+        if (data.gameStatus === 'waiting' && gameStatus !== 'waiting' && gameStatus !== '') {
           gameStatus = 'waiting';
           currentQuestionIndex = -1;
           myScore = 0;
@@ -1280,7 +1262,7 @@
         }
       });
 
-      // 监听玩家列表
+      // 2. 监听玩家列表
       const playersRef = database.ref('rooms/' + roomCode + '/players');
       playersRef.on('value', snapshot => {
         const players = [];
@@ -1296,7 +1278,7 @@
         }
       });
 
-      // 监听答题结果
+      // 3. 监听答题结果（学生端）
       if (!isHost) {
         const answersRef = database.ref('rooms/' + roomCode + '/answers');
         answersRef.on('child_added', snapshot => {
@@ -1318,22 +1300,21 @@
             qsa('.option-btn').forEach(btn => btn.disabled = true);
           }
         });
-      }
 
-      // 监听停止答题
-      const stopRef = database.ref('rooms/' + roomCode + '/currentQuestion/stopped');
-      stopRef.on('value', snapshot => {
-        if (snapshot.val() === true && myRole === 'student' && !hasAnswered) {
-          stopTimers();
-          qsa('.option-btn').forEach(btn => btn.disabled = true);
-          // 显示正确答案
-          const data = snapshot.parent.val();
-          if (data && data.correctAnswer !== undefined) {
-            const correctOpt = $(`opt-${data.correctAnswer}`);
-            if (correctOpt) correctOpt.classList.add('correct');
+        // 4. 监听停止答题
+        const stopRef = database.ref('rooms/' + roomCode + '/currentQuestion/stopped');
+        stopRef.on('value', snapshot => {
+          if (snapshot.val() === true && myRole === 'student' && !hasAnswered) {
+            stopTimers();
+            qsa('.option-btn').forEach(btn => btn.disabled = true);
+            const data = snapshot.parent.val();
+            if (data && data.correctAnswer !== undefined) {
+              const correctOpt = $(`opt-${data.correctAnswer}`);
+              if (correctOpt) correctOpt.classList.add('correct');
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     function getRankings() {
@@ -1493,7 +1474,21 @@
     }
 
     function getRankingsFromPlayers() {
-      return []; // 从 Firebase 获取玩家排名
+      // 这个函数会在回调中被调用，实际排名数据通过参数传入
+      return [];
+    }
+
+    function fetchRankings(callback) {
+      database.ref('rooms/' + roomCode + '/players').orderByChild('score').once('value', snapshot => {
+        const players = [];
+        snapshot.forEach(child => {
+          const p = child.val();
+          p.id = child.key;
+          players.push(p);
+        });
+        players.reverse(); // 从高到低
+        if (callback) callback(players);
+      });
     }
 
     function resetGame() {
@@ -1515,7 +1510,7 @@
 
       const currentQ = questions[currentQuestionIndex];
       const isCorrect = index === currentQ.correctAnswer;
-      const timeTaken = (Date.now() - (roomRef.currentQuestion?.startTime || Date.now())) / 1000;
+      const timeTaken = (Date.now() - questionStartTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((currentQ.timeLimit - timeTaken) * 50));
       const points = isCorrect ? 1000 + timeBonus : 0;
 
@@ -1636,6 +1631,7 @@
     // ===== 计时器 =====
     function startStudentTimer(seconds) {
       stopTimers();
+      questionStartTime = Date.now();
       timeLeft = seconds;
       timerInterval = setInterval(() => {
         timeLeft--;
