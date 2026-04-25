@@ -21,9 +21,7 @@
       --glass: rgba(255,255,255,0.1);
       --glass-border: rgba(255,255,255,0.2);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: 'Noto Sans SC', sans-serif;
       background: var(--darker);
@@ -31,23 +29,18 @@
       color: var(--light);
       overflow-x: hidden;
     }
-
     .bg-animation {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       z-index: -1;
       overflow: hidden;
     }
     .bg-animation::before {
       content: '';
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
       background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.3) 0%, transparent 50%),
                   radial-gradient(circle at 70% 70%, rgba(236,72,153,0.2) 0%, transparent 50%);
       animation: bgPulse 15s ease-in-out infinite;
@@ -56,20 +49,16 @@
       0%, 100% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(-5%, -5%) scale(1.1); }
     }
-
     .particles {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       z-index: -1;
       pointer-events: none;
     }
     .particle {
       position: absolute;
-      width: 4px;
-      height: 4px;
+      width: 4px; height: 4px;
       background: var(--primary);
       border-radius: 50%;
       opacity: 0.5;
@@ -81,9 +70,7 @@
       90% { opacity: 0.5; }
       100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
     }
-
     .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
-
     h1 {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(2.5rem, 8vw, 4rem);
@@ -93,7 +80,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 60px rgba(99,102,241,0.5);
       animation: titleGlow 3s ease-in-out infinite;
       letter-spacing: 4px;
     }
@@ -101,7 +87,6 @@
       0%, 100% { filter: drop-shadow(0 0 20px rgba(99,102,241,0.5)); }
       50% { filter: drop-shadow(0 0 40px rgba(236,72,153,0.7)); }
     }
-
     .subtitle {
       text-align: center;
       color: rgba(255,255,255,0.6);
@@ -110,7 +95,6 @@
       letter-spacing: 8px;
       text-transform: uppercase;
     }
-
     .card {
       background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
       backdrop-filter: blur(20px);
@@ -125,7 +109,6 @@
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .card h2 {
       font-size: 1.5rem;
       margin-bottom: 24px;
@@ -133,7 +116,6 @@
       align-items: center;
       gap: 12px;
     }
-
     .mode-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -147,46 +129,16 @@
       text-align: center;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      position: relative;
-      overflow: hidden;
     }
-    .mode-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
-    .mode-card:hover::before { left: 100%; }
     .mode-card:hover {
       transform: translateY(-8px) scale(1.02);
       border-color: var(--primary);
       box-shadow: 0 20px 40px rgba(99,102,241,0.3);
     }
-    .mode-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      display: block;
-      animation: bounce 2s ease-in-out infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    .mode-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: white;
-    }
-    .mode-desc {
-      color: rgba(255,255,255,0.6);
-      font-size: 0.95rem;
-    }
-
+    .mode-icon { font-size: 4rem; margin-bottom: 20px; display: block; animation: bounce 2s ease-in-out infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .mode-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: white; }
+    .mode-desc { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
     .btn {
       padding: 16px 32px;
       border: none;
@@ -196,69 +148,21 @@
       font-weight: 600;
       font-family: inherit;
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .btn::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255,255,255,0.3);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-    .btn:active::after {
-      width: 300px;
-      height: 300px;
     }
     .btn-primary {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
       box-shadow: 0 4px 15px rgba(99,102,241,0.4);
     }
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(99,102,241,0.5);
-    }
-    .btn-success {
-      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(16,185,129,0.4);
-    }
-    .btn-success:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(16,185,129,0.5);
-    }
-    .btn-danger {
-      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
-      color: white;
-    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
+    .btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; }
+    .btn-success:hover { transform: translateY(-3px); }
+    .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%); color: white; }
     .btn-danger:hover { transform: translateY(-3px); }
-    .btn-secondary {
-      background: rgba(255,255,255,0.1);
-      color: white;
-      border: 1px solid var(--glass-border);
-    }
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.2);
-      transform: translateY(-3px);
-    }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
+    .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
     input, textarea, select {
       width: 100%;
       padding: 16px 20px;
@@ -275,10 +179,8 @@
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 20px rgba(99,102,241,0.3);
-      background: rgba(255,255,255,0.1);
     }
     select option { background: var(--dark); color: white; }
-
     .room-code-display {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(2rem, 10vw, 4rem);
@@ -288,7 +190,6 @@
       background: linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(236,72,153,0.2) 100%);
       border-radius: 20px;
       border: 2px solid var(--primary);
-      box-shadow: 0 0 30px rgba(99,102,241,0.3);
       animation: codePulse 2s ease-in-out infinite;
       letter-spacing: 12px;
       margin: 20px 0;
@@ -297,7 +198,6 @@
       0%, 100% { box-shadow: 0 0 30px rgba(99,102,241,0.3); }
       50% { box-shadow: 0 0 50px rgba(236,72,153,0.5); }
     }
-
     .question-box {
       background: linear-gradient(135deg, rgba(99,102,241,0.4) 0%, rgba(236,72,153,0.3) 100%);
       border: 2px solid var(--glass-border);
@@ -305,28 +205,14 @@
       padding: 40px;
       text-align: center;
       position: relative;
-      overflow: hidden;
     }
-    .question-number {
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 10px;
-      letter-spacing: 4px;
-    }
-    .question-text {
-      font-size: clamp(1.3rem, 4vw, 2rem);
-      font-weight: 700;
-      margin-bottom: 30px;
-      position: relative;
-      line-height: 1.5;
-    }
-
+    .question-number { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 10px; letter-spacing: 4px; }
+    .question-text { font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 30px; position: relative; line-height: 1.5; }
     .timer-display {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(3rem, 12vw, 6rem);
       font-weight: 900;
       margin: 20px 0;
-      position: relative;
       display: inline-block;
       animation: timerPop 0.5s ease-out;
     }
@@ -336,23 +222,15 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .timer-normal { color: white; text-shadow: 0 0 30px rgba(255,255,255,0.5); }
-    .timer-warning { color: var(--accent); text-shadow: 0 0 30px rgba(245,158,11,0.8); animation: timerShake 0.5s ease-in-out infinite; }
-    .timer-danger { color: var(--danger); text-shadow: 0 0 40px rgba(239,68,68,0.8); animation: timerShake 0.2s ease-in-out infinite; }
+    .timer-warning { color: var(--accent); animation: timerShake 0.5s ease-in-out infinite; }
+    .timer-danger { color: var(--danger); animation: timerShake 0.2s ease-in-out infinite; }
     @keyframes timerShake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-5px); }
       75% { transform: translateX(5px); }
     }
-
-    .options-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-top: 20px;
-    }
-    @media (max-width: 600px) {
-      .options-grid { grid-template-columns: 1fr; }
-    }
+    .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
+    @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
     .option-btn {
       padding: 24px 20px;
       background: rgba(255,255,255,0.1);
@@ -363,23 +241,10 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
       text-align: left;
       display: flex;
       align-items: center;
       gap: 12px;
-    }
-    .option-btn .option-letter {
-      width: 40px;
-      height: 40px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      flex-shrink: 0;
     }
     .option-btn:hover:not(:disabled) {
       background: rgba(255,255,255,0.2);
@@ -388,61 +253,19 @@
       box-shadow: 0 10px 30px rgba(99,102,241,0.3);
     }
     .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
-    .option-btn.correct {
-      background: rgba(16,185,129,0.3) !important;
-      border-color: var(--success) !important;
-      animation: correctPulse 0.5s ease-out;
-    }
-    .option-btn.wrong {
-      background: rgba(239,68,68,0.3) !important;
-      border-color: var(--danger) !important;
-      animation: wrongShake 0.5s ease-out;
-    }
-    @keyframes correctPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    @keyframes wrongShake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-10px); }
-      40%, 80% { transform: translateX(10px); }
-    }
-
-    .player-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-    }
-    .player-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all 0.3s ease;
-    }
-    .player-card:hover {
-      background: rgba(255,255,255,0.1);
-      transform: translateX(4px);
-    }
-    .player-avatar {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      border-radius: 12px;
+    .option-btn.correct { background: rgba(16,185,129,0.3) !important; border-color: var(--success) !important; }
+    .option-btn.wrong { background: rgba(239,68,68,0.3) !important; border-color: var(--danger) !important; }
+    .option-btn.selected { background: rgba(99,102,241,0.5) !important; border-color: var(--primary) !important; }
+    .option-letter {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 1.2rem;
+      flex-shrink: 0;
     }
-    .player-info { flex: 1; }
-    .player-name { font-weight: 600; margin-bottom: 2px; }
-    .player-score { color: var(--accent); font-weight: 700; }
-
     .ranking-list { margin-top: 20px; }
     .ranking-item {
       display: flex;
@@ -451,7 +274,6 @@
       background: rgba(255,255,255,0.05);
       border-radius: 16px;
       margin-bottom: 12px;
-      transition: all 0.3s ease;
       animation: rankingAppear 0.5s ease-out backwards;
     }
     .ranking-item:nth-child(1) { animation-delay: 0.1s; }
@@ -461,32 +283,17 @@
       from { opacity: 0; transform: translateX(-30px); }
       to { opacity: 1; transform: translateX(0); }
     }
-    .ranking-item:hover {
-      background: rgba(255,255,255,0.1);
-      transform: translateX(8px);
-    }
     .ranking-item.top-3 {
       background: linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(245,158,11,0.1) 100%);
       border: 1px solid rgba(245,158,11,0.3);
     }
-    .rank-badge {
-      font-size: 2rem;
-      margin-right: 16px;
-      width: 50px;
-      text-align: center;
-    }
+    .rank-badge { font-size: 2rem; margin-right: 16px; width: 50px; text-align: center; }
     .rank-1 .rank-badge { filter: drop-shadow(0 0 10px gold); }
     .rank-2 .rank-badge { filter: drop-shadow(0 0 10px silver); }
     .rank-3 .rank-badge { filter: drop-shadow(0 0 10px #cd7f32); }
     .ranking-name { flex: 1; font-weight: 600; font-size: 1.1rem; }
-    .ranking-score {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
+    .ranking-score { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent); }
     .ranking-you { color: var(--primary); font-size: 0.85rem; margin-left: 8px; }
-
     .status-badge {
       display: inline-block;
       padding: 10px 20px;
@@ -495,23 +302,12 @@
       text-align: center;
       animation: statusPulse 2s ease-in-out infinite;
     }
-    @keyframes statusPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
+    @keyframes statusPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     .status-info { background: rgba(99,102,241,0.3); color: var(--primary); }
     .status-success { background: rgba(16,185,129,0.3); color: var(--success); }
     .status-warning { background: rgba(245,158,11,0.3); color: var(--accent); }
     .status-danger { background: rgba(239,68,68,0.3); color: var(--danger); }
-
-    .qr-container {
-      text-align: center;
-      padding: 30px;
-      background: white;
-      border-radius: 20px;
-      display: inline-block;
-      margin: 20px 0;
-    }
+    .qr-container { text-align: center; padding: 30px; background: white; border-radius: 20px; display: inline-block; margin: 20px 0; }
     .qr-url {
       font-family: monospace;
       background: var(--darker);
@@ -522,15 +318,7 @@
       display: inline-block;
       font-size: 0.9rem;
     }
-
-    .winner-container {
-      text-align: center;
-      padding: 40px;
-    }
-    .winner-trophy {
-      font-size: 6rem;
-      animation: trophyBounce 1s ease-in-out infinite;
-    }
+    .winner-trophy { font-size: 6rem; animation: trophyBounce 1s ease-in-out infinite; }
     @keyframes trophyBounce {
       0%, 100% { transform: translateY(0) rotate(-5deg); }
       50% { transform: translateY(-20px) rotate(5deg); }
@@ -546,43 +334,24 @@
     }
     .confetti {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       pointer-events: none;
       z-index: 1000;
     }
     .confetti-piece {
       position: absolute;
-      width: 10px;
-      height: 10px;
+      width: 10px; height: 10px;
       animation: confettiFall 3s ease-out forwards;
     }
     @keyframes confettiFall {
       0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
       100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-    @media (max-width: 768px) {
-      .form-grid { grid-template-columns: 1fr; }
-    }
-    .form-section {
-      background: rgba(255,255,255,0.03);
-      border-radius: 16px;
-      padding: 24px;
-    }
-    .form-section h3 {
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-      color: var(--primary);
-    }
-
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-section { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 24px; }
+    .form-section h3 { font-size: 1.1rem; margin-bottom: 16px; color: var(--primary); }
     .question-list { margin-top: 24px; }
     .question-item {
       background: rgba(255,255,255,0.05);
@@ -590,57 +359,22 @@
       padding: 20px;
       margin-bottom: 12px;
       border-left: 4px solid var(--primary);
-      animation: slideIn 0.3s ease-out;
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
     }
     .question-item-header { font-weight: 600; margin-bottom: 8px; }
     .question-item-options { font-size: 0.9rem; color: rgba(255,255,255,0.6); }
     .correct-badge { color: var(--success); font-weight: 700; }
-
     .hidden { display: none !important; }
-
     .loading {
       display: inline-block;
-      width: 20px;
-      height: 20px;
+      width: 20px; height: 20px;
       border: 3px solid rgba(255,255,255,0.3);
       border-radius: 50%;
       border-top-color: white;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .section-title {
-      font-size: 1rem;
-      color: rgba(255,255,255,0.5);
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-bottom: 16px;
-    }
-
-    .game-controls {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin: 20px 0;
-    }
-
-    .waiting-dots::after {
-      content: '';
-      animation: dots 1.5s steps(4, end) infinite;
-    }
-    @keyframes dots {
-      0%, 20% { content: ''; }
-      40% { content: '.'; }
-      60% { content: '..'; }
-      80%, 100% { content: '...'; }
-    }
-
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .section-title { font-size: 1rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 16px; }
+    .game-controls { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
     .toast {
       position: fixed;
       bottom: 30px;
@@ -658,10 +392,30 @@
       from { opacity: 0; transform: translateX(-50%) translateY(20px); }
       to { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
-    @keyframes toastOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+    .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .player-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
+    .player-avatar {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .player-info { flex: 1; }
+    .player-name { font-weight: 600; margin-bottom: 2px; }
+    .player-score { color: var(--accent); font-weight: 700; }
   </style>
 </head>
 <body>
@@ -706,9 +460,7 @@
       </div>
       <div id="teacherCreate">
         <div style="text-align: center; padding: 40px 0;">
-          <button class="btn btn-primary" onclick="createRoom()" style="padding: 20px 50px; font-size: 1.2rem;">
-            ✨ 创建新房间
-          </button>
+          <button class="btn btn-primary" onclick="createRoom()" style="padding: 20px 50px; font-size: 1.2rem;">✨ 创建新房间</button>
         </div>
         <div style="text-align: center;">
           <button class="btn btn-secondary" onclick="showModeSelection()">← 返回选择</button>
@@ -748,15 +500,14 @@
       </div>
     </div>
 
-    <!-- 游戏控制 - 老师端显示题目 -->
+    <!-- 游戏控制 - 老师端显示题目（用于投影） -->
     <div id="teacherControl" class="card hidden">
       <h2>🎮 游戏控制台</h2>
       <div id="gameStatus" class="status-badge status-info">等待开始</div>
 
-      <!-- 老师端显示题目区域 - 用于投影 -->
       <div id="teacherQuestionDisplay" class="question-box" style="margin-top: 20px;">
         <div class="question-number" id="teacherQuestionNumber">第 1 题</div>
-        <div class="question-text" id="teacherQuestionText" style="font-size: clamp(1.5rem, 5vw, 2.5rem);">等待发题...</div>
+        <div class="question-text" id="teacherQuestionText">等待发题...</div>
         <div class="timer-display timer-normal" id="teacherTimerDisplay" style="font-size: 3rem;">--</div>
         <div class="options-grid" id="teacherOptionsDisplay" style="margin-top: 30px;"></div>
       </div>
@@ -811,7 +562,7 @@
     <div id="studentQuiz" class="card hidden">
       <div class="question-box">
         <div class="question-number" id="studentQuestionNumber">第 1 题 / 共 10 题</div>
-        <div class="question-text" id="studentQuestionText" style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">老师展示题目区域</div>
+        <div class="question-text" id="studentQuestionText" style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">请在老师屏幕上查看题目</div>
         <div class="timer-display timer-normal" id="studentTimer">15</div>
         <div class="options-grid" id="studentOptions"></div>
       </div>
@@ -843,15 +594,15 @@
     </div>
   </div>
 
+  <!-- Pusher SDK -->
+  <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
   <script>
-    // ===== Firebase REST API 配置 =====
-    const FIREBASE_DB_URL = 'https://quizblitz-feab7-default-rtdb.asia-southeast1.firebasedatabase.app';
-    const POLL_INTERVAL = 500; // 每500ms轮询一次
+    // ===== Pusher 配置 =====
+    const PUSHER_KEY = '2ce32a7bfb95d96cfefa';
+    const PUSHER_CLUSTER = 'ap1';
 
-    let pollTimer = null;
-    let lastKnownData = null;
-
-    // ===== 状态 =====
+    let pusher = null;
+    let channel = null;
     let myRole = null;
     let myPlayerId = null;
     let roomCode = null;
@@ -866,80 +617,69 @@
     let questionStartTime = 0;
     let players = [];
 
-    // ===== Firebase REST API =====
-    async function fbFetch(path, method = 'GET', body = null) {
-      const options = {
-        method: method,
-        headers: { 'Content-Type': 'application/json' }
-      };
-      if (body) options.body = JSON.stringify(body);
-
-      const response = await fetch(`${FIREBASE_DB_URL}/${path}.json`, options);
-      if (!response.ok) throw new Error(`Firebase error: ${response.status}`);
-      return response.json();
+    // ===== Pusher 初始化 =====
+    function initPusher() {
+      pusher = new Pusher(PUSHER_KEY, {
+        cluster: PUSHER_CLUSTER,
+        forceTLS: true
+      });
+      console.log('Pusher initialized');
     }
 
-    async function saveState() {
-      // 保存游戏状态到 Firebase
-      await fbFetch(`rooms/${roomCode}/state`, 'PUT', {
-        gameStatus: gameStatus,
-        currentQuestion: currentQuestionIndex,
-        lastUpdate: Date.now()
+    function subscribeToRoom(room) {
+      if (channel) {
+        channel.unbind_all();
+        channel.unsubscribe();
+      }
+      channel = pusher.subscribe('quiz-' + room);
+      console.log('Subscribed to channel:', 'quiz-' + room);
+
+      channel.bind('pusher:subscription_succeeded', () => {
+        console.log('Subscription succeeded');
+      });
+
+      channel.bind('pusher:member_added', (member) => {
+        console.log('Member added:', member.id);
+      });
+
+      // 监听游戏更新
+      channel.bind('game-update', (data) => {
+        console.log('game-update received:', data);
+        handleGameUpdate(data);
+      });
+
+      // 监听题目
+      channel.bind('question', (data) => {
+        console.log('question received:', data);
+        handleQuestion(data);
+      });
+
+      // 监听停止答题
+      channel.bind('stop-question', (data) => {
+        console.log('stop-question received:', data);
+        handleStopQuestion(data);
+      });
+
+      // 监听答题结果
+      channel.bind('answer-result', (data) => {
+        console.log('answer-result received:', data);
+        handleAnswerResult(data);
       });
     }
 
-    async function loadState() {
-      try {
-        const data = await fbFetch(`rooms/${roomCode}/state`);
-        return data;
-      } catch (e) {
-        return null;
+    function sendEvent(eventName, data) {
+      if (channel) {
+        channel.trigger('client-' + eventName, data);
+        console.log('Sent event:', eventName, data);
+      } else {
+        console.error('Channel not available');
       }
     }
 
-    // ===== 轮询监听 =====
-    async function startPolling() {
-      if (pollTimer) clearInterval(pollTimer);
+    // ===== 游戏事件处理 =====
+    function handleGameUpdate(data) {
+      console.log('handleGameUpdate:', data);
 
-      const poll = async () => {
-        try {
-          const data = await fbFetch(`rooms/${roomCode}`);
-          if (data && JSON.stringify(data) !== lastKnownData) {
-            lastKnownData = JSON.stringify(data);
-            handleRemoteUpdate(data);
-          }
-        } catch (e) {
-          console.error('Poll error:', e);
-        }
-      };
-
-      poll();
-      pollTimer = setInterval(poll, POLL_INTERVAL);
-      console.log('Started polling, interval:', POLL_INTERVAL);
-    }
-
-    function stopPolling() {
-      if (pollTimer) {
-        clearInterval(pollTimer);
-        pollTimer = null;
-      }
-    }
-
-    function handleRemoteUpdate(data) {
-      console.log('Remote update:', data);
-
-      // 更新玩家列表
-      if (data.players) {
-        players = Object.values(data.players);
-        updatePlayerList(players);
-      }
-
-      // 更新题目列表
-      if (data.questions) {
-        questions = Object.values(data.questions);
-      }
-
-      // 游戏状态变化
       if (data.gameStatus === 'playing' && gameStatus !== 'playing') {
         gameStatus = 'playing';
         if (!isHost) {
@@ -947,31 +687,7 @@
         }
       }
 
-      // 当前题目变化
-      if (data.currentQuestion !== undefined && data.currentQuestion >= 0) {
-        const qIndex = data.currentQuestion;
-        if (qIndex !== currentQuestionIndex) {
-          currentQuestionIndex = qIndex;
-          const q = questions[qIndex];
-          if (q) {
-            if (!isHost) {
-              showQuestionToStudent(qIndex, q);
-            }
-          }
-        }
-      }
-
-      // 游戏结束
-      if (data.gameStatus === 'finished' && gameStatus !== 'finished') {
-        gameStatus = 'finished';
-        showConfetti();
-        if (!isHost) {
-          showFinalRanking(players);
-        }
-      }
-
-      // 重置
-      if (data.gameStatus === 'waiting' && gameStatus !== 'waiting' && gameStatus !== '') {
+      if (data.gameStatus === 'waiting') {
         gameStatus = 'waiting';
         currentQuestionIndex = -1;
         myScore = 0;
@@ -979,47 +695,91 @@
           show('studentWaiting');
           hide('studentQuiz');
           updateWaitingStatus('游戏已重置，等待再次开始');
+        } else {
+          showTeacherRoom();
         }
       }
 
-      // 答题结果（学生端）
-      if (data.answerResult && data.answerResult.playerId === myPlayerId) {
-        const result = data.answerResult;
+      if (data.gameStatus === 'finished') {
+        gameStatus = 'finished';
+        showConfetti();
+        if (!isHost) {
+          showFinalRanking(players);
+        }
+      }
+
+      if (data.players) {
+        players = data.players;
+        updatePlayerList(players);
+      }
+    }
+
+    function handleQuestion(data) {
+      console.log('handleQuestion:', data);
+      const qIndex = data.questionIndex;
+      const q = questions[qIndex];
+      if (!q) return;
+
+      currentQuestionIndex = qIndex;
+      questionStartTime = Date.now();
+      hasAnswered = false;
+
+      if (!isHost) {
+        // 学生端：只显示选项
+        show('studentQuiz');
+        hide('studentWaiting');
+        hide('studentResult');
+        hide('studentRanking');
+        $('studentQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
+        $('studentTimer').textContent = data.timeLimit;
+        $('studentTimer').className = 'timer-display timer-normal';
+        $('studentOptions').innerHTML = q.options.map((opt, i) => `
+          <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
+            <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+            <span>${escapeHtml(opt)}</span>
+          </button>
+        `).join('');
+        startStudentTimer(data.timeLimit);
+      }
+    }
+
+    function handleStopQuestion(data) {
+      console.log('handleStopQuestion:', data);
+      if (!isHost && !hasAnswered) {
+        stopTimers();
+        qsa('.option-btn').forEach(btn => btn.disabled = true);
+        if (data.correctAnswer !== undefined) {
+          const correctOpt = $(`opt-${data.correctAnswer}`);
+          if (correctOpt) correctOpt.classList.add('correct');
+        }
+      }
+    }
+
+    function handleAnswerResult(data) {
+      console.log('handleAnswerResult:', data);
+      if (data.playerId === myPlayerId) {
         hasAnswered = true;
         stopTimers();
         const resultEl = $('resultStatus');
-        if (result.isCorrect) {
-          resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
+        if (data.isCorrect) {
+          resultEl.textContent = `✓ 回答正确！+${data.points} 分`;
           resultEl.style.color = '#10b981';
         } else {
           resultEl.textContent = '✗ 回答错误';
           resultEl.style.color = '#ef4444';
         }
-        myScore = result.totalScore;
+        myScore = data.totalScore;
         $('myScore').textContent = myScore;
         show('studentResult');
         qsa('.option-btn').forEach(btn => btn.disabled = true);
       }
-    }
 
-    function showQuestionToStudent(qIndex, q) {
-      show('studentQuiz');
-      hide('studentWaiting');
-      hide('studentResult');
-      hide('studentRanking');
-      $('studentQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
-      $('studentQuestionText').textContent = q.question;
-      $('studentTimer').textContent = q.timeLimit;
-      $('studentTimer').className = 'timer-display timer-normal';
-      hasAnswered = false;
-      $('studentOptions').innerHTML = q.options.map((opt, i) => `
-        <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
-          <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-          ${escapeHtml(opt)}
-        </button>
-      `).join('');
-      questionStartTime = Date.now();
-      startStudentTimer(q.timeLimit);
+      // 更新玩家分数
+      const player = players.find(p => p.id === data.playerId);
+      if (player) {
+        player.score = data.totalScore;
+        updatePlayerList(players);
+      }
     }
 
     // ===== 工具函数 =====
@@ -1042,7 +802,6 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
-    // ===== 粒子背景 =====
     function initParticles() {
       const container = $('particles');
       for (let i = 0; i < 30; i++) {
@@ -1058,7 +817,6 @@
     }
     initParticles();
 
-    // ===== 彩带庆祝 =====
     function showConfetti() {
       const container = document.createElement('div');
       container.className = 'confetti';
@@ -1076,7 +834,6 @@
       setTimeout(() => container.remove(), 4000);
     }
 
-    // ===== QR码 =====
     function generateQR(text) {
       const canvas = $('qrcode');
       const size = 200;
@@ -1097,7 +854,6 @@
         baseUrl = window.location.origin + '/quizblitz';
       }
       const joinUrl = `${baseUrl}?room=${roomCode}`;
-      console.log('QR URL:', joinUrl);
       $('qrUrl').textContent = joinUrl;
       generateQR(joinUrl);
       hideAllScreens();
@@ -1112,7 +868,6 @@
       }
     }
 
-    // ===== 界面切换 =====
     function hideAllScreens() {
       ['modeSelection', 'teacherJoin', 'teacherEditor', 'teacherControl',
        'studentMode', 'studentQuiz', 'finalRanking', 'qrModal'].forEach(id => hide(id));
@@ -1160,14 +915,14 @@
       return code;
     }
 
-    async function createRoom() {
+    function createRoom() {
       roomCode = generateRoomCode();
       myRole = 'teacher';
       isHost = true;
       myPlayerId = 'host_' + Date.now();
       gameStatus = 'waiting';
       questions = [];
-      players = [{ id: myPlayerId, name: '老师', score: 0, isHost: true }];
+      players = [{ id: myPlayerId, name: '老师', score: 0 }];
 
       console.log('Creating room:', roomCode);
 
@@ -1177,34 +932,19 @@
         btn.disabled = true;
       }
 
-      try {
-        // 初始化房间数据
-        await fbFetch(`rooms/${roomCode}`, 'PUT', {
-          hostId: myPlayerId,
-          createdAt: Date.now(),
-          gameStatus: 'waiting',
-          currentQuestion: -1,
-          questions: {},
-          players: { [myPlayerId]: { name: '老师', score: 0, isHost: true, joinedAt: Date.now() } }
-        });
+      initPusher();
+      subscribeToRoom(roomCode);
 
+      setTimeout(() => {
         $('teacherRoomCode').textContent = roomCode;
         hide('teacherCreate');
         show('teacherRoomInfo');
         showQrModal();
-        startPolling();
         updatePlayerList(players);
-      } catch (e) {
-        console.error('Create room error:', e);
-        showToast('创建房间失败: ' + e.message);
-        if (btn) {
-          btn.innerHTML = '✨ 创建新房间';
-          btn.disabled = false;
-        }
-      }
+      }, 500);
     }
 
-    async function joinRoom() {
+    function joinRoom() {
       const code = $('roomCode').value.trim().toUpperCase();
       const name = $('playerName').value.trim() || '玩家' + Math.floor(Math.random() * 1000);
       if (!code || code.length < 4) { showToast('请输入正确的房间码'); return; }
@@ -1219,41 +959,22 @@
       hide('studentJoin');
       updateWaitingStatus('正在连接房间...');
 
-      try {
-        // 检查房间是否存在
-        const data = await fbFetch(`rooms/${roomCode}`);
-        if (!data) {
-          updateWaitingStatus('房间不存在或已结束');
-          showToast('房间不存在或已结束');
-          return;
-        }
+      initPusher();
+      subscribeToRoom(roomCode);
 
-        // 加入房间
-        await fbFetch(`rooms/${roomCode}/players/${myPlayerId}`, 'PUT', {
+      // 等待订阅成功后加入
+      setTimeout(() => {
+        sendEvent('player-join', {
+          playerId: myPlayerId,
           name: name,
-          score: 0,
-          isHost: false,
-          joinedAt: Date.now()
+          score: 0
         });
-
         updateWaitingStatus('已加入房间，等待游戏开始...');
-        startPolling();
-
-        // 定期更新等待状态
-        setTimeout(() => {
-          if (gameStatus === 'waiting') {
-            updateWaitingStatus('等待老师开始游戏...');
-          }
-        }, 3000);
-      } catch (e) {
-        console.error('Join room error:', e);
-        updateWaitingStatus('连接失败，请检查房间码');
-        showToast('加入房间失败: ' + e.message);
-      }
+      }, 1000);
     }
 
     // ===== 教师功能 =====
-    async function addSingleQuestion() {
+    function addSingleQuestion() {
       const question = $('questionText').value.trim();
       const options = [$('option0').value.trim(), $('option1').value.trim(),
                        $('option2').value.trim(), $('option3').value.trim()];
@@ -1279,48 +1000,35 @@
         timeLimit
       };
 
-      try {
-        await fbFetch(`rooms/${roomCode}/questions/${questionId}`, 'PUT', newQuestion);
-        questions.push(newQuestion);
-        renderQuestionList();
+      questions.push(newQuestion);
+      renderQuestionList();
 
-        $('questionText').value = '';
-        $('option0').value = ''; $('option1').value = ''; $('option2').value = ''; $('option3').value = '';
-        showToast('题目添加成功');
-      } catch (e) {
-        console.error('Add question error:', e);
-        showToast('添加失败: ' + e.message);
-      }
+      $('questionText').value = '';
+      $('option0').value = ''; $('option1').value = ''; $('option2').value = ''; $('option3').value = '';
+      showToast('题目添加成功');
     }
 
-    async function importQuestions() {
+    function importQuestions() {
       const text = $('jsonImport').value.trim();
       if (!text) { showToast('请输入 JSON 数据'); return; }
       let imported;
       try { imported = JSON.parse(text); } catch (e) { showToast('JSON 格式错误'); return; }
       if (!Array.isArray(imported)) imported = [imported];
 
-      try {
-        for (let i = 0; i < imported.length; i++) {
-          const q = imported[i];
-          const questionId = 'q_' + Date.now() + '_' + i;
-          const question = {
-            id: questionId,
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            timeLimit: q.timeLimit || 15
-          };
-          await fbFetch(`rooms/${roomCode}/questions/${questionId}`, 'PUT', question);
-          questions.push(question);
-        }
+      imported.forEach((q, i) => {
+        const questionId = 'q_' + Date.now() + '_' + i;
+        questions.push({
+          id: questionId,
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          timeLimit: q.timeLimit || 15
+        });
+      });
 
-        $('jsonImport').value = '';
-        renderQuestionList();
-        showToast(`成功导入 ${imported.length} 道题目`);
-      } catch (e) {
-        showToast('导入失败: ' + e.message);
-      }
+      $('jsonImport').value = '';
+      renderQuestionList();
+      showToast(`成功导入 ${imported.length} 道题目`);
     }
 
     function renderQuestionList() {
@@ -1342,74 +1050,50 @@
       `;
     }
 
-    async function startGame() {
+    function startGame() {
       if (questions.length === 0) { showToast('请先添加至少一道题目'); return; }
+      gameStatus = 'playing';
+      showTeacherControl();
+      $('gameStatus').textContent = '游戏进行中';
+      $('gameStatus').className = 'status-badge status-success';
+      $('nextQuestionBtn').textContent = '第 1 题';
+      $('nextQuestionBtn').disabled = false;
 
-      try {
-        // 重置所有玩家分数
-        const data = await fbFetch(`rooms/${roomCode}/players`);
-        if (data) {
-          for (const playerId of Object.keys(data)) {
-            await fbFetch(`rooms/${roomCode}/players/${playerId}/score`, 'PUT', 0);
-          }
-        }
+      players.forEach(p => p.score = 0);
+      updatePlayerList(players);
 
-        // 更新游戏状态
-        gameStatus = 'playing';
-        await fbFetch(`rooms/${roomCode}`, 'PATCH', {
-          gameStatus: 'playing',
-          currentQuestion: -1
-        });
-
-        showTeacherControl();
-        $('gameStatus').textContent = '游戏进行中';
-        $('gameStatus').className = 'status-badge status-success';
-        $('nextQuestionBtn').textContent = '第 1 题';
-        $('nextQuestionBtn').disabled = false;
-      } catch (e) {
-        console.error('Start game error:', e);
-        showToast('启动失败: ' + e.message);
-      }
+      sendEvent('game-update', { gameStatus: 'playing', players: players });
     }
 
-    async function nextQuestion() {
+    function nextQuestion() {
       const nextIndex = currentQuestionIndex + 1;
       console.log('nextQuestion called, nextIndex:', nextIndex, 'questions length:', questions.length);
 
       if (nextIndex >= questions.length) {
-        // 游戏结束
-        await fbFetch(`rooms/${roomCode}`, 'PATCH', { gameStatus: 'finished' });
+        sendEvent('game-update', { gameStatus: 'finished' });
         return;
       }
 
       const question = questions[nextIndex];
       console.log('Sending question:', nextIndex);
 
-      try {
-        // 更新本地currentQuestionIndex
-        currentQuestionIndex = nextIndex;
+      // 老师端显示题目
+      showQuestionToTeacher(nextIndex, question);
 
-        // 在老师端显示题目（用于投影）
-        showQuestionToTeacher(nextIndex, question);
+      // 发送题目给学生
+      sendEvent('question', {
+        questionIndex: nextIndex,
+        timeLimit: question.timeLimit
+      });
 
-        // 发送题目到 Firebase
-        await fbFetch(`rooms/${roomCode}`, 'PATCH', {
-          currentQuestion: nextIndex
-        });
-
-        $('nextQuestionBtn').disabled = true;
-        $('nextQuestionBtn').textContent = `第 ${nextIndex + 2} 题`;
-        $('stopAnswerBtn').disabled = false;
-        $('showRankingBtn').disabled = true;
-        hide('teacherRankings');
-      } catch (e) {
-        console.error('Send question error:', e);
-        showToast('发题失败: ' + e.message);
-      }
+      $('nextQuestionBtn').disabled = true;
+      $('nextQuestionBtn').textContent = `第 ${nextIndex + 2} 题`;
+      $('stopAnswerBtn').disabled = false;
+      $('showRankingBtn').disabled = true;
+      hide('teacherRankings');
     }
 
     function showQuestionToTeacher(qIndex, q) {
-      // 老师端显示题目区域（用于投影到大屏幕）
       $('teacherQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
       $('teacherQuestionText').textContent = q.question;
       $('teacherTimerDisplay').textContent = q.timeLimit;
@@ -1424,67 +1108,42 @@
       startTeacherTimer(q.timeLimit);
     }
 
-    async function stopAnswer() {
+    function stopAnswer() {
       const q = questions[currentQuestionIndex];
       if (!q) return;
 
-      try {
-        // 显示正确答案给所有学生
-        await fbFetch(`rooms/${roomCode}/answerResult`, 'PUT', {
-          correctAnswer: q.correctAnswer
-        });
+      sendEvent('stop-question', { correctAnswer: q.correctAnswer });
 
-        $('stopAnswerBtn').disabled = true;
-        $('showRankingBtn').disabled = false;
-        showTeacherRankings(players);
-      } catch (e) {
-        console.error('Stop answer error:', e);
-      }
+      $('stopAnswerBtn').disabled = true;
+      $('showRankingBtn').disabled = false;
+      showTeacherRankings();
     }
 
     function showRanking() {
-      showTeacherRankings(players);
+      showTeacherRankings();
     }
 
-    async function resetGame() {
+    function resetGame() {
       if (!confirm('确定要重置游戏吗？所有得分将清零。')) return;
+      gameStatus = 'waiting';
+      currentQuestionIndex = -1;
+      myScore = 0;
+      players.forEach(p => p.score = 0);
 
-      try {
-        // 删除答题记录
-        await fbFetch(`rooms/${roomCode}/answers`, 'DELETE');
+      sendEvent('game-update', { gameStatus: 'waiting', players: players });
 
-        // 重置游戏状态
-        gameStatus = 'waiting';
-        currentQuestionIndex = -1;
-        myScore = 0;
-
-        await fbFetch(`rooms/${roomCode}`, 'PATCH', {
-          gameStatus: 'waiting',
-          currentQuestion: -1
-        });
-
-        // 重置玩家分数
-        const data = await fbFetch(`rooms/${roomCode}/players`);
-        if (data) {
-          for (const playerId of Object.keys(data)) {
-            await fbFetch(`rooms/${roomCode}/players/${playerId}/score`, 'PUT', 0);
-          }
-        }
-
-        showTeacherRoom();
-        hide('teacherRankings');
-      } catch (e) {
-        console.error('Reset game error:', e);
-        showToast('重置失败: ' + e.message);
-      }
+      showTeacherRoom();
+      hide('teacherRankings');
     }
 
     // ===== 学生功能 =====
-    async function submitAnswer(index) {
+    function submitAnswer(index) {
       if (hasAnswered) return;
       hasAnswered = true;
 
       const currentQ = questions[currentQuestionIndex];
+      if (!currentQ) return;
+
       const isCorrect = index === currentQ.correctAnswer;
       const timeTaken = (Date.now() - questionStartTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((currentQ.timeLimit - timeTaken) * 50));
@@ -1492,24 +1151,16 @@
 
       myScore += points;
 
-      try {
-        await fbFetch(`rooms/${roomCode}/answers/${myPlayerId}`, 'PUT', {
-          playerId: myPlayerId,
-          answer: index,
-          isCorrect,
-          points,
-          totalScore: myScore,
-          timeTaken: Math.round(timeTaken * 100) / 100,
-          timestamp: Date.now()
-        });
+      // 发送答案到老师
+      sendEvent('answer-result', {
+        playerId: myPlayerId,
+        answer: index,
+        isCorrect,
+        points,
+        totalScore: myScore
+      });
 
-        // 更新自己的分数
-        await fbFetch(`rooms/${roomCode}/players/${myPlayerId}/score`, 'PUT', myScore);
-
-        qsa('.option-btn').forEach(btn => btn.disabled = true);
-      } catch (e) {
-        console.error('Submit answer error:', e);
-      }
+      qsa('.option-btn').forEach(btn => btn.disabled = true);
     }
 
     function updateWaitingStatus(text) {
@@ -1517,8 +1168,8 @@
       if (el) el.textContent = text;
     }
 
-    function showTeacherRankings(rankings) {
-      const sorted = [...rankings].sort((a, b) => b.score - a.score);
+    function showTeacherRankings() {
+      const sorted = [...players].sort((a, b) => b.score - a.score);
       const container = $('teacherRankings');
       container.classList.remove('hidden');
       container.innerHTML = sorted.slice(0, 10).map((p, i) => `
@@ -1530,12 +1181,12 @@
       `).join('');
     }
 
-    function showFinalRanking(rankings) {
+    function showFinalRanking() {
       hideAllScreens();
       show('finalRanking');
       showConfetti();
 
-      const sorted = [...rankings].sort((a, b) => b.score - a.score);
+      const sorted = [...players].sort((a, b) => b.score - a.score);
       const top3 = sorted.slice(0, 3);
       let trophyHtml = '';
       if (top3.length > 0) {
@@ -1569,7 +1220,6 @@
       }
     }
 
-    // ===== 玩家列表 =====
     function updatePlayerList(playerList) {
       players = playerList;
       $('playerCount').textContent = players.length;
@@ -1584,6 +1234,13 @@
       `).join('');
     }
 
+    // 监听玩家加入事件
+    function initPlayerJoinListener() {
+      setInterval(() => {
+        // 定期检查玩家列表
+      }, 2000);
+    }
+
     // ===== 计时器 =====
     function startStudentTimer(seconds) {
       stopTimers();
@@ -1594,7 +1251,13 @@
         const el = $('studentTimer');
         el.textContent = timeLeft;
         el.className = timeLeft <= 5 ? 'timer-display timer-danger' : timeLeft <= 10 ? 'timer-display timer-warning' : 'timer-display timer-normal';
-        if (timeLeft <= 0) { stopTimers(); if (!hasAnswered) { el.textContent = '时间到！'; qsa('.option-btn').forEach(btn => btn.disabled = true); } }
+        if (timeLeft <= 0) {
+          stopTimers();
+          if (!hasAnswered) {
+            el.textContent = '时间到！';
+            qsa('.option-btn').forEach(btn => btn.disabled = true);
+          }
+        }
       }, 1000);
     }
 
@@ -1606,18 +1269,32 @@
         const el = $('teacherTimerDisplay');
         el.textContent = timeLeft;
         el.className = timeLeft <= 5 ? 'timer-display timer-danger' : timeLeft <= 10 ? 'timer-display timer-warning' : 'timer-display timer-normal';
-        if (timeLeft <= 0) { stopTimers(); el.textContent = '时间到！'; $('stopAnswerBtn').disabled = false; }
+        if (timeLeft <= 0) {
+          stopTimers();
+          el.textContent = '时间到！';
+          $('stopAnswerBtn').disabled = false;
+        }
       }, 1000);
     }
 
-    function stopTimers() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+    function stopTimers() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
 
     // ===== 初始化 =====
     function init() {
+      initPusher();
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get('room');
-      if (roomParam) { showStudentMode(); $('roomCode').value = roomParam.toUpperCase(); }
-      else showModeSelection();
+      if (roomParam) {
+        showStudentMode();
+        $('roomCode').value = roomParam.toUpperCase();
+      } else {
+        showModeSelection();
+      }
     }
     init();
   </script>
