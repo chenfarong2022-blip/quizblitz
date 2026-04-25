@@ -598,6 +598,7 @@
     const GOEASY_APPKEY = 'BC-51808aead9f94372a17f03fbd36e15e9';
     let goEasy = null;
     let goEasyChannel = null;
+    let currentChannelName = null;
 
     // ===== 状态 =====
     let myRole = null;
@@ -692,9 +693,9 @@
     }
 
     function doSubscribe(room) {
-      const channelName = 'quizblitz-' + room;
+      currentChannelName = 'quizblitz-' + room;
       goEasyChannel = goEasy.pubsub.subscribe({
-        channel: channelName,
+        channel: currentChannelName,
         onMessage: function(message) {
           console.log('GoEasy message received:', message.content);
           try {
@@ -705,7 +706,7 @@
           }
         },
         onSuccess: function() {
-          console.log('Subscribed to channel:', channelName);
+          console.log('Subscribed to channel:', currentChannelName);
         },
         onFailed: function(error) {
           console.error('Subscribe failed:', error);
@@ -716,7 +717,7 @@
     }
 
     function publishEvent(eventName, data) {
-      if (!goEasyChannel) {
+      if (!currentChannelName) {
         console.error('No GoEasy channel subscribed');
         return;
       }
@@ -730,7 +731,7 @@
 
       console.log('Publishing:', eventName, eventData);
       goEasy.pubsub.publish({
-        channel: channelName,
+        channel: currentChannelName,
         content: JSON.stringify(eventData),
         onSuccess: function() {
           console.log('Published:', eventName);
