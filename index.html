@@ -841,97 +841,13 @@
     </div>
   </div>
 
-  <!-- Pusher SDK -->
-  <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
   <script>
-    // ===== Pusher 配置 =====
-    const PUSHER_KEY = '2ce32a7bfb95d96cfefa';
-    const PUSHER_CLUSTER = 'ap1';
+    // ===== Firebase REST API 配置 =====
+    const FIREBASE_DB_URL = 'https://quizblitz-feab7-default-rtdb.asia-southeast1.firebasedatabase.app';
+    const POLL_INTERVAL = 500; // 每500ms轮询一次
 
-    let pusher = null;
-    let channel = null;
-
-    function initPusher() {
-      pusher = new Pusher(PUSHER_KEY, {
-        cluster: PUSHER_CLUSTER,
-        forceTLS: true
-      });
-      console.log('Pusher initialized');
-    }
-
-    function subscribeToRoom(room) {
-      if (channel) {
-        channel.unbind_all();
-        channel.unsubscribe();
-      }
-      channel = pusher.subscribe('quiz-' + room);
-      console.log('Subscribed to channel:', 'quiz-' + room);
-
-      channel.bind('pusher:subscription_succeeded', () => {
-        console.log('Subscription succeeded');
-      });
-
-      channel.bind('game-update', data => {
-        console.log('Game update received:', data);
-        handleGameUpdate(data);
-      });
-
-      channel.bind('question', data => {
-        console.log('Question received:', data);
-        handleQuestion(data);
-      });
-
-      channel.bind('player-joined', data => {
-        console.log('Player joined:', data);
-        handlePlayerJoined(data);
-      });
-
-      channel.bind('answer-result', data => {
-        console.log('Answer result:', data);
-        if (data.playerId === myPlayerId) {
-          hasAnswered = true;
-          stopTimers();
-          const resultEl = $('resultStatus');
-          if (data.isCorrect) {
-            resultEl.textContent = `✓ 回答正确！+${data.points} 分`;
-            resultEl.style.color = '#10b981';
-          } else {
-            resultEl.textContent = '✗ 回答错误';
-            resultEl.style.color = '#ef4444';
-          }
-          myScore = data.totalScore;
-          $('myScore').textContent = myScore;
-          show('studentResult');
-          qsa('.option-btn').forEach(btn => btn.disabled = true);
-        }
-      });
-
-      channel.bind('stop-question', data => {
-        console.log('Stop question received');
-        if (myRole === 'student' && !hasAnswered) {
-          stopTimers();
-          qsa('.option-btn').forEach(btn => btn.disabled = true);
-          if (data.correctAnswer !== undefined) {
-            const correctOpt = $(`opt-${data.correctAnswer}`);
-            if (correctOpt) correctOpt.classList.add('correct');
-          }
-        }
-      });
-
-      channel.bind('ranking-update', data => {
-        console.log('Ranking update:', data);
-        updatePlayerList(data.players || []);
-      });
-    }
-
-    function trigger(event, data) {
-      if (channel) {
-        const result = channel.trigger('client-' + event, data);
-        console.log('Triggered:', event, data, 'result:', result);
-      } else {
-        console.error('Channel not initialized, cannot trigger:', event);
-      }
-    }
+    let pollTimer = null;
+    let lastKnownData = null;
 
     // ===== 状态 =====
     let myRole = null;
@@ -947,6 +863,162 @@
     let myScore = 0;
     let questionStartTime = 0;
     let players = [];
+
+    // ===== Firebase REST API =====
+    async function fbFetch(path, method = 'GET', body = null) {
+      const options = {
+        method: method,
+        headers: { 'Content-Type': 'application/json' }
+      };
+      if (body) options.body = JSON.stringify(body);
+
+      const response = await fetch(`${FIREBASE_DB_URL}/${path}.json`, options);
+      if (!response.ok) throw new Error(`Firebase error: ${response.status}`);
+      return response.json();
+    }
+
+    async function saveState() {
+      // 保存游戏状态到 Firebase
+      await fbFetch(`rooms/${roomCode}/state`, 'PUT', {
+        gameStatus: gameStatus,
+        currentQuestion: currentQuestionIndex,
+        lastUpdate: Date.now()
+      });
+    }
+
+    async function loadState() {
+      try {
+        const data = await fbFetch(`rooms/${roomCode}/state`);
+        return data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // ===== 轮询监听 =====
+    async function startPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+
+      const poll = async () => {
+        try {
+          const data = await fbFetch(`rooms/${roomCode}`);
+          if (data && JSON.stringify(data) !== lastKnownData) {
+            lastKnownData = JSON.stringify(data);
+            handleRemoteUpdate(data);
+          }
+        } catch (e) {
+          console.error('Poll error:', e);
+        }
+      };
+
+      poll();
+      pollTimer = setInterval(poll, POLL_INTERVAL);
+      console.log('Started polling, interval:', POLL_INTERVAL);
+    }
+
+    function stopPolling() {
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    function handleRemoteUpdate(data) {
+      console.log('Remote update:', data);
+
+      // 更新玩家列表
+      if (data.players) {
+        players = Object.values(data.players);
+        updatePlayerList(players);
+      }
+
+      // 更新题目列表
+      if (data.questions) {
+        questions = Object.values(data.questions);
+      }
+
+      // 游戏状态变化
+      if (data.gameStatus === 'playing' && gameStatus !== 'playing') {
+        gameStatus = 'playing';
+        if (!isHost) {
+          updateWaitingStatus('游戏开始！等待发题...');
+        }
+      }
+
+      // 当前题目变化
+      if (data.currentQuestion !== undefined && data.currentQuestion >= 0) {
+        const qIndex = data.currentQuestion;
+        if (qIndex !== currentQuestionIndex) {
+          currentQuestionIndex = qIndex;
+          const q = questions[qIndex];
+          if (q) {
+            if (!isHost) {
+              showQuestionToStudent(qIndex, q);
+            }
+          }
+        }
+      }
+
+      // 游戏结束
+      if (data.gameStatus === 'finished' && gameStatus !== 'finished') {
+        gameStatus = 'finished';
+        showConfetti();
+        if (!isHost) {
+          showFinalRanking(players);
+        }
+      }
+
+      // 重置
+      if (data.gameStatus === 'waiting' && gameStatus !== 'waiting' && gameStatus !== '') {
+        gameStatus = 'waiting';
+        currentQuestionIndex = -1;
+        myScore = 0;
+        if (!isHost) {
+          show('studentWaiting');
+          hide('studentQuiz');
+          updateWaitingStatus('游戏已重置，等待再次开始');
+        }
+      }
+
+      // 答题结果（学生端）
+      if (data.answerResult && data.answerResult.playerId === myPlayerId) {
+        const result = data.answerResult;
+        hasAnswered = true;
+        stopTimers();
+        const resultEl = $('resultStatus');
+        if (result.isCorrect) {
+          resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
+          resultEl.style.color = '#10b981';
+        } else {
+          resultEl.textContent = '✗ 回答错误';
+          resultEl.style.color = '#ef4444';
+        }
+        myScore = result.totalScore;
+        $('myScore').textContent = myScore;
+        show('studentResult');
+        qsa('.option-btn').forEach(btn => btn.disabled = true);
+      }
+    }
+
+    function showQuestionToStudent(qIndex, q) {
+      show('studentQuiz');
+      hide('studentWaiting');
+      hide('studentResult');
+      hide('studentRanking');
+      $('studentQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
+      $('studentQuestionText').textContent = q.question;
+      $('studentTimer').textContent = q.timeLimit;
+      $('studentTimer').className = 'timer-display timer-normal';
+      hasAnswered = false;
+      $('studentOptions').innerHTML = q.options.map((opt, i) => `
+        <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
+          <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+          ${escapeHtml(opt)}
+        </button>
+      `).join('');
+      questionStartTime = Date.now();
+      startStudentTimer(q.timeLimit);
+    }
 
     // ===== 工具函数 =====
     const $ = id => document.getElementById(id);
@@ -1078,95 +1150,6 @@
       show('teacherRoomInfo');
     }
 
-    // ===== 游戏更新处理 =====
-    function handleGameUpdate(data) {
-      console.log('handleGameUpdate:', data);
-      if (data.gameStatus === 'playing' && gameStatus !== 'playing') {
-        gameStatus = 'playing';
-        if (isHost) {
-          showTeacherControl();
-          $('gameStatus').textContent = '游戏进行中';
-          $('gameStatus').className = 'status-badge status-success';
-          $('nextQuestionBtn').disabled = false;
-          hide('teacherRankings');
-        } else {
-          updateWaitingStatus('游戏开始！等待发题...');
-        }
-      }
-      if (data.gameStatus === 'waiting') {
-        gameStatus = 'waiting';
-        currentQuestionIndex = -1;
-        if (isHost) {
-          showTeacherRoom();
-          hide('teacherRankings');
-        } else {
-          show('studentWaiting');
-          hide('studentQuiz');
-          updateWaitingStatus('游戏已重置，等待再次开始');
-        }
-      }
-      if (data.gameStatus === 'finished') {
-        gameStatus = 'finished';
-        showConfetti();
-        if (isHost) {
-          showTeacherControl();
-          $('gameStatus').textContent = '游戏结束';
-          $('gameStatus').className = 'status-badge status-success';
-          $('nextQuestionBtn').disabled = true;
-          showTeacherRankings(players);
-        } else {
-          showFinalRanking(players);
-        }
-      }
-    }
-
-    function handleQuestion(data) {
-      console.log('handleQuestion:', data);
-      const qIndex = data.questionIndex;
-      const q = questions[qIndex];
-      if (!q) return;
-
-      currentQuestionIndex = qIndex;
-      questionStartTime = Date.now();
-      hasAnswered = false;
-
-      if (myRole === 'student') {
-        show('studentQuiz');
-        hide('studentWaiting');
-        hide('studentResult');
-        hide('studentRanking');
-        $('studentQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
-        $('studentQuestionText').textContent = q.question;
-        $('studentTimer').textContent = q.timeLimit;
-        $('studentTimer').className = 'timer-display timer-normal';
-        $('studentOptions').innerHTML = q.options.map((opt, i) => `
-          <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
-            <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-            ${escapeHtml(opt)}
-          </button>
-        `).join('');
-        startStudentTimer(q.timeLimit);
-      } else if (isHost) {
-        $('gameStatus').textContent = `第 ${qIndex + 1} 题进行中`;
-        $('questionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
-        $('questionDisplay').textContent = q.question;
-        show('currentQuestionDisplay');
-        $('nextQuestionBtn').disabled = true;
-        $('nextQuestionBtn').textContent = `第 ${qIndex + 2} 题`;
-        $('stopAnswerBtn').disabled = false;
-        $('showRankingBtn').disabled = true;
-        startTeacherTimer(q.timeLimit);
-      }
-    }
-
-    function handlePlayerJoined(data) {
-      console.log('Player joined:', data);
-      if (!players.find(p => p.id === data.playerId)) {
-        players.push(data);
-        updatePlayerList(players);
-      }
-    }
-
     // ===== 房间管理 =====
     function generateRoomCode() {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1175,14 +1158,14 @@
       return code;
     }
 
-    function createRoom() {
+    async function createRoom() {
       roomCode = generateRoomCode();
       myRole = 'teacher';
       isHost = true;
       myPlayerId = 'host_' + Date.now();
       gameStatus = 'waiting';
       questions = [];
-      players = [];
+      players = [{ id: myPlayerId, name: '老师', score: 0, isHost: true }];
 
       console.log('Creating room:', roomCode);
 
@@ -1192,25 +1175,34 @@
         btn.disabled = true;
       }
 
-      initPusher();
-      subscribeToRoom(roomCode);
+      try {
+        // 初始化房间数据
+        await fbFetch(`rooms/${roomCode}`, 'PUT', {
+          hostId: myPlayerId,
+          createdAt: Date.now(),
+          gameStatus: 'waiting',
+          currentQuestion: -1,
+          questions: {},
+          players: { [myPlayerId]: { name: '老师', score: 0, isHost: true, joinedAt: Date.now() } }
+        });
 
-      setTimeout(() => {
         $('teacherRoomCode').textContent = roomCode;
         hide('teacherCreate');
         show('teacherRoomInfo');
         showQrModal();
-
-        trigger('player-joined', {
-          playerId: myPlayerId,
-          name: '老师',
-          score: 0,
-          isHost: true
-        });
-      }, 500);
+        startPolling();
+        updatePlayerList(players);
+      } catch (e) {
+        console.error('Create room error:', e);
+        showToast('创建房间失败: ' + e.message);
+        if (btn) {
+          btn.innerHTML = '✨ 创建新房间';
+          btn.disabled = false;
+        }
+      }
     }
 
-    function joinRoom() {
+    async function joinRoom() {
       const code = $('roomCode').value.trim().toUpperCase();
       const name = $('playerName').value.trim() || '玩家' + Math.floor(Math.random() * 1000);
       if (!code || code.length < 4) { showToast('请输入正确的房间码'); return; }
@@ -1225,28 +1217,41 @@
       hide('studentJoin');
       updateWaitingStatus('正在连接房间...');
 
-      initPusher();
-      subscribeToRoom(roomCode);
+      try {
+        // 检查房间是否存在
+        const data = await fbFetch(`rooms/${roomCode}`);
+        if (!data) {
+          updateWaitingStatus('房间不存在或已结束');
+          showToast('房间不存在或已结束');
+          return;
+        }
 
-      setTimeout(() => {
-        trigger('player-joined', {
-          playerId: myPlayerId,
+        // 加入房间
+        await fbFetch(`rooms/${roomCode}/players/${myPlayerId}`, 'PUT', {
           name: name,
           score: 0,
-          isHost: false
+          isHost: false,
+          joinedAt: Date.now()
         });
-        updateWaitingStatus('已加入房间，等待游戏开始...');
-      }, 1000);
 
-      setTimeout(() => {
-        if (gameStatus === 'waiting') {
-          updateWaitingStatus('等待老师开始游戏...');
-        }
-      }, 5000);
+        updateWaitingStatus('已加入房间，等待游戏开始...');
+        startPolling();
+
+        // 定期更新等待状态
+        setTimeout(() => {
+          if (gameStatus === 'waiting') {
+            updateWaitingStatus('等待老师开始游戏...');
+          }
+        }, 3000);
+      } catch (e) {
+        console.error('Join room error:', e);
+        updateWaitingStatus('连接失败，请检查房间码');
+        showToast('加入房间失败: ' + e.message);
+      }
     }
 
     // ===== 教师功能 =====
-    function addSingleQuestion() {
+    async function addSingleQuestion() {
       const question = $('questionText').value.trim();
       const options = [$('option0').value.trim(), $('option1').value.trim(),
                        $('option2').value.trim(), $('option3').value.trim()];
@@ -1272,30 +1277,48 @@
         timeLimit
       };
 
-      console.log('Adding question:', newQuestion);
-      questions.push(newQuestion);
-      renderQuestionList();
+      try {
+        await fbFetch(`rooms/${roomCode}/questions/${questionId}`, 'PUT', newQuestion);
+        questions.push(newQuestion);
+        renderQuestionList();
 
-      $('questionText').value = '';
-      $('option0').value = ''; $('option1').value = ''; $('option2').value = ''; $('option3').value = '';
-      showToast('题目添加成功');
+        $('questionText').value = '';
+        $('option0').value = ''; $('option1').value = ''; $('option2').value = ''; $('option3').value = '';
+        showToast('题目添加成功');
+      } catch (e) {
+        console.error('Add question error:', e);
+        showToast('添加失败: ' + e.message);
+      }
     }
 
-    function importQuestions() {
+    async function importQuestions() {
       const text = $('jsonImport').value.trim();
       if (!text) { showToast('请输入 JSON 数据'); return; }
       let imported;
       try { imported = JSON.parse(text); } catch (e) { showToast('JSON 格式错误'); return; }
       if (!Array.isArray(imported)) imported = [imported];
 
-      imported.forEach((q, i) => {
-        const questionId = 'q_' + Date.now() + '_' + i;
-        questions.push({ id: questionId, question: q.question, options: q.options, correctAnswer: q.correctAnswer, timeLimit: q.timeLimit || 15 });
-      });
+      try {
+        for (let i = 0; i < imported.length; i++) {
+          const q = imported[i];
+          const questionId = 'q_' + Date.now() + '_' + i;
+          const question = {
+            id: questionId,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            timeLimit: q.timeLimit || 15
+          };
+          await fbFetch(`rooms/${roomCode}/questions/${questionId}`, 'PUT', question);
+          questions.push(question);
+        }
 
-      $('jsonImport').value = '';
-      renderQuestionList();
-      showToast(`成功导入 ${imported.length} 道题目`);
+        $('jsonImport').value = '';
+        renderQuestionList();
+        showToast(`成功导入 ${imported.length} 道题目`);
+      } catch (e) {
+        showToast('导入失败: ' + e.message);
+      }
     }
 
     function renderQuestionList() {
@@ -1317,73 +1340,122 @@
       `;
     }
 
-    function startGame() {
+    async function startGame() {
       if (questions.length === 0) { showToast('请先添加至少一道题目'); return; }
-      gameStatus = 'playing';
-      showTeacherControl();
-      $('gameStatus').textContent = '游戏进行中';
-      $('gameStatus').className = 'status-badge status-success';
-      $('nextQuestionBtn').textContent = '第 1 题';
-      $('nextQuestionBtn').disabled = false;
 
-      trigger('game-update', { gameStatus: 'playing' });
+      try {
+        // 重置所有玩家分数
+        const data = await fbFetch(`rooms/${roomCode}/players`);
+        if (data) {
+          for (const playerId of Object.keys(data)) {
+            await fbFetch(`rooms/${roomCode}/players/${playerId}/score`, 'PUT', 0);
+          }
+        }
 
-      players.forEach(p => p.score = 0);
-      updatePlayerList(players);
+        // 更新游戏状态
+        gameStatus = 'playing';
+        await fbFetch(`rooms/${roomCode}`, 'PATCH', {
+          gameStatus: 'playing',
+          currentQuestion: -1
+        });
+
+        showTeacherControl();
+        $('gameStatus').textContent = '游戏进行中';
+        $('gameStatus').className = 'status-badge status-success';
+        $('nextQuestionBtn').textContent = '第 1 题';
+        $('nextQuestionBtn').disabled = false;
+      } catch (e) {
+        console.error('Start game error:', e);
+        showToast('启动失败: ' + e.message);
+      }
     }
 
-    function nextQuestion() {
+    async function nextQuestion() {
       const nextIndex = currentQuestionIndex + 1;
       console.log('nextQuestion called, nextIndex:', nextIndex, 'questions length:', questions.length);
 
       if (nextIndex >= questions.length) {
-        trigger('game-update', { gameStatus: 'finished' });
+        // 游戏结束
+        await fbFetch(`rooms/${roomCode}`, 'PATCH', { gameStatus: 'finished' });
         return;
       }
 
       const question = questions[nextIndex];
       console.log('Sending question:', nextIndex);
 
-      trigger('question', {
-        questionIndex: nextIndex,
-        question: question.question,
-        options: question.options,
-        timeLimit: question.timeLimit,
-        correctAnswer: question.correctAnswer
-      });
+      try {
+        await fbFetch(`rooms/${roomCode}`, 'PATCH', {
+          currentQuestion: nextIndex
+        });
 
-      $('nextQuestionBtn').disabled = true;
-      $('stopAnswerBtn').disabled = false;
-      $('showRankingBtn').disabled = true;
-      hide('teacherRankings');
+        $('nextQuestionBtn').disabled = true;
+        $('nextQuestionBtn').textContent = `第 ${nextIndex + 2} 题`;
+        $('stopAnswerBtn').disabled = false;
+        $('showRankingBtn').disabled = true;
+        hide('teacherRankings');
+      } catch (e) {
+        console.error('Send question error:', e);
+        showToast('发题失败: ' + e.message);
+      }
     }
 
-    function stopAnswer() {
+    async function stopAnswer() {
       const q = questions[currentQuestionIndex];
-      trigger('stop-question', { correctAnswer: q.correctAnswer });
+      if (!q) return;
 
-      $('stopAnswerBtn').disabled = true;
-      $('showRankingBtn').disabled = false;
-      showTeacherRankings(players);
+      try {
+        // 显示正确答案给所有学生
+        await fbFetch(`rooms/${roomCode}/answerResult`, 'PUT', {
+          correctAnswer: q.correctAnswer
+        });
+
+        $('stopAnswerBtn').disabled = true;
+        $('showRankingBtn').disabled = false;
+        showTeacherRankings(players);
+      } catch (e) {
+        console.error('Stop answer error:', e);
+      }
     }
 
     function showRanking() {
       showTeacherRankings(players);
     }
 
-    function resetGame() {
+    async function resetGame() {
       if (!confirm('确定要重置游戏吗？所有得分将清零。')) return;
-      gameStatus = 'waiting';
-      currentQuestionIndex = -1;
-      myScore = 0;
-      players.forEach(p => p.score = 0);
-      trigger('game-update', { gameStatus: 'waiting' });
-      showTeacherRoom();
-      hide('teacherRankings');
+
+      try {
+        // 删除答题记录
+        await fbFetch(`rooms/${roomCode}/answers`, 'DELETE');
+
+        // 重置游戏状态
+        gameStatus = 'waiting';
+        currentQuestionIndex = -1;
+        myScore = 0;
+
+        await fbFetch(`rooms/${roomCode}`, 'PATCH', {
+          gameStatus: 'waiting',
+          currentQuestion: -1
+        });
+
+        // 重置玩家分数
+        const data = await fbFetch(`rooms/${roomCode}/players`);
+        if (data) {
+          for (const playerId of Object.keys(data)) {
+            await fbFetch(`rooms/${roomCode}/players/${playerId}/score`, 'PUT', 0);
+          }
+        }
+
+        showTeacherRoom();
+        hide('teacherRankings');
+      } catch (e) {
+        console.error('Reset game error:', e);
+        showToast('重置失败: ' + e.message);
+      }
     }
 
     // ===== 学生功能 =====
-    function submitAnswer(index) {
+    async function submitAnswer(index) {
       if (hasAnswered) return;
       hasAnswered = true;
 
@@ -1395,16 +1467,24 @@
 
       myScore += points;
 
-      trigger('answer-result', {
-        playerId: myPlayerId,
-        answer: index,
-        isCorrect,
-        points,
-        totalScore: myScore,
-        timeTaken: Math.round(timeTaken * 100) / 100
-      });
+      try {
+        await fbFetch(`rooms/${roomCode}/answers/${myPlayerId}`, 'PUT', {
+          playerId: myPlayerId,
+          answer: index,
+          isCorrect,
+          points,
+          totalScore: myScore,
+          timeTaken: Math.round(timeTaken * 100) / 100,
+          timestamp: Date.now()
+        });
 
-      qsa('.option-btn').forEach(btn => btn.disabled = true);
+        // 更新自己的分数
+        await fbFetch(`rooms/${roomCode}/players/${myPlayerId}/score`, 'PUT', myScore);
+
+        qsa('.option-btn').forEach(btn => btn.disabled = true);
+      } catch (e) {
+        console.error('Submit answer error:', e);
+      }
     }
 
     function updateWaitingStatus(text) {
@@ -1419,8 +1499,8 @@
       container.innerHTML = sorted.slice(0, 10).map((p, i) => `
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
-          <span class="ranking-name">${escapeHtml(p.name)}</span>
-          <span class="ranking-score">${p.score} 分</span>
+          <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
+          <span class="ranking-score">${p.score || 0} 分</span>
         </div>
       `).join('');
     }
@@ -1446,20 +1526,12 @@
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="ranking-name">
-            ${escapeHtml(p.name)}
+            ${escapeHtml(p.name || '未知')}
             ${p.id === myPlayerId ? '<span class="ranking-you">(你)</span>' : ''}
           </span>
-          <span class="ranking-score">${p.score} 分</span>
+          <span class="ranking-score">${p.score || 0} 分</span>
         </div>
       `).join('');
-
-      const myRank = sorted.findIndex(p => p.id === myPlayerId);
-      if (myRank >= 0 && myRank < 3) {
-        const messages = ['🎉 恭喜你获得第一名！', '🥈 你获得了第二名！', '🥉 你获得了第三名！'];
-        container.innerHTML += `
-          <div style="text-align: center; margin-top: 20px; font-size: 1.3em; color: var(--accent);">${messages[myRank]}</div>
-        `;
-      }
     }
 
     function playAgain() {
@@ -1517,7 +1589,6 @@
 
     // ===== 初始化 =====
     function init() {
-      initPusher();
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get('room');
       if (roomParam) { showStudentMode(); $('roomCode').value = roomParam.toUpperCase(); }
