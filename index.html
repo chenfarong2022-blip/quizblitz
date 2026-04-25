@@ -475,6 +475,13 @@
       <h2>📝 编辑题目</h2>
       <div class="form-grid">
         <div class="form-section">
+          <h3>内置题库</h3>
+          <select id="builtInBankSelect">
+            <option value="">选择题库...</option>
+          </select>
+          <button class="btn btn-success" onclick="importBuiltInBank()" style="width: 100%; margin-top: 10px;">导入选中题库</button>
+        </div>
+        <div class="form-section">
           <h3>手动添加</h3>
           <input type="text" id="questionText" placeholder="题目内容">
           <input type="text" id="option0" placeholder="选项 A">
@@ -490,11 +497,11 @@
           <input type="number" id="timeLimit" value="15" min="5" max="60">
           <button class="btn btn-primary" onclick="addSingleQuestion()" style="width: 100%;">添加题目</button>
         </div>
-        <div class="form-section">
-          <h3>批量导入 JSON</h3>
-          <textarea id="jsonImport" placeholder='[{"question":"题目1","options":["A","B","C","D"],"correctAnswer":0,"timeLimit":15}]' style="min-height: 280px;"></textarea>
-          <button class="btn btn-success" onclick="importQuestions()" style="width: 100%;">导入题目</button>
-        </div>
+      </div>
+      <div class="form-section" style="margin-top: 20px;">
+        <h3>批量导入 JSON</h3>
+        <textarea id="jsonImport" placeholder='[{"question":"题目1","options":["A","B","C","D"],"correctAnswer":0,"timeLimit":15}]' style="min-height: 120px;"></textarea>
+        <button class="btn btn-success" onclick="importQuestions()" style="width: 100%; margin-top: 10px;">导入题目</button>
       </div>
       <div id="questionList" class="question-list"></div>
       <div style="margin-top: 20px;">
@@ -619,6 +626,38 @@
     let myScore = 0;
     let questionStartTime = 0;
     let players = [];
+
+    // ===== 内置题库 =====
+    const BUILT_IN_BANKS = {
+      "2班听力4-6课": [
+        // 选择题
+        { question: "妈妈说："麦克，起床吧，差十分钟八点了。" 问：现在几点？", options: ["八点十分", "七点五十", "八点五十", "七点十分"], correctAnswer: 1, timeLimit: 15 },
+        { question: "麦克说："我原来想在这儿学习半年，现在觉得汉语很有意思，所以我准备再延长一年。" 问：麦克最后打算在这儿学习多长时间？", options: ["半年", "一年", "一年半", "两年"], correctAnswer: 2, timeLimit: 15 },
+        { question: "王丽说："这套房子每月的房租是三千块，没有对面的那套便宜。" 问：对面那套房子的房租可能是多少钱？", options: ["三千五百块", "三千块", "两千五百块", "四千块"], correctAnswer: 2, timeLimit: 15 },
+        { question: "妈妈说："我让你每天只看一个小时的电视，你不能再看了。" 问：他为什么现在不能看电视了？", options: ["他不喜欢看电视", "电视坏了", "一个小时的时间到了", "他该去睡觉了"], correctAnswer: 2, timeLimit: 15 },
+        { question: "女的说："坐火车才四百多块。坐飞机的话，比坐火车贵八百多块呢。" 问：坐飞机的票价大概是多少钱？", options: ["四百块", "八百块", "一千两百块", "一千六百块"], correctAnswer: 2, timeLimit: 15 },
+        { question: "老师说："北京今天的气温是十度，上海今天比北京高两度。" 问：上海今天多少度？", options: ["八度", "十度", "十二度", "二度"], correctAnswer: 2, timeLimit: 15 },
+        { question: "一位老人说："我二十八岁跟她结婚，到现在都一起生活了三十几年了。" 问：他现在大概多大年纪？", options: ["二十八岁", "三十岁", "五十岁", "差不多六十岁"], correctAnswer: 3, timeLimit: 15 },
+        { question: "男的说："我买东西还是喜欢去大商场，大商场的东西比小商店的好得多。" 问：男的是什么意思？", options: ["大商场的东西太贵了", "大商场的东西质量更好", "他不喜欢买东西", "小商店的东西比大商场好"], correctAnswer: 1, timeLimit: 15 },
+        { question: "爷爷说："抽烟对身体不好，我从来不抽；喝酒嘛，少喝点儿对身体还是不错的。" 问：关于爷爷的习惯，下面哪个是对的？", options: ["爷爷抽烟，不喝酒", "爷爷不抽烟，喝一点儿酒", "爷爷又抽烟又喝酒", "爷爷不抽烟，也不喝酒"], correctAnswer: 1, timeLimit: 15 },
+        { question: "山田说："飞机票我半年以前就买好了。早一点儿买的话，会便宜很多。" 问：山田为什么半年前就买票？", options: ["怕买不到票", "为了省钱，因为早买便宜", "他想早点回国", "朋友让他早点买"], correctAnswer: 1, timeLimit: 15 },
+        // 判断题
+        { question: "说话人说"我来北京已经两个月了。" 判断：说话人是两个月以前到北京的。", options: ["正确", "错误"], correctAnswer: 0, timeLimit: 10 },
+        { question: "说话人说"我擦完了窗户就去买水果。" 判断：说话人打算先去买水果，回来再擦窗户。", options: ["正确", "错误"], correctAnswer: 1, timeLimit: 10 },
+        { question: "说话人说"我比小王大三岁，不过个子没有他高。" 判断：小王个子比说话人高。", options: ["正确", "错误"], correctAnswer: 0, timeLimit: 10 },
+        { question: "说话人说"从北京到上海，坐高铁大概要五个小时。" 判断：北京到上海坐高铁需要五个小时左右。", options: ["正确", "错误"], correctAnswer: 0, timeLimit: 10 },
+        { question: "说话人说"我的包还差两公斤到二十公斤呢。" 判断：这个包现在重二十二公斤。", options: ["正确", "错误"], correctAnswer: 1, timeLimit: 10 },
+        { question: "说话人说"昨天差不多复习了一个晚上，只睡了一个多小时。" 判断：说话人现在觉得非常困。", options: ["正确", "错误"], correctAnswer: 0, timeLimit: 10 },
+        { question: "说话人说"小强，打开窗户吧，通通风。" 判断：妈妈想让屋子里的空气好一点儿。", options: ["正确", "错误"], correctAnswer: 0, timeLimit: 10 },
+        { question: "说话人说"郊区的空气好，对身体有好处啊！" 判断：说话人认为住在郊区更健康。", options: ["正确", "错误"], correctAnswer: 0, timeLimit: 10 },
+        { question: "说话人说"山田，你才学了半年汉语，可是比我说得流利多了。" 判断：山田学习汉语的时间非常长。", options: ["正确", "错误"], correctAnswer: 1, timeLimit: 10 },
+        { question: "说话人说"小王跟我说好了晚上七点来，可是他到现在还没来呢。" 判断：小王迟到了，或者还没到。", options: ["正确", "错误"], correctAnswer: 0, timeLimit: 10 },
+        // 填空题
+        { question: "今天的客厅我已经打扫________ (Finished) 了。", answer: "完了", timeLimit: 15 },
+        { question: "城里的房子价钱太________ (Expensive) 了。", answer: "贵", timeLimit: 15 },
+        { question: "老师，我们的考试________ (Grades/Results) 什么时候能知道？", answer: "成绩", timeLimit: 15 }
+      ]
+    };
 
     // ===== Firebase REST API =====
     async function fbGet(path) {
@@ -828,18 +867,61 @@
       $('studentTimer').textContent = q.timeLimit;
       $('studentTimer').className = 'timer-display timer-normal';
       hasAnswered = false;
-      $('studentOptions').innerHTML = q.options.map((opt, i) => `
-        <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
-          <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-          <span>${escapeHtml(opt)}</span>
-        </button>
-      `).join('');
+
+      // 判断是选择题还是填空题
+      if (q.options && q.options.length > 0) {
+        // 选择题
+        $('studentOptions').innerHTML = q.options.map((opt, i) => `
+          <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
+            <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+            <span>${escapeHtml(opt)}</span>
+          </button>
+        `).join('');
+      } else if (q.answer !== null && q.answer !== undefined) {
+        // 填空题 - 显示输入框
+        $('studentOptions').innerHTML = `
+          <div style="width: 100%; text-align: center;">
+            <input type="text" id="fillAnswerInput" placeholder="请输入答案"
+              style="text-align: center; font-size: 1.2rem; padding: 16px; width: 80%; max-width: 400px;"
+              onkeydown="if(event.key==='Enter')submitFillAnswer()">
+            <button class="btn btn-primary" onclick="submitFillAnswer()" style="margin-top: 16px;">提交答案</button>
+          </div>
+        `;
+      }
       questionStartTime = Date.now();
       startStudentTimer(q.timeLimit);
     }
 
-    // ===== 工具函数 =====
-    const $ = id => document.getElementById(id);
+    function submitFillAnswer() {
+      if (hasAnswered) return;
+      const input = $('fillAnswerInput');
+      if (!input) return;
+      const userAnswer = input.value.trim();
+      if (!userAnswer) { showToast('请输入答案'); return; }
+
+      const currentQ = questions[currentQuestionIndex];
+      if (!currentQ) return;
+
+      // 简化判断：填空题只要回答了就给基础分
+      const isCorrect = userAnswer === currentQ.answer;
+      const timeTaken = (Date.now() - questionStartTime) / 1000;
+      const timeBonus = Math.max(0, Math.floor((currentQ.timeLimit - timeTaken) * 50));
+      const points = isCorrect ? 1000 + timeBonus : 0;
+
+      hasAnswered = true;
+      stopTimers();
+
+      myScore += points;
+      qsa('.option-btn').forEach(btn => btn.disabled = true);
+
+      const resultEl = $('resultStatus');
+      resultEl.textContent = isCorrect ? `✓ 回答正确！+${points} 分` : `✗ 正确答案是：${currentQ.answer}`;
+      resultEl.style.color = isCorrect ? '#10b981' : '#ef4444';
+      $('myScore').textContent = myScore;
+      show('studentResult');
+    }
+
+    function submitAnswer(index) {
     const show = id => $(id).classList.remove('hidden');
     const hide = id => $(id).classList.add('hidden');
     const qsa = sel => document.querySelectorAll(sel);
@@ -1460,7 +1542,46 @@
     }
 
     // ===== 初始化 =====
+    function populateBuiltInBankSelect() {
+      const select = $('builtInBankSelect');
+      select.innerHTML = '<option value="">选择题库...</option>';
+      for (const bankName of Object.keys(BUILT_IN_BANKS)) {
+        const count = BUILT_IN_BANKS[bankName].length;
+        select.innerHTML += `<option value="${bankName}">${bankName} (${count}题)</option>`;
+      }
+    }
+
+    async function importBuiltInBank() {
+      const bankName = $('builtInBankSelect').value;
+      if (!bankName) { showToast('请先选择题库'); return; }
+      const bank = BUILT_IN_BANKS[bankName];
+      if (!bank) return;
+
+      try {
+        for (let i = 0; i < bank.length; i++) {
+          const q = bank[i];
+          const questionId = 'bank_' + Date.now() + '_' + i;
+          const question = {
+            id: questionId,
+            question: q.question,
+            options: q.options || null,
+            answer: q.answer || null,
+            correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : -1,
+            timeLimit: q.timeLimit || 15
+          };
+          await fbPut(`rooms/${roomCode}/questions/${questionId}`, question);
+          questions.push(question);
+        }
+        renderQuestionList();
+        showToast(`已导入 ${bank.length} 道题目`);
+      } catch (e) {
+        console.error('Import bank error:', e);
+        showToast('导入失败: ' + e.message);
+      }
+    }
+
     function init() {
+      populateBuiltInBankSelect();
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get('room');
       if (roomParam) {
