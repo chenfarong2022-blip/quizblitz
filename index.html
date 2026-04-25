@@ -306,6 +306,7 @@
     .status-success { background: rgba(16,185,129,0.3); color: var(--success); }
     .status-warning { background: rgba(245,158,11,0.3); color: var(--accent); }
     .status-danger { background: rgba(239,68,68,0.3); color: var(--danger); }
+    #teacherControlContent.collapsed { display: none; }
     .qr-container { text-align: center; padding: 30px; background: white; border-radius: 20px; display: inline-block; margin: 20px 0; }
     .qr-url {
       font-family: monospace;
@@ -511,29 +512,33 @@
 
     <!-- 游戏控制 -->
     <div id="teacherControl" class="card hidden">
-      <h2>🎮 游戏控制台</h2>
-      <div id="gameStatus" class="status-badge status-info">等待开始</div>
-
-      <div id="teacherQuestionDisplay" class="question-box" style="margin-top: 20px;">
-        <div class="question-number" id="teacherQuestionNumber">第 1 题</div>
-        <div class="question-text" id="teacherQuestionText">等待发题...</div>
-        <div class="timer-display timer-normal" id="teacherTimerDisplay" style="font-size: 3rem;">--</div>
-        <div class="options-grid" id="teacherOptionsDisplay" style="margin-top: 30px;"></div>
+      <div id="teacherControlHeader" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 10px; background: rgba(99,102,241,0.2); border-radius: 8px;" onclick="toggleTeacherControl()">
+        <span>🎮 游戏控制台 <span id="gameStatus" class="status-badge status-info" style="font-size: 0.75rem;">等待开始</span></span>
+        <span id="teacherControlToggle">▼ 收起</span>
       </div>
 
-      <div class="game-controls" style="margin-top: 20px;">
-        <button class="btn btn-primary" id="nextQuestionBtn" onclick="nextQuestion()">下一题</button>
-        <button class="btn btn-danger" id="stopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
-        <button class="btn btn-success" id="showRankingBtn" onclick="showRanking()" disabled>显示排名</button>
-      </div>
+      <div id="teacherControlContent">
+        <div id="teacherQuestionDisplay" class="question-box" style="margin-top: 20px;">
+          <div class="question-number" id="teacherQuestionNumber">第 1 题</div>
+          <div class="question-text" id="teacherQuestionText">等待发题...</div>
+          <div class="timer-display timer-normal" id="teacherTimerDisplay" style="font-size: 3rem;">--</div>
+          <div class="options-grid" id="teacherOptionsDisplay" style="margin-top: 30px;"></div>
+        </div>
 
-      <div id="teacherRankings" class="ranking-list hidden"></div>
+        <div class="game-controls" style="margin-top: 20px;">
+          <button class="btn btn-primary" id="nextQuestionBtn" onclick="nextQuestion()">下一题</button>
+          <button class="btn btn-danger" id="stopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
+          <button class="btn btn-success" id="showRankingBtn" onclick="showRanking()" disabled>显示排名</button>
+        </div>
 
-      <h3 style="margin-top: 30px;">👥 在线玩家 (<span id="playerCount">0</span>)</h3>
-      <div id="teacherPlayerList" class="player-grid"></div>
+        <div id="teacherRankings" class="ranking-list hidden"></div>
 
-      <div style="margin-top: 20px;">
-        <button class="btn btn-secondary" onclick="showTeacherRoom()">← 返回房间</button>
+        <h3 style="margin-top: 30px;">👥 在线玩家 (<span id="playerCount">0</span>)</h3>
+        <div id="teacherPlayerList" class="player-grid"></div>
+
+        <div style="margin-top: 20px;">
+          <button class="btn btn-secondary" onclick="showTeacherRoom()">← 返回房间</button>
+        </div>
       </div>
     </div>
 
@@ -1095,6 +1100,18 @@
       showToast(`已导入 ${bank.length} 道题目`);
     }
 
+    function toggleTeacherControl() {
+      const content = $('teacherControlContent');
+      const toggle = $('teacherControlToggle');
+      if (content.classList.contains('collapsed')) {
+        content.classList.remove('collapsed');
+        toggle.textContent = '▼ 收起';
+      } else {
+        content.classList.add('collapsed');
+        toggle.textContent = '▲ 展开';
+      }
+    }
+
     function startGame() {
       if (questions.length === 0) { showToast('请先添加至少一道题目'); return; }
 
@@ -1104,6 +1121,10 @@
       showTeacherControl();
       $('gameStatus').textContent = '游戏进行中';
       $('gameStatus').className = 'status-badge status-success';
+
+      // Auto collapse the control panel
+      $('teacherControlContent').classList.add('collapsed');
+      $('teacherControlToggle').textContent = '▲ 展开';
 
       updatePlayerList(players);
 
