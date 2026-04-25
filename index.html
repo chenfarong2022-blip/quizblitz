@@ -450,6 +450,10 @@
           <span id="roomInfoToggle">▲</span>
         </div>
         <div id="roomInfoContent">
+          <div id="roomInfoHeader" style="display: flex; justify-content: space-between; align-items: center; background: rgba(99,102,241,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 15px;">
+            <span>📋 房间信息</span>
+            <button onclick="toggleRoomInfo()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">▼ 收起</button>
+          </div>
           <div style="text-align: center; margin-bottom: 20px;">
             <div class="section-title">房间码</div>
             <div class="room-code-display" id="teacherRoomCode" style="font-size: 3rem; margin: 15px 0;"></div>
@@ -517,31 +521,25 @@
 
     <!-- 游戏控制 -->
     <div id="teacherControl" class="card hidden">
-      <div id="teacherControlHeader" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 10px; background: rgba(99,102,241,0.2); border-radius: 8px;" onclick="toggleTeacherControl()">
-        <span>🎮 游戏控制台 <span id="gameStatus" class="status-badge status-info" style="font-size: 0.75rem;">等待开始</span></span>
-        <span id="teacherControlToggle">▼ 收起</span>
+      <div id="teacherQuestionDisplay" class="question-box">
+        <div class="question-number" id="teacherQuestionNumber">第 1 题</div>
+        <div class="question-text" id="teacherQuestionText">等待发题...</div>
+        <div class="timer-display timer-normal" id="teacherTimerDisplay" style="font-size: 3rem;">--</div>
+        <div class="options-grid" id="teacherOptionsDisplay" style="margin-top: 30px;"></div>
       </div>
 
-      <div id="teacherControlContent" style="display: block;">
-        <div id="teacherQuestionDisplay" class="question-box" style="margin-top: 20px;">
-          <div class="question-number" id="teacherQuestionNumber">第 1 题</div>
-          <div class="question-text" id="teacherQuestionText">等待发题...</div>
-          <div class="timer-display timer-normal" id="teacherTimerDisplay" style="font-size: 3rem;">--</div>
-          <div class="options-grid" id="teacherOptionsDisplay" style="margin-top: 30px;"></div>
-        </div>
+      <div class="game-controls" style="margin-top: 20px;">
+        <button class="btn btn-primary" id="nextQuestionBtn" onclick="nextQuestion()">下一题</button>
+        <button class="btn btn-danger" id="stopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
+        <button class="btn btn-success" id="showRankingBtn" onclick="showRanking()" disabled>显示排名</button>
+      </div>
 
-        <div class="game-controls" style="margin-top: 20px;">
-          <button class="btn btn-primary" id="nextQuestionBtn" onclick="nextQuestion()">下一题</button>
-          <button class="btn btn-danger" id="stopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
-          <button class="btn btn-success" id="showRankingBtn" onclick="showRanking()" disabled>显示排名</button>
-        </div>
+      <div id="teacherRankings" class="ranking-list hidden"></div>
 
-        <div id="teacherRankings" class="ranking-list hidden"></div>
+      <h3 style="margin-top: 30px;">👥 在线玩家 (<span id="playerCount">0</span>)</h3>
+      <div id="teacherPlayerList" class="player-grid"></div>
 
-        <h3 style="margin-top: 30px;">👥 在线玩家 (<span id="playerCount">0</span>)</h3>
-        <div id="teacherPlayerList" class="player-grid"></div>
-
-        <div style="margin-top: 20px;">
+      <div style="margin-top: 20px;">
           <button class="btn btn-secondary" onclick="showTeacherRoom()">← 返回房间</button>
         </div>
       </div>
@@ -1123,18 +1121,6 @@
 
       renderQuestionList();
       showToast(`已导入 ${bank.length} 道题目`);
-    }
-
-    function toggleTeacherControl() {
-      const content = $('teacherControlContent');
-      const toggle = $('teacherControlToggle');
-      if (content.style.display === 'none') {
-        content.style.display = 'block';
-        toggle.textContent = '▼ 收起';
-      } else {
-        content.style.display = 'none';
-        toggle.textContent = '▲ 展开';
-      }
     }
 
     function startGame() {
