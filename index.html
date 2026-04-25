@@ -420,6 +420,13 @@
 <body>
   <!-- 封面 -->
   <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+    <!-- 音乐控制 -->
+    <div style="position: absolute; top: 20px; right: 80px;">
+      <button id="musicBtn" onclick="toggleMusic()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 14px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">🎵</button>
+    </div>
+    <audio id="bgMusic" loop>
+      <source src="YOUR_MUSIC_URL_HERE.mp3" type="audio/mpeg">
+    </audio>
     <div style="position: relative; margin-bottom: 30px;">
       <!-- 小王子星球装饰 -->
       <div style="position: absolute; top: -60px; left: -80px; font-size: 3rem; animation: float 3s ease-in-out infinite;">🌟</div>
@@ -445,12 +452,25 @@
   </style>
 
   <script>
+    let isMusicPlaying = false;
     function enterApp() {
       document.getElementById('cover').style.opacity = '0';
       document.getElementById('cover').style.transition = 'opacity 0.5s ease';
       setTimeout(() => {
         document.getElementById('cover').style.display = 'none';
       }, 500);
+    }
+    function toggleMusic() {
+      const music = document.getElementById('bgMusic');
+      const btn = document.getElementById('musicBtn');
+      if (isMusicPlaying) {
+        music.pause();
+        btn.textContent = '🎵';
+      } else {
+        music.play().catch(() => {});
+        btn.textContent = '🔊';
+      }
+      isMusicPlaying = !isMusicPlaying;
     }
   </script>
 
