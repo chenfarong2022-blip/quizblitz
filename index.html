@@ -652,19 +652,21 @@
       goEasy = GoEasy.getInstance({
         appkey: GOEASY_APPKEY,
         host: 'cn-beijing',
-        modules: ['PUBSUB'],
-        onConnectSuccess: function() {
+        modules: ['PUBSUB']
+      });
+
+      goEasy.connect({
+        onSuccess: function() {
           console.log('GoEasy connected!');
           goEasyConnected = true;
         },
-        onConnectFailed: function(error) {
+        onFailed: function(error) {
           console.error('GoEasy connect failed:', error);
           goEasyConnected = false;
         }
       });
 
       console.log('GoEasy initializing...');
-      goEasy.connect();
       return goEasy;
     }
 
