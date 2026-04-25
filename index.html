@@ -799,37 +799,17 @@
           console.log('currentQuestion changed from', currentQuestionIndex, 'to', qIndex);
           currentQuestionIndex = qIndex;
 
-          // 如果本地没有题目，先获取题目
-          if (questions.length === 0 && data.questions) {
-            questions = Object.values(data.questions);
-            console.log('Questions loaded from poll:', questions.length);
-          }
-
-          const q = questions[qIndex];
-          if (q) {
-            console.log('Found question locally, showing to student');
-            if (!isHost) {
-              showQuestionToStudent(qIndex, q);
-            }
-          } else {
-            // 题目未同步，立即重新获取
-            console.log('Question not synced yet, re-fetching...');
-            setTimeout(async () => {
-              try {
-                const freshData = await fbGetFull(`rooms/${roomCode}`);
-                if (freshData && freshData.questions) {
-                  questions = Object.values(freshData.questions);
-                  const freshQ = questions[qIndex];
-                  console.log('Re-fetched questions:', questions.length, 'want index:', qIndex);
-                  if (freshQ && !isHost) {
-                    showQuestionToStudent(qIndex, freshQ);
-                  }
-                }
-              } catch (e) {
-                console.error('Re-fetch error:', e);
+          // 立即从Firebase获取题目
+          fbGetFull(`rooms/${roomCode}/questions`).then(questionsData => {
+            if (questionsData) {
+              questions = Object.values(questionsData);
+              console.log('Questions fetched:', questions.length, 'looking for index:', qIndex);
+              const q = questions[qIndex];
+              if (q && !isHost) {
+                showQuestionToStudent(qIndex, q);
               }
-            }, 50);
-          }
+            }
+          }).catch(e => console.error('Fetch questions error:', e));
         }
       }
 
