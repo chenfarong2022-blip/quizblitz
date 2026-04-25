@@ -792,7 +792,15 @@
       if (data.currentQuestion !== undefined && data.currentQuestion >= 0) {
         const qIndex = data.currentQuestion;
         if (qIndex !== currentQuestionIndex) {
+          console.log('currentQuestion changed from', currentQuestionIndex, 'to', qIndex);
           currentQuestionIndex = qIndex;
+
+          // 如果本地没有题目，先获取题目
+          if (questions.length === 0 && data.questions) {
+            questions = Object.values(data.questions);
+            console.log('Questions loaded from poll:', questions.length);
+          }
+
           const q = questions[qIndex];
           if (q) {
             if (!isHost) {
@@ -807,6 +815,11 @@
                 if (freshData && freshData.questions) {
                   questions = Object.values(freshData.questions);
                   const freshQ = questions[qIndex];
+                  console.log('Re-fetched questions:', questions.length, 'want index:', qIndex);
+                  if (freshQ && !isHost) {
+                    showQuestionToStudent(qIndex, freshQ);
+                  }
+                }
                   if (freshQ && !isHost) {
                     showQuestionToStudent(qIndex, freshQ);
                   }
