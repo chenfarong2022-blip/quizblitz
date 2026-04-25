@@ -1555,6 +1555,7 @@
     async function importBuiltInBank() {
       const bankName = $('builtInBankSelect').value;
       if (!bankName) { showToast('请先选择题库'); return; }
+      if (!roomCode) { showToast('请先创建房间'); return; }
       const bank = BUILT_IN_BANKS[bankName];
       if (!bank) return;
 
@@ -1570,6 +1571,7 @@
             correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : -1,
             timeLimit: q.timeLimit || 15
           };
+          console.log('Importing question:', question);
           await fbPut(`rooms/${roomCode}/questions/${questionId}`, question);
           questions.push(question);
         }
