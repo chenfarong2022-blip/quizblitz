@@ -306,7 +306,6 @@
     .status-success { background: rgba(16,185,129,0.3); color: var(--success); }
     .status-warning { background: rgba(245,158,11,0.3); color: var(--accent); }
     .status-danger { background: rgba(239,68,68,0.3); color: var(--danger); }
-    #teacherControlContent.collapsed { display: none; }
     .qr-container { text-align: center; padding: 30px; background: white; border-radius: 20px; display: inline-block; margin: 20px 0; }
     .qr-url {
       font-family: monospace;
@@ -517,7 +516,7 @@
         <span id="teacherControlToggle">▼ 收起</span>
       </div>
 
-      <div id="teacherControlContent">
+      <div id="teacherControlContent" style="display: block;">
         <div id="teacherQuestionDisplay" class="question-box" style="margin-top: 20px;">
           <div class="question-number" id="teacherQuestionNumber">第 1 题</div>
           <div class="question-text" id="teacherQuestionText">等待发题...</div>
@@ -1103,11 +1102,11 @@
     function toggleTeacherControl() {
       const content = $('teacherControlContent');
       const toggle = $('teacherControlToggle');
-      if (content.classList.contains('collapsed')) {
-        content.classList.remove('collapsed');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
         toggle.textContent = '▼ 收起';
       } else {
-        content.classList.add('collapsed');
+        content.style.display = 'none';
         toggle.textContent = '▲ 展开';
       }
     }
@@ -1123,7 +1122,7 @@
       $('gameStatus').className = 'status-badge status-success';
 
       // Auto collapse the control panel
-      $('teacherControlContent').classList.add('collapsed');
+      $('teacherControlContent').style.display = 'none';
       $('teacherControlToggle').textContent = '▲ 展开';
 
       updatePlayerList(players);
