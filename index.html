@@ -812,22 +812,31 @@
           break;
 
         case 'answer-submitted':
-          if (data.answerResult && data.answerResult.playerId === myPlayerId) {
+          if (data.answerResult) {
             const result = data.answerResult;
-            hasAnswered = true;
-            stopTimers();
-            const resultEl = $('resultStatus');
-            if (result.isCorrect) {
-              resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
-              resultEl.style.color = '#10b981';
-            } else {
-              resultEl.textContent = '✗ 回答错误';
-              resultEl.style.color = '#ef4444';
+            // 找到对应玩家并更新分数
+            const player = players.find(p => p.id === result.playerId);
+            if (player) {
+              player.score = result.totalScore;
+              updatePlayerList(players);
             }
-            myScore = result.totalScore;
-            $('myScore').textContent = myScore;
-            show('studentResult');
-            qsa('.option-btn').forEach(btn => btn.disabled = true);
+            // 如果是教师自己（host）的答案
+            if (result.playerId === myPlayerId) {
+              hasAnswered = true;
+              stopTimers();
+              const resultEl = $('resultStatus');
+              if (result.isCorrect) {
+                resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
+                resultEl.style.color = '#10b981';
+              } else {
+                resultEl.textContent = '✗ 回答错误';
+                resultEl.style.color = '#ef4444';
+              }
+              myScore = result.totalScore;
+              $('myScore').textContent = myScore;
+              show('studentResult');
+              qsa('.option-btn').forEach(btn => btn.disabled = true);
+            }
           }
           break;
       }
