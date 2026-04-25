@@ -1556,10 +1556,12 @@
       if (!bank) return;
 
       try {
+        // Build all questions object in one operation
+        const questionsObj = {};
         for (let i = 0; i < bank.length; i++) {
           const q = bank[i];
           const questionId = 'bank_' + Date.now() + '_' + i;
-          const question = {
+          questionsObj[questionId] = {
             id: questionId,
             question: q.question,
             options: q.options || null,
@@ -1567,10 +1569,13 @@
             correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : -1,
             timeLimit: q.timeLimit || 15
           };
-          console.log('Importing question:', question);
-          await fbPut(`rooms/${roomCode}/questions/${questionId}`, question);
-          questions.push(question);
         }
+
+        // Single Firebase call for all questions at once
+        await fbPut(`rooms/${roomCode}/questions`, questionsObj);
+
+        // Update local questions array
+        questions = Object.values(questionsObj);
         renderQuestionList();
         showToast(`已导入 ${bank.length} 道题目`);
       } catch (e) {
