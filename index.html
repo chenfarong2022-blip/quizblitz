@@ -596,7 +596,7 @@
   <script>
     // ===== Firebase REST API 配置 =====
     const FIREBASE_DB_URL = 'https://quizblitz-feab7-default-rtdb.asia-southeast1.firebasedatabase.app';
-    const POLL_INTERVAL = 500; // 每500ms轮询一次
+    const POLL_INTERVAL = 200; // 每200ms轮询一次
 
     let pollTimer = null;
     let lastKnownData = null;
@@ -759,7 +759,7 @@
               } catch (e) {
                 console.error('Re-fetch error:', e);
               }
-            }, 100);
+            }, 50);
           }
         }
       }
