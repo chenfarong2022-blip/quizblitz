@@ -1073,7 +1073,7 @@
 
       try {
         // 创建房间数据
-        const roomPromise = fbPut(`rooms/${roomCode}`, {
+        await fbPut(`rooms/${roomCode}`, {
           hostId: myPlayerId,
           gameStatus: 'waiting',
           currentQuestion: -1,
@@ -1081,27 +1081,26 @@
         });
 
         // 添加老师到玩家列表
-        const playerPromise = fbPut(`rooms/${roomCode}/players/${myPlayerId}`, {
+        await fbPut(`rooms/${roomCode}/players/${myPlayerId}`, {
           name: '老师',
           score: 0,
           isHost: true,
           joinedAt: Date.now()
         });
 
-        // Wait for both to complete
-        await Promise.all([roomPromise, playerPromise]);
-
         $('teacherRoomCode').textContent = roomCode;
         hide('teacherCreate');
         show('teacherRoomInfo');
-        // 直接在页面显示二维码（不阻塞）
+
+        // 显示二维码
         let baseUrl = window.location.origin;
         if (window.location.pathname.includes('/quizblitz/')) {
           baseUrl = window.location.origin + '/quizblitz';
         }
         const joinUrl = `${baseUrl}?room=${roomCode}`;
         $('qrUrl').textContent = joinUrl;
-        setTimeout(() => generateQR(joinUrl, 'qrcode'), 0);
+        generateQR(joinUrl, 'qrcode');
+
         updatePlayerList(players);
         startPolling();
 
