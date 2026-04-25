@@ -760,6 +760,8 @@
             if (isHost) {
               showQuestionToTeacher(data.questionIndex, q);
             } else {
+              // 学生端保存题目到本地
+              questions[currentQuestionIndex] = q;
               showQuestionToStudent(data.questionIndex, q);
             }
           }
