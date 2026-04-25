@@ -649,7 +649,8 @@
 
       goEasy = GoEasy.getInstance({
         appkey: GOEASY_APPKEY,
-        host: 'cn-beijing'  // 使用中国区域服务器
+        host: 'cn-beijing',
+        modules: ['PUBSUB']
       });
 
       console.log('GoEasy initialized');
