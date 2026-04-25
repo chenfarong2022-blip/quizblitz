@@ -644,16 +644,27 @@
     };
 
     // ===== GoEasy 初始化 =====
+    let goEasyConnected = false;
+
     function initGoEasy() {
       if (goEasy) return goEasy;
 
       goEasy = GoEasy.getInstance({
         appkey: GOEASY_APPKEY,
         host: 'cn-beijing',
-        modules: ['PUBSUB']
+        modules: ['PUBSUB'],
+        onConnectSuccess: function() {
+          console.log('GoEasy connected!');
+          goEasyConnected = true;
+        },
+        onConnectFailed: function(error) {
+          console.error('GoEasy connect failed:', error);
+          goEasyConnected = false;
+        }
       });
 
-      console.log('GoEasy initialized');
+      console.log('GoEasy initializing...');
+      goEasy.connect();
       return goEasy;
     }
 
@@ -663,6 +674,22 @@
       }
 
       initGoEasy();
+
+      // Wait for connection before subscribing
+      let attempts = 0;
+      let subscribeInterval = setInterval(function() {
+        attempts++;
+        if (goEasyConnected) {
+          clearInterval(subscribeInterval);
+          doSubscribe(room);
+        } else if (attempts > 50) {
+          clearInterval(subscribeInterval);
+          console.error('GoEasy connection timeout');
+        }
+      }, 100);
+    }
+
+    function doSubscribe(room) {
       const channelName = 'quizblitz-' + room;
       goEasyChannel = goEasy.pubsub.subscribe({
         channel: channelName,
