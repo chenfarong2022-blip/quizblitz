@@ -678,11 +678,15 @@
       }
 
       initPusher();
-      const channelName = `quizblitz-${room}`;
+      const channelName = `presence-quizblitz-${room}`;
       pusherChannel = pusher.subscribe(channelName);
 
-      pusherChannel.bind('pusher:subscription_succeeded', () => {
-        console.log('Subscribed to channel:', channelName);
+      pusherChannel.bind('pusher:subscription_succeeded', (members) => {
+        console.log('Subscribed to channel:', channelName, 'members:', members.count);
+      });
+
+      pusherChannel.bind('pusher:member_added', (member) => {
+        console.log('Member added:', member);
       });
 
       // 监听游戏事件
@@ -737,8 +741,14 @@
         timestamp: Date.now()
       };
 
-      pusherChannel.trigger(`client-${eventName}`, eventData);
-      console.log('Triggered event:', eventName, eventData);
+      const eventToTrigger = `client-${eventName}`;
+      console.log('Triggering:', eventToTrigger, eventData);
+      try {
+        pusherChannel.trigger(eventToTrigger, eventData);
+        console.log('Trigger success');
+      } catch (e) {
+        console.error('Trigger failed:', e);
+      }
     }
 
     function handlePusherEvent(data) {
