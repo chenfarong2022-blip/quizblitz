@@ -445,16 +445,22 @@
     <div id="teacherJoin" class="card hidden">
       <h2>👨‍🏫 老师控制台</h2>
       <div id="teacherRoomInfo" class="hidden">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <div class="section-title">房间码</div>
-          <div class="room-code-display" id="teacherRoomCode" style="font-size: 3rem; margin: 15px 0;"></div>
-          <div class="qr-container" style="background: white; border-radius: 16px; padding: 20px; display: inline-block;">
-            <canvas id="qrcode" width="180" height="180"></canvas>
+        <div id="roomInfoContent">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <div class="section-title">房间码</div>
+            <div class="room-code-display" id="teacherRoomCode" style="font-size: 3rem; margin: 15px 0;"></div>
+            <div class="qr-container" style="background: white; border-radius: 16px; padding: 20px; display: inline-block;">
+              <canvas id="qrcode" width="180" height="180"></canvas>
+            </div>
+            <div class="qr-url" id="qrUrl" style="margin-top: 12px;"></div>
+            <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 10px;">学生扫码直接加入房间</p>
           </div>
-          <div class="qr-url" id="qrUrl" style="margin-top: 12px;"></div>
-          <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 10px;">学生扫码直接加入房间</p>
         </div>
-        <div class="game-controls" style="justify-content: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(99,102,241,0.2); padding: 8px 12px; border-radius: 8px;">
+          <span id="roomInfoStatus">房间码: <span id="miniRoomCode"></span></span>
+          <button onclick="toggleRoomInfo()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;">▼</button>
+        </div>
+        <div class="game-controls" style="justify-content: center; margin-top: 15px;">
           <button class="btn btn-primary" onclick="showTeacherEditor()">📝 编辑题目</button>
           <button class="btn btn-success" onclick="startGame()">🎮 开始游戏</button>
           <button class="btn btn-danger" onclick="resetGame()">🔄 重置</button>
@@ -931,6 +937,8 @@
       show('teacherJoin');
       show('teacherEditor');
       show('teacherRoomInfo');
+      $('roomInfoContent').style.display = 'block';
+      $('miniRoomCode').textContent = roomCode;
       renderQuestionList();
     }
     function showTeacherControl() {
@@ -938,6 +946,21 @@
       show('teacherJoin');
       show('teacherControl');
       show('teacherRoomInfo');
+      $('roomInfoContent').style.display = 'none';
+      $('miniRoomCode').textContent = roomCode;
+    }
+
+    function toggleRoomInfo() {
+      const content = $('roomInfoContent');
+      const btn = content.parentElement.querySelector('button');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        btn.textContent = '▼';
+      } else {
+        content.style.display = 'none';
+        btn.textContent = '▲';
+      }
+    }
     }
 
     // ===== 房间管理 =====
@@ -1121,9 +1144,9 @@
       $('gameStatus').textContent = '游戏进行中';
       $('gameStatus').className = 'status-badge status-success';
 
-      // Auto collapse the control panel
-      $('teacherControlContent').style.display = 'none';
-      $('teacherControlToggle').textContent = '▲ 展开';
+      // Auto collapse the room info panel
+      toggleRoomInfo();
+      $('roomInfoStatus').textContent = '游戏进行中';
 
       updatePlayerList(players);
 
