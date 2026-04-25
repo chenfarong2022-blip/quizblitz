@@ -1152,7 +1152,7 @@
 
       // 1. 监听房间数据变化（主监听器）
       roomRef.on('value', snapshot => {
-        console.log('Room data changed!');
+        console.log('Room data changed!', JSON.stringify(snapshot.val()));
         const data = snapshot.val();
         if (!data) {
           console.log('No data in snapshot');
@@ -1440,26 +1440,31 @@
     function nextQuestion() {
       const nextIndex = currentQuestionIndex + 1;
       console.log('nextQuestion called, nextIndex:', nextIndex, 'questions length:', questions.length);
+
       if (nextIndex >= questions.length) {
-        // 游戏结束
         roomRef.update({ gameStatus: 'finished' });
         return;
       }
 
-      console.log('Sending question to Firebase, index:', nextIndex);
-      roomRef.update({
+      const question = questions[nextIndex];
+      console.log('Question to send:', JSON.stringify(question));
+
+      // 直接传入简单数据，不传复杂对象
+      const updateData = {
         currentQuestion: nextIndex,
-        currentQuestionData: questions[nextIndex],
         'currentQuestion/stopped': false,
-        'currentQuestion/correctAnswer': questions[nextIndex].correctAnswer
-      }).then(() => {
-        console.log('Question sent to Firebase - update completed');
+        'currentQuestion/correctAnswer': question.correctAnswer
+      };
+      console.log('Update data:', JSON.stringify(updateData));
+
+      roomRef.update(updateData).then(() => {
+        console.log('Firebase update completed!');
         $('nextQuestionBtn').disabled = true;
         $('stopAnswerBtn').disabled = false;
         $('showRankingBtn').disabled = true;
         hide('teacherRankings');
       }).catch(err => {
-        console.error('Update failed:', err);
+        console.error('Firebase update error:', err);
         showToast('发题失败: ' + err.message);
       });
     }
