@@ -721,12 +721,19 @@
     function startPolling() {
       if (pollTimer) clearInterval(pollTimer);
 
+      console.log('Starting polling, roomCode:', roomCode);
+
       const poll = async () => {
         if (!roomCode) return;
 
         try {
           const data = await fbGetFull(`rooms/${roomCode}`);
-          if (!data) return;
+          if (!data) {
+            console.log('Poll returned no data');
+            return;
+          }
+
+          console.log('Poll got data, currentQuestion:', data.currentQuestion, 'gameStatus:', data.gameStatus);
 
           const dataStr = JSON.stringify(data);
           const dataChanged = dataStr !== lastKnownData;
@@ -734,18 +741,15 @@
           // 当currentQuestion变化时，立即更新本地题目列表
           if (data.currentQuestion !== undefined && data.currentQuestion >= 0 && data.currentQuestion !== currentQuestionIndex) {
             console.log('currentQuestion changed:', data.currentQuestion, 'local:', currentQuestionIndex);
-            // 立即获取最新题目
             if (data.questions) {
               questions = Object.values(data.questions);
+              console.log('Questions updated:', questions.length);
             }
-            handleRemoteUpdate(data);
           }
 
-          if (dataChanged) {
-            lastKnownData = dataStr;
-            console.log('Data changed:', data);
-            handleRemoteUpdate(data);
-          }
+          // Always call handleRemoteUpdate to process changes
+          lastKnownData = dataStr;
+          handleRemoteUpdate(data);
         } catch (e) {
           console.error('Poll error:', e);
         }
@@ -753,7 +757,7 @@
 
       poll();
       pollTimer = setInterval(poll, POLL_INTERVAL);
-      console.log('Started polling, interval:', POLL_INTERVAL);
+      console.log('Polling started, interval:', POLL_INTERVAL);
     }
 
     function stopPolling() {
