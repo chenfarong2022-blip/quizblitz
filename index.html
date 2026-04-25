@@ -607,7 +607,7 @@
   <script>
     // ===== Firebase REST API 配置 =====
     const FIREBASE_DB_URL = 'https://quizblitz-feab7-default-rtdb.asia-southeast1.firebasedatabase.app';
-    const POLL_INTERVAL = 200; // 每200ms轮询一次
+    const POLL_INTERVAL = 100; // 每100ms轮询一次
 
     let pollTimer = null;
     let lastKnownData = null;
@@ -1256,18 +1256,11 @@
     }
 
     async function startGame() {
+      console.log('startGame called, questions.length:', questions.length, 'roomCode:', roomCode);
       if (questions.length === 0) { showToast('请先添加至少一道题目'); return; }
 
       try {
-        // 重置所有玩家分数
-        const playersData = await fbGetFull(`rooms/${roomCode}/players`);
-        if (playersData) {
-          for (const playerId of Object.keys(playersData)) {
-            await fbPatch(`rooms/${roomCode}/players/${playerId}`, { score: 0 });
-          }
-        }
-
-        // 更新游戏状态
+        // 直接更新游戏状态，不需要逐个重置玩家分数
         await fbPatch(`rooms/${roomCode}`, {
           gameStatus: 'playing',
           currentQuestion: -1
