@@ -729,11 +729,23 @@
           if (!data) return;
 
           const dataStr = JSON.stringify(data);
-          if (dataStr === lastKnownData) return;
-          lastKnownData = dataStr;
+          const dataChanged = dataStr !== lastKnownData;
 
-          console.log('Data changed:', data);
-          handleRemoteUpdate(data);
+          // 当currentQuestion变化时，立即更新本地题目列表
+          if (data.currentQuestion !== undefined && data.currentQuestion >= 0 && data.currentQuestion !== currentQuestionIndex) {
+            console.log('currentQuestion changed:', data.currentQuestion, 'local:', currentQuestionIndex);
+            // 立即获取最新题目
+            if (data.questions) {
+              questions = Object.values(data.questions);
+            }
+            handleRemoteUpdate(data);
+          }
+
+          if (dataChanged) {
+            lastKnownData = dataStr;
+            console.log('Data changed:', data);
+            handleRemoteUpdate(data);
+          }
         } catch (e) {
           console.error('Poll error:', e);
         }
