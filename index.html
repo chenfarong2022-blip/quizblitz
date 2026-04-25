@@ -266,6 +266,7 @@
     .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
     .option-btn.correct { background: rgba(16,185,129,0.3) !important; border-color: var(--success) !important; }
     .option-btn.wrong { background: rgba(239,68,68,0.3) !important; border-color: var(--danger) !important; }
+    .option-btn.selected { background: rgba(99,102,241,0.4) !important; border-color: var(--primary) !important; transform: scale(1.05); }
     .ranking-list { margin-top: 20px; }
     .ranking-item {
       display: flex;
@@ -1234,13 +1235,16 @@
       $('studentTimer').textContent = q.timeLimit;
       $('studentTimer').className = 'timer-display timer-normal';
       hasAnswered = false;
+      window.selectedAnswer = null;
 
       if (q.options && q.options.length > 0) {
         $('studentOptions').innerHTML = q.options.map((opt, i) => `
-          <button class="option-btn" onclick="submitAnswer(${i})" id="opt-${i}">
+          <button class="option-btn" onclick="selectOption(${i})" id="opt-${i}">
             ${String.fromCharCode(65 + i)}
           </button>
-        `).join('');
+        `).join('') + `
+          <button class="btn btn-primary" id="submitBtn" onclick="confirmAnswer()" style="margin-top: 16px; padding: 16px; font-size: 1.1rem;" disabled>确认提交</button>
+        `;
       } else if (q.answer !== null && q.answer !== undefined) {
         $('studentOptions').innerHTML = `
           <div style="width: 100%; text-align: center;">
@@ -1291,6 +1295,28 @@
           totalScore: myScore
         }
       });
+    }
+
+    function selectOption(index) {
+      if (hasAnswered) return;
+      window.selectedAnswer = index;
+      qsa('.option-btn').forEach((btn, i) => {
+        if (i === index) {
+          btn.classList.add('selected');
+        } else {
+          btn.classList.remove('selected');
+        }
+      });
+      const submitBtn = $('submitBtn');
+      if (submitBtn) submitBtn.disabled = false;
+    }
+
+    function confirmAnswer() {
+      if (window.selectedAnswer === null || window.selectedAnswer === undefined) {
+        showToast('请先选择一个选项');
+        return;
+      }
+      submitAnswer(window.selectedAnswer);
     }
 
     function submitAnswer(index) {
