@@ -1245,7 +1245,10 @@
           <div class="question-item">
             <div class="question-item-header">${i + 1}. ${escapeHtml(q.question)}</div>
             <div class="question-item-options">
-              ${q.options.map((o, j) => `<span class="${j === q.correctAnswer ? 'correct-badge' : ''}">${String.fromCharCode(65 + j)}. ${escapeHtml(o)}</span>`).join(' | ')}
+              ${q.options && q.options.length > 0
+                ? q.options.map((o, j) => `<span class="${j === q.correctAnswer ? 'correct-badge' : ''}">${String.fromCharCode(65 + j)}. ${escapeHtml(o)}</span>`).join(' | ')
+                : `<span style="color: var(--accent);">填空题 (答案: ${q.answer || '未设置'})</span>`
+              }
             </div>
           </div>
         `).join('')}
