@@ -670,14 +670,27 @@
       return data;
     }
 
+    // ===== Firebase REST API =====
     async function fbGetFull(path) {
-      const response = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Firebase GET failed: ${response.status} - ${text}`);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(`${FIREBASE_DB_URL}/${path}.json`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(`Firebase GET failed: ${response.status} - ${text}`);
+        }
+        const data = await response.json();
+        return data;
+      } catch (e) {
+        if (e.name === 'AbortError') {
+          console.error('Firebase request timeout');
+        } else {
+          console.error('Firebase error:', e);
+        }
+        return null;
       }
-      const data = await response.json();
-      return data;
     }
 
     async function fbPut(path, data) {
