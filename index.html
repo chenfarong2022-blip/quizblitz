@@ -509,7 +509,7 @@
       </div>
     </div>
 
-    <!-- 游戏控制 - 老师端显示题目（用于投影） -->
+    <!-- 游戏控制 -->
     <div id="teacherControl" class="card hidden">
       <h2>🎮 游戏控制台</h2>
       <div id="gameStatus" class="status-badge status-info">等待开始</div>
@@ -567,7 +567,7 @@
       </div>
     </div>
 
-    <!-- 学生答题 - 只显示选项 -->
+    <!-- 学生答题 -->
     <div id="studentQuiz" class="card hidden">
       <div class="question-box">
         <div class="question-number" id="studentQuestionNumber">第 1 题 / 共 10 题</div>
@@ -590,29 +590,14 @@
         <button class="btn btn-primary" onclick="playAgain()">再来一轮</button>
       </div>
     </div>
-
-    <!-- QR弹窗 -->
-    <div id="qrModal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; min-width: 320px;">
-      <h2>📱 扫码加入</h2>
-      <div class="qr-container">
-        <canvas id="qrcodeLarge" width="200" height="200"></canvas>
-        <div class="qr-url" id="qrUrlLarge"></div>
-      </div>
-      <p style="color: rgba(255,255,255,0.6); margin-top: 20px;">学生扫码即可直接加入房间</p>
-      <button class="btn btn-secondary" onclick="closeQrModal()" style="margin-top: 20px;">关闭</button>
-    </div>
-    <div id="qrOverlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;" onclick="closeQrModal()"></div>
   </div>
 
-  <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+  <script src="https://cdn.goeasy.io/goeasy-2.6.0.min.js"></script>
   <script>
-    // ===== Pusher 配置 =====
-    const PUSHER_KEY = '2ce32a7bfb95d96cfefa';
-    const PUSHER_CLUSTER = 'ap1';
-    const PUSHER_APP_ID = '2146342';
-
-    let pusher = null;
-    let pusherChannel = null;
+    // ===== GoEasy 配置 =====
+    const GOEASY_APPKEY = 'PC-111da9826a36404a9f046d1b479fe222';
+    let goEasy = null;
+    let goEasyChannel = null;
 
     // ===== 状态 =====
     let myRole = null;
@@ -658,97 +643,75 @@
       ]
     };
 
-    // ===== Pusher 初始化 =====
-    function initPusher() {
-      if (pusher) return pusher;
+    // ===== GoEasy 初始化 =====
+    function initGoEasy() {
+      if (goEasy) return goEasy;
 
-      pusher = new Pusher(PUSHER_KEY, {
-        cluster: PUSHER_CLUSTER,
-        forceTLS: true
+      goEasy = GoEasy.getInstance({
+        appkey: GOEASY_APPKEY,
+        host: 'cn-beijing'  // 使用中国区域服务器
       });
 
-      console.log('Pusher initialized');
-      return pusher;
+      console.log('GoEasy initialized');
+      return goEasy;
     }
 
     function subscribeToRoom(room) {
-      if (pusherChannel) {
-        pusherChannel.unbind_all();
-        pusherChannel.unsubscribe();
+      if (goEasyChannel) {
+        goEasyChannel.unbind();
       }
 
-      initPusher();
-      const channelName = `private-quizblitz-${room}`;
-      pusherChannel = pusher.subscribe(channelName);
-
-      pusherChannel.bind('pusher:subscription_succeeded', () => {
-        console.log('Subscribed to channel:', channelName);
-      });
-
-      // 监听游戏事件
-      pusherChannel.bind('game-event', function(data) {
-        console.log('Game event received:', data);
-        handlePusherEvent(data);
-      });
-
-      // 监听玩家加入事件
-      pusherChannel.bind('player-joined', function(data) {
-        console.log('Player joined:', data);
-        if (data.players) {
-          players = data.players;
-          updatePlayerList(players);
-        }
-      });
-
-      // 监听答案提交事件
-      pusherChannel.bind('answer-submitted', function(data) {
-        console.log('Answer submitted:', data);
-        if (data.answerResult && data.answerResult.playerId === myPlayerId) {
-          const result = data.answerResult;
-          hasAnswered = true;
-          stopTimers();
-          const resultEl = $('resultStatus');
-          if (result.isCorrect) {
-            resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
-            resultEl.style.color = '#10b981';
-          } else {
-            resultEl.textContent = '✗ 回答错误';
-            resultEl.style.color = '#ef4444';
+      initGoEasy();
+      const channelName = 'quizblitz-' + room;
+      goEasyChannel = goEasy.subscribe({
+        channel: channelName,
+        onMessage: function(message) {
+          console.log('GoEasy message received:', message.content);
+          try {
+            const data = JSON.parse(message.content);
+            handleGoEasyEvent(data);
+          } catch (e) {
+            console.error('Parse error:', e);
           }
-          myScore = result.totalScore;
-          $('myScore').textContent = myScore;
-          show('studentResult');
-          qsa('.option-btn').forEach(btn => btn.disabled = true);
+        },
+        onSuccess: function() {
+          console.log('Subscribed to channel:', channelName);
+        },
+        onFailed: function(error) {
+          console.error('Subscribe failed:', error);
         }
       });
 
-      return pusherChannel;
+      return goEasyChannel;
     }
 
-    function triggerEvent(eventName, data) {
-      if (!pusherChannel) {
-        console.error('No Pusher channel subscribed');
+    function publishEvent(eventName, data) {
+      if (!goEasyChannel) {
+        console.error('No GoEasy channel subscribed');
         return;
       }
 
       const eventData = {
+        type: eventName,
         ...data,
         room: roomCode,
         timestamp: Date.now()
       };
 
-      const eventToTrigger = `client-${eventName}`;
-      console.log('Triggering:', eventToTrigger, eventData);
-      try {
-        pusherChannel.trigger(eventToTrigger, eventData);
-        console.log('Trigger success');
-      } catch (e) {
-        console.error('Trigger failed:', e);
-      }
+      console.log('Publishing:', eventName, eventData);
+      goEasyChannel.publish({
+        content: JSON.stringify(eventData),
+        onSuccess: function() {
+          console.log('Published:', eventName);
+        },
+        onFailed: function(error) {
+          console.error('Publish failed:', error);
+        }
+      });
     }
 
-    function handlePusherEvent(data) {
-      console.log('handlePusherEvent:', data);
+    function handleGoEasyEvent(data) {
+      console.log('handleGoEasyEvent:', data);
 
       switch(data.type) {
         case 'game-start':
@@ -760,7 +723,7 @@
 
         case 'question':
           currentQuestionIndex = data.questionIndex;
-          const q = questions[data.questionIndex];
+          const q = data.question;
           if (q) {
             if (isHost) {
               showQuestionToTeacher(data.questionIndex, q);
@@ -782,15 +745,15 @@
           break;
 
         case 'show-ranking':
-          if (isHost) {
-            showTeacherRankings();
+          if (!isHost) {
+            showStudentRanking(data.rankings);
           }
           break;
 
         case 'game-finished':
           gameStatus = 'finished';
           if (!isHost) {
-            showFinalRanking();
+            showFinalRanking(data.rankings);
           }
           break;
 
@@ -802,6 +765,33 @@
             show('studentWaiting');
             hide('studentQuiz');
             updateWaitingStatus('游戏已重置，等待再次开始');
+          }
+          break;
+
+        case 'player-joined':
+          if (data.players) {
+            players = data.players;
+            updatePlayerList(players);
+          }
+          break;
+
+        case 'answer-submitted':
+          if (data.answerResult && data.answerResult.playerId === myPlayerId) {
+            const result = data.answerResult;
+            hasAnswered = true;
+            stopTimers();
+            const resultEl = $('resultStatus');
+            if (result.isCorrect) {
+              resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
+              resultEl.style.color = '#10b981';
+            } else {
+              resultEl.textContent = '✗ 回答错误';
+              resultEl.style.color = '#ef4444';
+            }
+            myScore = result.totalScore;
+            $('myScore').textContent = myScore;
+            show('studentResult');
+            qsa('.option-btn').forEach(btn => btn.disabled = true);
           }
           break;
       }
@@ -873,28 +863,9 @@
       img.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
     }
 
-    function showQrModal() {
-      let baseUrl = window.location.origin;
-      if (window.location.pathname.includes('/quizblitz/')) {
-        baseUrl = window.location.origin + '/quizblitz';
-      }
-      const joinUrl = `${baseUrl}?room=${roomCode}`;
-      $('qrUrlLarge').textContent = joinUrl;
-      generateQR(joinUrl, 'qrcodeLarge');
-      show('qrOverlay');
-      show('qrModal');
-    }
-
-    function closeQrModal() {
-      if (isHost) {
-        hide('qrOverlay');
-        hide('qrModal');
-      }
-    }
-
     function hideAllScreens() {
       ['modeSelection', 'teacherJoin', 'teacherEditor', 'teacherControl',
-       'studentMode', 'studentQuiz', 'finalRanking', 'qrModal', 'qrOverlay'].forEach(id => hide(id));
+       'studentMode', 'studentQuiz', 'finalRanking'].forEach(id => hide(id));
     }
 
     function showModeSelection() { hideAllScreens(); show('modeSelection'); }
@@ -934,7 +905,7 @@
       return code;
     }
 
-    async function createRoom() {
+    function createRoom() {
       roomCode = generateRoomCode();
       myRole = 'teacher';
       isHost = true;
@@ -961,7 +932,7 @@
       showToast('房间创建成功！');
     }
 
-    async function joinRoom() {
+    function joinRoom() {
       const code = $('roomCode').value.trim().toUpperCase();
       const name = $('playerName').value.trim() || '玩家' + Math.floor(Math.random() * 1000);
       if (!code || code.length < 4) { showToast('请输入正确的房间码'); return; }
@@ -978,18 +949,16 @@
 
       subscribeToRoom(roomCode);
 
-      // 触发玩家加入事件
       setTimeout(() => {
-        triggerEvent('player-join', {
-          type: 'player-join',
-          player: { id: myPlayerId, name: name, score: 0 }
-        });
+        const player = { id: myPlayerId, name: name, score: 0 };
+        players.push(player);
+        publishEvent('player-joined', { player: player, players: players });
         updateWaitingStatus('已加入房间，等待游戏开始...');
       }, 500);
     }
 
     // ===== 教师功能 =====
-    async function addSingleQuestion() {
+    function addSingleQuestion() {
       const questionText = $('questionText').value.trim();
       const options = [$('option0').value.trim(), $('option1').value.trim(),
                        $('option2').value.trim(), $('option3').value.trim()];
@@ -1017,7 +986,7 @@
       showToast('题目添加成功');
     }
 
-    async function importQuestions() {
+    function importQuestions() {
       const text = $('jsonImport').value.trim();
       if (!text) { showToast('请输入 JSON 数据'); return; }
       let imported;
@@ -1064,7 +1033,7 @@
       `;
     }
 
-    async function importBuiltInBank() {
+    function importBuiltInBank() {
       const bankName = $('builtInBankSelect').value;
       if (!bankName) { showToast('请先选择题库'); return; }
       const bank = BUILT_IN_BANKS[bankName];
@@ -1099,10 +1068,8 @@
 
       updatePlayerList(players);
 
-      // 通过 Pusher 通知所有学生
-      triggerEvent('game-start', { type: 'game-start' });
+      publishEvent('game-start', { type: 'game-start' });
 
-      // 自动展示第一题
       nextQuestion();
     }
 
@@ -1110,7 +1077,8 @@
       const nextIndex = currentQuestionIndex + 1;
 
       if (nextIndex >= questions.length) {
-        triggerEvent('game-finish', { type: 'game-finished' });
+        const rankings = [...players].sort((a, b) => b.score - a.score);
+        publishEvent('game-finished', { type: 'game-finished', rankings: rankings });
         $('nextQuestionBtn').textContent = '游戏结束';
         $('nextQuestionBtn').disabled = true;
         $('stopAnswerBtn').disabled = true;
@@ -1120,16 +1088,14 @@
       const question = questions[nextIndex];
       currentQuestionIndex = nextIndex;
 
-      // 老师端立即显示题目
       showQuestionToTeacher(nextIndex, question);
 
-      // 通过 Pusher 通知所有学生
-      triggerEvent('question', {
+      publishEvent('question', {
         type: 'question',
-        questionIndex: nextIndex
+        questionIndex: nextIndex,
+        question: question
       });
 
-      // 更新按钮文字
       if (nextIndex + 1 < questions.length) {
         $('nextQuestionBtn').textContent = '下一题';
       } else {
@@ -1168,8 +1134,10 @@
       $('showRankingBtn').disabled = false;
       showTeacherRankings();
 
-      // 通过 Pusher 通知所有学生
-      triggerEvent('stop-question', {
+      const rankings = [...players].sort((a, b) => b.score - a.score);
+      publishEvent('show-ranking', { type: 'show-ranking', rankings: rankings });
+
+      publishEvent('stop-question', {
         type: 'stop-question',
         correctAnswer: q.correctAnswer
       });
@@ -1177,7 +1145,8 @@
 
     function showRanking() {
       showTeacherRankings();
-      triggerEvent('show-ranking', { type: 'show-ranking' });
+      const rankings = [...players].sort((a, b) => b.score - a.score);
+      publishEvent('show-ranking', { type: 'show-ranking', rankings: rankings });
     }
 
     function showTeacherRankings() {
@@ -1185,6 +1154,19 @@
       const container = $('teacherRankings');
       container.classList.remove('hidden');
       container.innerHTML = sorted.slice(0, 10).map((p, i) => `
+        <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
+          <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
+          <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
+          <span class="ranking-score">${p.score || 0} 分</span>
+        </div>
+      `).join('');
+    }
+
+    function showStudentRanking(rankings) {
+      if (!rankings) return;
+      const container = $('studentRanking');
+      container.classList.remove('hidden');
+      container.innerHTML = rankings.slice(0, 10).map((p, i) => `
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
@@ -1204,7 +1186,7 @@
       showTeacherRoom();
       hide('teacherRankings');
 
-      triggerEvent('game-reset', { type: 'game-reset' });
+      publishEvent('game-reset', { type: 'game-reset' });
     }
 
     // ===== 学生功能 =====
@@ -1266,7 +1248,7 @@
       $('myScore').textContent = myScore;
       show('studentResult');
 
-      triggerEvent('answer-submit', {
+      publishEvent('answer-submitted', {
         type: 'answer-submitted',
         answerResult: {
           playerId: myPlayerId,
@@ -1277,7 +1259,7 @@
       });
     }
 
-    async function submitAnswer(index) {
+    function submitAnswer(index) {
       if (hasAnswered) return;
       hasAnswered = true;
 
@@ -1299,7 +1281,7 @@
       $('myScore').textContent = myScore;
       show('studentResult');
 
-      triggerEvent('answer-submit', {
+      publishEvent('answer-submitted', {
         type: 'answer-submitted',
         answerResult: {
           playerId: myPlayerId,
@@ -1315,13 +1297,13 @@
       if (el) el.textContent = text;
     }
 
-    function showFinalRanking() {
+    function showFinalRanking(rankings) {
+      if (!rankings) return;
       hideAllScreens();
       show('finalRanking');
       showConfetti();
 
-      const sorted = [...players].sort((a, b) => b.score - a.score);
-      const top3 = sorted.slice(0, 3);
+      const top3 = rankings.slice(0, 3);
       let trophyHtml = '';
       if (top3.length > 0) {
         trophyHtml = `
@@ -1332,7 +1314,7 @@
       $('winnerContainer').innerHTML = trophyHtml;
 
       const container = $('finalRankingList');
-      container.innerHTML = sorted.map((p, i) => `
+      container.innerHTML = rankings.map((p, i) => `
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="ranking-name">
