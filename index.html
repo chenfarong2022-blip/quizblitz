@@ -803,6 +803,7 @@
 
           const q = questions[qIndex];
           if (q) {
+            console.log('Found question locally, showing to student');
             if (!isHost) {
               showQuestionToStudent(qIndex, q);
             }
@@ -816,10 +817,6 @@
                   questions = Object.values(freshData.questions);
                   const freshQ = questions[qIndex];
                   console.log('Re-fetched questions:', questions.length, 'want index:', qIndex);
-                  if (freshQ && !isHost) {
-                    showQuestionToStudent(qIndex, freshQ);
-                  }
-                }
                   if (freshQ && !isHost) {
                     showQuestionToStudent(qIndex, freshQ);
                   }
