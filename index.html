@@ -707,16 +707,29 @@
     }
 
     async function fbPatch(path, data) {
-      const response = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Firebase PATCH failed: ${response.status} - ${text}`);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const response = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(`Firebase PATCH failed: ${response.status} - ${text}`);
+        }
+        return response.json();
+      } catch (e) {
+        if (e.name === 'AbortError') {
+          console.error('fbPatch timeout');
+        } else {
+          console.error('fbPatch error:', e);
+        }
+        return null;
       }
-      return response.json();
     }
 
     async function fbDelete(path) {
@@ -742,14 +755,19 @@
         try {
           const data = await fbGetFull(`rooms/${roomCode}`);
           if (!data) {
-            console.log('Poll returned no data');
+            console.log('Poll returned null, retrying...');
+            // 重试一次
+            setTimeout(() => {
+              fbGetFull(`rooms/${roomCode}`).then(retryData => {
+                if (retryData) {
+                  handleRemoteUpdate(retryData);
+                }
+              });
+            }, 100);
             return;
           }
 
-          console.log('Poll got data, currentQuestion:', data.currentQuestion, 'gameStatus:', data.gameStatus);
-
-          const dataStr = JSON.stringify(data);
-          const dataChanged = dataStr !== lastKnownData;
+          console.log('Poll got data, currentQuestion:', data.currentQuestion, 'gameStatus:', data.gameStatus, 'hasQuestions:', !!data.questions);
 
           // 当currentQuestion变化时，立即更新本地题目列表
           if (data.currentQuestion !== undefined && data.currentQuestion >= 0 && data.currentQuestion !== currentQuestionIndex) {
@@ -761,7 +779,7 @@
           }
 
           // Always call handleRemoteUpdate to process changes
-          lastKnownData = dataStr;
+          lastKnownData = JSON.stringify(data);
           handleRemoteUpdate(data);
         } catch (e) {
           console.error('Poll error:', e);
