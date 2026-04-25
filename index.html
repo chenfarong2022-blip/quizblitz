@@ -1094,6 +1094,7 @@
       }
 
       try {
+        console.log('Creating room data...');
         // 创建房间数据
         await fbPut(`rooms/${roomCode}`, {
           hostId: myPlayerId,
@@ -1101,7 +1102,9 @@
           currentQuestion: -1,
           createdAt: Date.now()
         });
+        console.log('Room data created');
 
+        console.log('Adding teacher to players...');
         // 添加老师到玩家列表
         await fbPut(`rooms/${roomCode}/players/${myPlayerId}`, {
           name: '老师',
@@ -1109,6 +1112,7 @@
           isHost: true,
           joinedAt: Date.now()
         });
+        console.log('Teacher added');
 
         $('teacherRoomCode').textContent = roomCode;
         hide('teacherCreate');
