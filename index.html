@@ -1439,18 +1439,21 @@
 
     function nextQuestion() {
       const nextIndex = currentQuestionIndex + 1;
+      console.log('nextQuestion called, nextIndex:', nextIndex, 'questions length:', questions.length);
       if (nextIndex >= questions.length) {
         // 游戏结束
         roomRef.update({ gameStatus: 'finished' });
         return;
       }
 
+      console.log('Sending question to Firebase, index:', nextIndex);
       roomRef.update({
         currentQuestion: nextIndex,
         currentQuestionData: questions[nextIndex],
         'currentQuestion/stopped': false,
         'currentQuestion/correctAnswer': questions[nextIndex].correctAnswer
       }).then(() => {
+        console.log('Question sent to Firebase');
         $('nextQuestionBtn').disabled = true;
         $('stopAnswerBtn').disabled = false;
         $('showRankingBtn').disabled = true;
