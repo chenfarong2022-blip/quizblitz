@@ -564,13 +564,12 @@
 
     <!-- 学生答题 -->
     <div id="studentQuiz" class="card hidden">
-      <div class="question-box">
-        <div class="question-number" id="studentQuestionNumber">第 1 题 / 共 10 题</div>
-        <div class="question-text" id="studentQuestionText" style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">请在老师屏幕上查看题目</div>
-        <div class="timer-display timer-normal" id="studentTimer">15</div>
+      <div class="question-box" style="padding: 12px;">
+        <div class="question-number" id="studentQuestionNumber" style="margin-bottom: 4px;">第 1 题 / 共 10 题</div>
+        <div class="timer-display timer-normal" id="studentTimer" style="font-size: 1.2rem; padding: 4px 12px; margin-bottom: 8px;">15</div>
         <div class="options-grid" id="studentOptions"></div>
-        <div id="submitContainer" style="text-align: center; display: none; margin-top: 20px;">
-          <button class="btn btn-primary" id="submitBtn" onclick="confirmAnswer()" style="padding: 16px 48px; font-size: 1.2rem;" disabled>Submit</button>
+        <div id="submitContainer" style="text-align: center; display: none; margin-top: 12px;">
+          <button class="btn btn-primary" id="submitBtn" onclick="confirmAnswer()" style="padding: 12px 32px; font-size: 1rem;" disabled>Submit</button>
         </div>
       </div>
       <div id="studentResult" class="hidden" style="text-align: center; padding: 30px;">
@@ -1233,6 +1232,7 @@
     // ===== 学生功能 =====
     function showQuestionToStudent(qIndex, q) {
       show('studentQuiz');
+      hide('studentJoin');
       hide('studentWaiting');
       hide('studentResult');
       hide('studentRanking');
