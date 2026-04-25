@@ -418,6 +418,42 @@
   </style>
 </head>
 <body>
+  <!-- 封面 -->
+  <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+    <div style="position: relative; margin-bottom: 30px;">
+      <!-- 小王子星球装饰 -->
+      <div style="position: absolute; top: -60px; left: -80px; font-size: 3rem; animation: float 3s ease-in-out infinite;">🌟</div>
+      <div style="position: absolute; top: -30px; right: -60px; font-size: 2rem; animation: float 4s ease-in-out infinite 0.5s;">✨</div>
+      <div style="position: absolute; top: 20px; left: -100px; font-size: 1.5rem; animation: float 3.5s ease-in-out infinite 1s;">⭐</div>
+      <div style="position: absolute; top: -10px; right: -90px; font-size: 2.5rem; animation: float 4.5s ease-in-out infinite 0.3s;">🌙</div>
+      <div style="position: absolute; bottom: -50px; left: -50px; font-size: 1.8rem; animation: float 3s ease-in-out infinite 0.8s;">🦊</div>
+      <div style="position: absolute; bottom: -40px; right: -70px; font-size: 2rem; animation: float 4s ease-in-out infinite 1.2s;">🌹</div>
+    </div>
+    <h1 style="font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 5rem); font-weight: 900; background: linear-gradient(135deg, #f5af19 0%, #f12711 50%, #ec008c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; text-shadow: 0 0 40px rgba(236, 72, 153, 0.5);">QUIZBLITZ</h1>
+    <p style="font-size: 1.5rem; color: rgba(255,255,255,0.8); margin-bottom: 8px; letter-spacing: 4px;">🌟 实时答题竞赛 🌟</p>
+    <p style="font-size: 1rem; color: rgba(255,255,255,0.6); margin-bottom: 50px;">—— 小王子陪你答题 ——</p>
+    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
+    <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
+    <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
+  </div>
+
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+  </style>
+
+  <script>
+    function enterApp() {
+      document.getElementById('cover').style.opacity = '0';
+      document.getElementById('cover').style.transition = 'opacity 0.5s ease';
+      setTimeout(() => {
+        document.getElementById('cover').style.display = 'none';
+      }, 500);
+    }
+  </script>
+
   <div class="bg-animation"></div>
   <div class="particles" id="particles"></div>
 
