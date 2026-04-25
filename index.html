@@ -678,15 +678,11 @@
       }
 
       initPusher();
-      const channelName = `presence-quizblitz-${room}`;
+      const channelName = `private-quizblitz-${room}`;
       pusherChannel = pusher.subscribe(channelName);
 
-      pusherChannel.bind('pusher:subscription_succeeded', (members) => {
-        console.log('Subscribed to channel:', channelName, 'members:', members.count);
-      });
-
-      pusherChannel.bind('pusher:member_added', (member) => {
-        console.log('Member added:', member);
+      pusherChannel.bind('pusher:subscription_succeeded', () => {
+        console.log('Subscribed to channel:', channelName);
       });
 
       // 监听游戏事件
