@@ -743,6 +743,23 @@
             if (!isHost) {
               showQuestionToStudent(qIndex, q);
             }
+          } else {
+            // 题目未同步，立即重新获取
+            console.log('Question not synced yet, re-fetching...');
+            setTimeout(async () => {
+              try {
+                const freshData = await fbGetFull(`rooms/${roomCode}`);
+                if (freshData && freshData.questions) {
+                  questions = Object.values(freshData.questions);
+                  const freshQ = questions[qIndex];
+                  if (freshQ && !isHost) {
+                    showQuestionToStudent(qIndex, freshQ);
+                  }
+                }
+              } catch (e) {
+                console.error('Re-fetch error:', e);
+              }
+            }, 100);
           }
         }
       }
