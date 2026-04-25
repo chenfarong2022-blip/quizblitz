@@ -748,15 +748,17 @@
       </div>
     </div>
 
-    <!-- 游戏控制 -->
+    <!-- 游戏控制 - 老师端显示题目 -->
     <div id="teacherControl" class="card hidden">
       <h2>🎮 游戏控制台</h2>
       <div id="gameStatus" class="status-badge status-info">等待开始</div>
 
-      <div id="currentQuestionDisplay" class="question-box hidden" style="margin-top: 20px;">
-        <div class="question-number" id="questionNumber">第 1 题</div>
-        <div class="question-text" id="questionDisplay"></div>
-        <div class="timer-display timer-normal" id="timerDisplay">15</div>
+      <!-- 老师端显示题目区域 - 用于投影 -->
+      <div id="teacherQuestionDisplay" class="question-box" style="margin-top: 20px;">
+        <div class="question-number" id="teacherQuestionNumber">第 1 题</div>
+        <div class="question-text" id="teacherQuestionText" style="font-size: clamp(1.5rem, 5vw, 2.5rem);">等待发题...</div>
+        <div class="timer-display timer-normal" id="teacherTimerDisplay" style="font-size: 3rem;">--</div>
+        <div class="options-grid" id="teacherOptionsDisplay" style="margin-top: 30px;"></div>
       </div>
 
       <div class="game-controls" style="margin-top: 20px;">
@@ -805,11 +807,11 @@
       </div>
     </div>
 
-    <!-- 学生答题 -->
+    <!-- 学生答题 - 只显示选项 -->
     <div id="studentQuiz" class="card hidden">
       <div class="question-box">
         <div class="question-number" id="studentQuestionNumber">第 1 题 / 共 10 题</div>
-        <div class="question-text" id="studentQuestionText"></div>
+        <div class="question-text" id="studentQuestionText" style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">老师展示题目区域</div>
         <div class="timer-display timer-normal" id="studentTimer">15</div>
         <div class="options-grid" id="studentOptions"></div>
       </div>
@@ -1384,6 +1386,13 @@
       console.log('Sending question:', nextIndex);
 
       try {
+        // 更新本地currentQuestionIndex
+        currentQuestionIndex = nextIndex;
+
+        // 在老师端显示题目（用于投影）
+        showQuestionToTeacher(nextIndex, question);
+
+        // 发送题目到 Firebase
         await fbFetch(`rooms/${roomCode}`, 'PATCH', {
           currentQuestion: nextIndex
         });
@@ -1397,6 +1406,22 @@
         console.error('Send question error:', e);
         showToast('发题失败: ' + e.message);
       }
+    }
+
+    function showQuestionToTeacher(qIndex, q) {
+      // 老师端显示题目区域（用于投影到大屏幕）
+      $('teacherQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
+      $('teacherQuestionText').textContent = q.question;
+      $('teacherTimerDisplay').textContent = q.timeLimit;
+      $('teacherTimerDisplay').className = 'timer-display timer-normal';
+      $('teacherOptionsDisplay').innerHTML = q.options.map((opt, i) => `
+        <div class="option-btn" style="cursor:default; background: rgba(255,255,255,0.1);">
+          <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+          <span style="font-size: 1.2rem;">${escapeHtml(opt)}</span>
+        </div>
+      `).join('');
+
+      startTeacherTimer(q.timeLimit);
     }
 
     async function stopAnswer() {
@@ -1578,7 +1603,7 @@
       timeLeft = seconds;
       timerInterval = setInterval(() => {
         timeLeft--;
-        const el = $('timerDisplay');
+        const el = $('teacherTimerDisplay');
         el.textContent = timeLeft;
         el.className = timeLeft <= 5 ? 'timer-display timer-danger' : timeLeft <= 10 ? 'timer-display timer-warning' : 'timer-display timer-normal';
         if (timeLeft <= 0) { stopTimers(); el.textContent = '时间到！'; $('stopAnswerBtn').disabled = false; }
