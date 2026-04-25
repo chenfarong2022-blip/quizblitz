@@ -732,7 +732,7 @@
       console.log('Publishing:', eventName, eventData);
       goEasy.pubsub.publish({
         channel: currentChannelName,
-        content: JSON.stringify(eventData),
+        message: JSON.stringify(eventData),
         onSuccess: function() {
           console.log('Published:', eventName);
         },
