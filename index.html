@@ -926,8 +926,10 @@
 
     function trigger(event, data) {
       if (channel) {
-        channel.trigger('client-' + event, data);
-        console.log('Triggered:', event, data);
+        const result = channel.trigger('client-' + event, data);
+        console.log('Triggered:', event, data, 'result:', result);
+      } else {
+        console.error('Channel not initialized, cannot trigger:', event);
       }
     }
 
