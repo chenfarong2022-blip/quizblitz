@@ -1261,28 +1261,27 @@
       console.log('startGame called, questions.length:', questions.length, 'roomCode:', roomCode);
       if (questions.length === 0) { showToast('请先添加至少一道题目'); return; }
 
-      try {
-        // 直接更新游戏状态，不需要逐个重置玩家分数
-        await fbPatch(`rooms/${roomCode}`, {
-          gameStatus: 'playing',
-          currentQuestion: -1
-        });
+      console.log('Step 1: Patching game status');
+      // 直接更新游戏状态，不需要逐个重置玩家分数
+      await fbPatch(`rooms/${roomCode}`, {
+        gameStatus: 'playing',
+        currentQuestion: -1
+      });
+      console.log('Step 1 done');
 
-        gameStatus = 'playing';
-        players.forEach(p => p.score = 0);
+      gameStatus = 'playing';
+      players.forEach(p => p.score = 0);
 
-        showTeacherControl();
-        $('gameStatus').textContent = '游戏进行中';
-        $('gameStatus').className = 'status-badge status-success';
+      showTeacherControl();
+      $('gameStatus').textContent = '游戏进行中';
+      $('gameStatus').className = 'status-badge status-success';
 
-        updatePlayerList(players);
+      updatePlayerList(players);
 
-        // 自动展示第一题
-        nextQuestion();
-      } catch (e) {
-        console.error('Start game error:', e);
-        showToast('启动失败: ' + e.message);
-      }
+      console.log('Step 2: Calling nextQuestion');
+      // 自动展示第一题
+      nextQuestion();
+      console.log('Step 2 done');
     }
 
     async function nextQuestion() {
@@ -1302,18 +1301,20 @@
       }
 
       const question = questions[nextIndex];
-      console.log('Sending question:', nextIndex);
+      console.log('Sending question:', nextIndex, question);
 
       try {
         // 老师端显示题目
         showQuestionToTeacher(nextIndex, question);
 
-        // 更新数据
+        // 更新数据 - 在显示题目之后更新Firebase
         currentQuestionIndex = nextIndex;
+        console.log('Patching currentQuestion to:', nextIndex);
         await fbPatch(`rooms/${roomCode}`, {
           currentQuestion: nextIndex,
           stopQuestion: false
         });
+        console.log('Patch done');
 
         // 更新按钮文字
         if (nextIndex + 2 < questions.length) {
@@ -1331,18 +1332,25 @@
     }
 
     function showQuestionToTeacher(qIndex, q) {
+      console.log('showQuestionToTeacher called:', qIndex);
       $('teacherQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
       $('teacherQuestionText').textContent = q.question;
       $('teacherTimerDisplay').textContent = q.timeLimit;
       $('teacherTimerDisplay').className = 'timer-display timer-normal';
-      $('teacherOptionsDisplay').innerHTML = q.options.map((opt, i) => `
-        <div class="option-btn" style="cursor:default; background: rgba(255,255,255,0.1);">
-          <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-          <span style="font-size: 1.2rem;">${escapeHtml(opt)}</span>
-        </div>
-      `).join('');
+
+      if (q.options && q.options.length > 0) {
+        $('teacherOptionsDisplay').innerHTML = q.options.map((opt, i) => `
+          <div class="option-btn" style="cursor:default; background: rgba(255,255,255,0.1);">
+            <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+            <span style="font-size: 1.2rem;">${escapeHtml(opt)}</span>
+          </div>
+        `).join('');
+      } else {
+        $('teacherOptionsDisplay').innerHTML = `<div style="text-align:center;color:var(--accent);">填空题 (答案: ${q.answer})</div>`;
+      }
 
       startTeacherTimer(q.timeLimit);
+      console.log('showQuestionToTeacher done');
     }
 
     async function stopAnswer() {
