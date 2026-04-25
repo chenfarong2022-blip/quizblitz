@@ -607,7 +607,7 @@
   <script>
     // ===== Firebase REST API 配置 =====
     const FIREBASE_DB_URL = 'https://quizblitz-feab7-default-rtdb.asia-southeast1.firebasedatabase.app';
-    const POLL_INTERVAL = 100; // 每100ms轮询一次
+    const POLL_INTERVAL = 50; // 每50ms轮询一次
 
     let pollTimer = null;
     let lastKnownData = null;
@@ -674,7 +674,7 @@
     async function fbGetFull(path) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         const response = await fetch(`${FIREBASE_DB_URL}/${path}.json`, { signal: controller.signal });
         clearTimeout(timeoutId);
         if (!response.ok) {
