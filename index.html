@@ -231,7 +231,7 @@
     }
     .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
     @media (max-width: 500px) {
-      .options-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+      .options-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; padding: 0 4px; box-sizing: border-box; }
     }
     .option-btn {
       padding: 20px 16px;
@@ -247,26 +247,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     @media (max-width: 500px) {
       .option-btn {
-        padding: 16px 10px;
-        font-size: 1.6rem;
-        min-height: 70px;
+        padding: 12px 8px;
+        font-size: 1.4rem;
+        min-height: 60px;
       }
     }
     .option-btn:hover:not(:disabled) {
       background: rgba(99,102,241,0.3);
       border-color: var(--primary);
-      transform: scale(1.05);
-    }
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(99,102,241,0.3);
     }
     .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
     .option-btn.correct { background: rgba(16,185,129,0.3) !important; border-color: var(--success) !important; }
     .option-btn.wrong { background: rgba(239,68,68,0.3) !important; border-color: var(--danger) !important; }
-    .option-btn.selected { background: rgba(99,102,241,0.4) !important; border-color: var(--primary) !important; transform: scale(1.05); }
+    .option-btn.selected { background: rgba(99,102,241,0.4) !important; border-color: var(--primary) !important; }
     .ranking-list { margin-top: 20px; }
     .ranking-item {
       display: flex;
@@ -576,6 +574,9 @@
         <div class="question-text" id="studentQuestionText" style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">请在老师屏幕上查看题目</div>
         <div class="timer-display timer-normal" id="studentTimer">15</div>
         <div class="options-grid" id="studentOptions"></div>
+        <div id="submitContainer" style="text-align: center; display: none;">
+          <button class="btn btn-primary" id="submitBtn" onclick="confirmAnswer()" style="padding: 16px 48px; font-size: 1.2rem;" disabled>Submit</button>
+        </div>
       </div>
       <div id="studentResult" class="hidden" style="text-align: center; padding: 30px;">
         <div id="resultStatus" style="font-size: 2rem; margin-bottom: 20px;"></div>
@@ -1251,11 +1252,9 @@
           <button class="option-btn" onclick="selectOption(${i})" id="opt-${i}">
             ${String.fromCharCode(65 + i)}
           </button>
-        `).join('') + `
-          <div style="text-align: center;">
-            <button class="btn btn-primary" id="submitBtn" onclick="confirmAnswer()" style="margin-top: 16px; padding: 16px; font-size: 1.1rem; min-width: 200px;" disabled>Submit</button>
-          </div>
-        `;
+        `).join('');
+        $('submitContainer').style.display = 'block';
+        $('submitBtn').disabled = true;
       } else if (q.answer !== null && q.answer !== undefined) {
         $('studentOptions').innerHTML = `
           <div style="width: 100%; text-align: center;">
@@ -1265,6 +1264,7 @@
             <button class="btn btn-primary" onclick="submitFillAnswer()" style="margin-top: 16px;">提交答案</button>
           </div>
         `;
+        $('submitContainer').style.display = 'none';
       }
       questionStartTime = Date.now();
       startStudentTimer(q.timeLimit);
