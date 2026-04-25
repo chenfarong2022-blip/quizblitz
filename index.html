@@ -1252,7 +1252,9 @@
             ${String.fromCharCode(65 + i)}
           </button>
         `).join('') + `
-          <button class="btn btn-primary" id="submitBtn" onclick="confirmAnswer()" style="margin-top: 16px; padding: 16px; font-size: 1.1rem;" disabled>确认提交</button>
+          <div style="text-align: center;">
+            <button class="btn btn-primary" id="submitBtn" onclick="confirmAnswer()" style="margin-top: 16px; padding: 16px; font-size: 1.1rem; min-width: 200px;" disabled>Submit</button>
+          </div>
         `;
       } else if (q.answer !== null && q.answer !== undefined) {
         $('studentOptions').innerHTML = `
