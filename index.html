@@ -427,6 +427,9 @@
     <audio id="bgMusic" loop autoplay>
       <source id="musicSource" src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/%E5%B0%81%E9%9D%A2%E9%A1%B5Kalimba%20Loop.mp3" type="audio/mpeg">
     </audio>
+    <audio id="gameMusic" loop>
+      <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/%E7%AD%94%E9%A2%80%E9%A1%B5Countdown%20Standoff.mp3" type="audio/mpeg">
+    </audio>
     <div style="position: relative; margin-bottom: 30px;">
       <!-- 小王子星球装饰 -->
       <div style="position: absolute; top: -60px; left: -80px; font-size: 3rem; animation: float 3s ease-in-out infinite;">🌟</div>
@@ -1207,6 +1210,14 @@
       gameStatus = 'playing';
       players.forEach(p => p.score = 0);
 
+      // Switch to game music
+      const bgMusic = document.getElementById('bgMusic');
+      const gameMusic = document.getElementById('gameMusic');
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+      gameMusic.currentTime = 0;
+      gameMusic.play().catch(() => {});
+
       showTeacherControl();
       $('gameStatus').textContent = '游戏进行中';
       $('gameStatus').className = 'status-badge status-success';
@@ -1237,6 +1248,11 @@
 
       const question = questions[nextIndex];
       currentQuestionIndex = nextIndex;
+
+      // Restart game music for each question
+      const gameMusic = document.getElementById('gameMusic');
+      gameMusic.currentTime = 0;
+      gameMusic.play().catch(() => {});
 
       showQuestionToTeacher(nextIndex, question);
 
@@ -1332,6 +1348,14 @@
       currentQuestionIndex = -1;
       myScore = 0;
       players.forEach(p => p.score = 0);
+
+      // Switch back to cover music
+      const bgMusic = document.getElementById('bgMusic');
+      const gameMusic = document.getElementById('gameMusic');
+      gameMusic.pause();
+      gameMusic.currentTime = 0;
+      bgMusic.currentTime = 0;
+      bgMusic.play().catch(() => {});
 
       showTeacherRoom();
       hide('teacherRankings');
