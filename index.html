@@ -415,6 +415,20 @@
     .player-info { flex: 1; }
     .player-name { font-weight: 600; margin-bottom: 2px; }
     .player-score { color: var(--accent); font-weight: 700; }
+    .avatar-option {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      border: 3px solid transparent;
+      transition: all 0.2s ease;
+      background: var(--glass);
+    }
+    .avatar-option:hover { transform: scale(1.1); border-color: var(--primary); }
+    .avatar-option.selected { border-color: var(--accent); transform: scale(1.15); box-shadow: 0 0 20px rgba(245,158,11,0.5); }
   </style>
 </head>
 <body>
@@ -621,6 +635,7 @@
         <div style="margin-bottom: 8px;">
           <input type="text" id="playerName" placeholder="昵称" maxlength="20" style="padding: 8px; font-size: 1rem; width: 100%; text-align: center;">
         </div>
+        <div id="avatarSelector" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px;"></div>
         <button class="btn btn-primary" onclick="joinRoom()" style="width: 100%; padding: 10px; font-size: 1rem;">加入房间</button>
       </div>
       <div id="studentWaiting" class="hidden">
@@ -677,6 +692,9 @@
     let roomCode = null;
     let isHost = false;
     let questions = [];
+    let selectedAvatar = '😺';
+
+    const AVATARS = ['😺','🐱','🐶','🐰','🦊','🐻','🐼','🐨','🦁','🐸','🐵','🐷','🐮','🐔','🐧','🐦','🦋','🐝','🐢','🐍','🦎','🐙','🦀','🐠','🐳','🦄','👻','🤖','👾','🎃','👻','🎅','🤡','👴','👵','👶','🧒','👧','🧑','👨','👩','💃','🕺','🚀','⭐','🌙','☀️','🌈','🍎','🍓','🍕','🎈','🎁','🎮','🎯','🏆'];
     let currentQuestionIndex = -1;
     let gameStatus = 'waiting';
     let timerInterval = null;
@@ -961,6 +979,20 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
+    function initAvatarSelector() {
+      const container = $('avatarSelector');
+      if (!container) return;
+      container.innerHTML = AVATARS.slice(0, 24).map(av => `
+        <div class="avatar-option ${av === selectedAvatar ? 'selected' : ''}" onclick="selectAvatar('${av}')">${av}</div>
+      `).join('');
+    }
+
+    function selectAvatar(avatar) {
+      selectedAvatar = avatar;
+      qsa('.avatar-option').forEach(el => el.classList.remove('selected'));
+      event.target.classList.add('selected');
+    }
+
     function initParticles() {
       const container = $('particles');
       for (let i = 0; i < 30; i++) {
@@ -975,6 +1007,7 @@
       }
     }
     initParticles();
+    initAvatarSelector();
 
     function showConfetti() {
       const container = document.createElement('div');
@@ -1114,7 +1147,7 @@
       subscribeToRoom(roomCode);
 
       setTimeout(() => {
-        const player = { id: myPlayerId, name: name, score: 0 };
+        const player = { id: myPlayerId, name: name, avatar: selectedAvatar, score: 0 };
         players.push(player);
         publishEvent('player-joined', { player: player, players: players });
         updateWaitingStatus('已加入房间，等待游戏开始...');
@@ -1357,6 +1390,7 @@
       container.innerHTML = sorted.slice(0, 10).map((p, i) => `
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
+          <span style="font-size: 1.5rem;">${p.avatar || ''}</span>
           <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
           <span class="ranking-score">${p.score || 0} 分</span>
         </div>
@@ -1369,6 +1403,8 @@
       container.classList.remove('hidden');
       container.innerHTML = rankings.slice(0, 10).map((p, i) => `
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
+          <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
+          <span style="font-size: 1.5rem;">${p.avatar || ''}</span>
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
           <span class="ranking-score">${p.score || 0} 分</span>
@@ -1577,7 +1613,7 @@
       $('playerCount').textContent = players.length;
       $('teacherPlayerList').innerHTML = players.map(p => `
         <div class="player-card">
-          <div class="player-avatar">${(p.name || '?').charAt(0).toUpperCase()}</div>
+          <div class="player-avatar">${p.avatar || (p.name || '?').charAt(0).toUpperCase()}</div>
           <div class="player-info">
             <div class="player-name">${escapeHtml(p.name || '未知')}</div>
             <div class="player-score">${p.score || 0} 分</div>
