@@ -921,8 +921,14 @@
           break;
 
         case 'player-joined':
-          if (data.players) {
-            players = data.players;
+          if (data.player) {
+            // Merge new player into existing players list
+            const existingIndex = players.findIndex(p => p.id === data.player.id);
+            if (existingIndex === -1) {
+              players.push(data.player);
+            } else {
+              players[existingIndex] = data.player;
+            }
             updatePlayerList(players);
             updateJoinedStudentsList(players);
           }
