@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.06</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.07</p>
   </div>
 
   <style>
@@ -926,37 +926,27 @@
 
     // ===== 内置题库 =====
     const BUILT_IN_BANKS = {
-      "2班听力4-6课": [
-        { question: `妈妈说："麦克，起床吧，差十分钟八点了。"
-        问：现在几点？`, options: ["八点十分", "七点五十", "八点五十", "七点十分"], correctAnswer: 1, timeLimit: 45 },
-        { question: `麦克说："我原来想在这儿学习半年，现在觉得汉语很有意思，所以我准备再延长一年。"
-        问：麦克最后打算在这儿学习多长时间？`, options: ["半年", "一年", "一年半", "两年"], correctAnswer: 2, timeLimit: 45 },
-        { question: `王丽说："这套房子每月的房租是三千块，没有对面的那套便宜。"
-        问：对面那套房子的房租可能是多少钱？`, options: ["三千五百块", "三千块", "两千五百块", "四千块"], correctAnswer: 2, timeLimit: 45 },
-        { question: `妈妈说："我让你每天只看一个小时的电视，你不能再看了。"
-        问：他为什么现在不能看电视了？`, options: ["他不喜欢看电视", "电视坏了", "一个小时的时间到了", "他该去睡觉了"], correctAnswer: 2, timeLimit: 45 },
-        { question: `女的说："坐火车才四百多块。坐飞机的话，比坐火车贵八百多块呢。"
-        问：坐飞机的票价大概是多少钱？`, options: ["四百块", "八百块", "一千两百块", "一千六百块"], correctAnswer: 2, timeLimit: 45 },
-        { question: `老师说："北京今天的气温是十度，上海今天比北京高两度。"
-        问：上海今天多少度？`, options: ["八度", "十度", "十二度", "二度"], correctAnswer: 2, timeLimit: 45 },
-        { question: `一位老人说："我二十八岁跟她结婚，到现在都一起生活了三十几年了。"
-        问：他现在大概多大年纪？`, options: ["二十八岁", "三十岁", "五十岁", "差不多六十岁"], correctAnswer: 3, timeLimit: 45 },
-        { question: `男的说："我买东西还是喜欢去大商场，大商场的东西比小商店的好得多。"
-        问：男的是什么意思？`, options: ["大商场的东西太贵了", "大商场的东西质量更好", "他不喜欢买东西", "小商店的东西比大商场好"], correctAnswer: 1, timeLimit: 45 },
-        { question: `爷爷说："抽烟对身体不好，我从来不抽；喝酒嘛，少喝点儿对身体还是不错的。"
-        问：关于爷爷的习惯，下面哪个是对的？`, options: ["爷爷抽烟，不喝酒", "爷爷不抽烟，喝一点儿酒", "爷爷又抽烟又喝酒", "爷爷不抽烟，也不喝酒"], correctAnswer: 1, timeLimit: 45 },
-        { question: `山田说："飞机票我半年以前就买好了。早一点儿买的话，会便宜很多。"
-        问：山田为什么半年前就买票？`, options: ["怕买不到票", "为了省钱，因为早买便宜", "他想早点回国", "朋友让他早点买"], correctAnswer: 1, timeLimit: 45 },
-        { question: `说话人说"我来北京已经两个月了。" 判断：说话人是两个月以前到北京的。`, options: ["对", "错"], correctAnswer: 0, timeLimit: 20 },
-        { question: `说话人说"我擦完了窗户就去买水果。" 判断：说话人打算先去买水果，回来再擦窗户。`, options: ["对", "错"], correctAnswer: 1, timeLimit: 20 },
-        { question: `说话人说"我比小王大三岁，不过个子没有他高。" 判断：小王个子比说话人高。`, options: ["对", "错"], correctAnswer: 0, timeLimit: 20 },
-        { question: `说话人说"从北京到上海，坐高铁大概要五个小时。" 判断：北京到上海坐高铁需要五个小时左右。`, options: ["对", "错"], correctAnswer: 0, timeLimit: 20 },
-        { question: `说话人说"我的包还差两公斤到二十公斤呢。" 判断：这个包现在重二十二公斤。`, options: ["对", "错"], correctAnswer: 1, timeLimit: 20 },
-        { question: `说话人说"昨天差不多复习了一个晚上，只睡了一个多小时。" 判断：说话人现在觉得非常困。`, options: ["对", "错"], correctAnswer: 0, timeLimit: 20 },
-        { question: `说话人说"小强，打开窗户吧，通通风。" 判断：妈妈想让屋子里的空气好一点儿。`, options: ["对", "错"], correctAnswer: 0, timeLimit: 20 },
-        { question: `说话人说"郊区的空气好，对身体有好处啊！" 判断：说话人认为住在郊区更健康。`, options: ["对", "错"], correctAnswer: 0, timeLimit: 20 },
-        { question: `说话人说"山田，你才学了半年汉语，可是比我说得流利多了。" 判断：山田学习汉语的时间非常长。`, options: ["对", "错"], correctAnswer: 1, timeLimit: 20 },
-        { question: `说话人说"小王跟我说好了晚上七点来，可是他到现在还没来呢。" 判断：小王迟到了，或者还没到。`, options: ["对", "错"], correctAnswer: 0, timeLimit: 20 }
+      "词汇练习 (Lessons 4-6)": [
+        { question: `延长`, options: ["A. To shorten", "B. To extend or lengthen", "C. To finish", "D. To delay"], correctAnswer: 1, timeLimit: 45 },
+        { question: `坚持`, options: ["A. To give up", "B. To start", "C. To persist or keep doing", "D. To change"], correctAnswer: 2, timeLimit: 45 },
+        { question: `辅导`, options: ["A. To teach a large class", "B. To tutor or provide academic guidance", "C. To take an exam", "D. To write a letter"], correctAnswer: 1, timeLimit: 45 },
+        { question: `预习`, options: ["A. To review after class", "B. To preview or study before class", "C. To do homework", "D. To take a nap"], correctAnswer: 1, timeLimit: 45 },
+        { question: `集合`, options: ["A. To leave a place", "B. To get lost", "C. To gather or assemble", "D. To travel alone"], correctAnswer: 2, timeLimit: 45 },
+        { question: `流利`, options: ["A. Slow", "B. Difficult", "C. Fluent", "D. Accurate"], correctAnswer: 2, timeLimit: 45 },
+        { question: `准`, options: ["A. Wrong", "B. Accurate or correct", "C. Loud", "D. Fast"], correctAnswer: 1, timeLimit: 45 },
+        { question: `暖和`, options: ["A. Very cold", "B. Comfortably warm", "C. Extremely hot", "D. Raining"], correctAnswer: 1, timeLimit: 45 },
+        { question: `预订`, options: ["A. To cancel", "B. To pay immediately", "C. To book or reserve in advance", "D. To arrive late"], correctAnswer: 2, timeLimit: 45 },
+        { question: `热闹`, options: ["A. Quiet and lonely", "B. Lively and bustling", "C. Cold and silent", "D. Boring"], correctAnswer: 1, timeLimit: 45 },
+        { question: `打扫 means to clean a room or space.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+        { question: `差 is used in time-telling to indicate "minutes until" an hour (e.g., 差十分八点).`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+        { question: `已经 means "not yet" or "in the future."`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+        { question: `刚才 refers to something that happened a long time ago.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+        { question: `匆匆忙忙 describes doing something in a very relaxed and slow way.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+        { question: `房租 refers to the monthly rent paid for a house.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+        { question: `郊区 refers to the busy center of a city.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+        { question: `成绩 refers to the grades or results of an exam.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+        { question: `合适 means that something is suitable or fits well.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+        { question: `增加 means to decrease the number or amount of something.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 }
       ]
     };
 
