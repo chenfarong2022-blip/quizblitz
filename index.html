@@ -1782,7 +1782,9 @@
         if (timeLeft <= 0) {
           stopTimers();
           el.textContent = '时间到！';
-          $('stopAnswerBtn').disabled = false;
+          if (isHost && players.length > 0) {
+            stopAnswer();
+          }
         }
       }, 1000);
     }
