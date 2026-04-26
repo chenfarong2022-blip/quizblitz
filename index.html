@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.13</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.14</p>
   </div>
 
   <style>
@@ -1768,13 +1768,20 @@
       if (hasAnswered) return;
       const input = $('fillAnswerInput');
       if (!input) return;
-      const userAnswer = input.value.trim();
+      const userAnswer = input.value.trim().toLowerCase();
       if (!userAnswer) { showToast('请输入答案'); return; }
 
       const currentQ = questions[currentQuestionIndex];
       if (!currentQ) return;
 
-      const isCorrect = userAnswer === currentQ.answer;
+      // Very flexible answer checking - extract key words from accepted answers
+      const acceptedAnswers = currentQ.answer.split('/').map(a => a.trim().toLowerCase());
+      // Extract key words (first word of each alternative, removing common prefixes)
+      const keyWords = acceptedAnswers.flatMap(a => {
+        const words = a.replace(/[()]/g, '').split(/\s+/);
+        return words.filter(w => w.length > 2).slice(0, 2);
+      });
+      const isCorrect = keyWords.some(kw => userAnswer.includes(kw) || kw.includes(userAnswer));
       const timeTaken = (Date.now() - questionStartTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((currentQ.timeLimit - timeTaken) * 50));
       const points = isCorrect ? 1000 + timeBonus : 0;
@@ -1786,7 +1793,7 @@
       qsa('.option-btn').forEach(btn => btn.disabled = true);
 
       const resultEl = $('resultStatus');
-      resultEl.textContent = isCorrect ? `✓ 回答正确！+${points} 分` : `✗ 正确答案是：${currentQ.answer}`;
+      resultEl.textContent = isCorrect ? `✓ Correct! +${points}` : `✗ Answer: ${currentQ.answer}`;
       resultEl.style.color = isCorrect ? '#10b981' : '#ef4444';
       $('myScore').textContent = myScore;
       show('studentResult');
