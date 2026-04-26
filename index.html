@@ -1016,9 +1016,10 @@
             if (!submittedThisQuestion.includes(result.playerId)) {
               submittedThisQuestion.push(result.playerId);
             }
-            // Check if all players have submitted (only on host side)
-            if (isHost && players.length > 0 && submittedThisQuestion.length >= players.length) {
-              console.log('All players submitted, auto stopping question');
+            // Check if all students have submitted (only on host side, exclude teacher)
+            const studentCount = players.filter(p => p.id !== myPlayerId).length;
+            if (isHost && studentCount > 0 && submittedThisQuestion.length >= studentCount) {
+              console.log('All students submitted, auto stopping question');
               stopAnswer();
             }
             // 如果是教师自己（host）的答案
@@ -1783,7 +1784,8 @@
         if (timeLeft <= 0) {
           stopTimers();
           el.textContent = '时间到！';
-          if (isHost && players.length > 0) {
+          const studentCount = players.filter(p => p.id !== myPlayerId).length;
+          if (isHost && studentCount > 0) {
             stopAnswer();
           }
         }
