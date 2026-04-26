@@ -297,13 +297,24 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      z-index: 1000;
-      background: linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(2,6,23,0.98) 100%);
+      z-index: 1001;
+      background: linear-gradient(135deg, rgba(15,23,42,0.99) 0%, rgba(2,6,23,0.99) 100%);
       border: 2px solid var(--accent);
       border-radius: 20px;
       padding: 20px 30px;
       min-width: 350px;
-      box-shadow: 0 0 60px rgba(245,158,11,0.3);
+      box-shadow: 0 0 60px rgba(245,158,11,0.5), 0 0 100px rgba(0,0,0,0.8);
+    }
+    .mini-ranking-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .mini-ranking-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -667,6 +678,7 @@
         </div>
         <div id="miniRankingList" class="mini-ranking-list"></div>
       </div>
+      <div id="miniRankingOverlay" class="mini-ranking-overlay" style="display: none;" onclick="hideMiniRanking()"></div>
 
       <h3 style="margin-top: 30px;">👥 在线玩家 (<span id="playerCount">0</span>)</h3>
       <div id="teacherPlayerList" class="player-grid"></div>
@@ -1466,6 +1478,7 @@
       const sorted = [...players].sort((a, b) => b.score - a.score);
       const container = $('miniRankingList');
       const popup = $('miniRankingPopup');
+      const overlay = $('miniRankingOverlay');
       container.innerHTML = sorted.slice(0, 10).map((p, i) => `
         <div class="mini-ranking-item ${i < 3 ? 'highlight' : ''}" style="animation: slideInRankings 0.4s ease-out ${i * 0.08}s backwards;">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
@@ -1474,13 +1487,14 @@
           <span class="rank-score">${p.score || 0}</span>
         </div>
       `).join('');
-      console.log('Showing mini ranking popup, players:', players.length);
+      overlay.style.display = 'block';
       popup.style.display = 'block';
       popup.style.animation = 'slideInRankings 0.5s ease-out';
     }
 
     function hideMiniRanking() {
       $('miniRankingPopup').style.display = 'none';
+      $('miniRankingOverlay').style.display = 'none';
     }
 
     function showStudentRanking(rankings) {
