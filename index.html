@@ -947,7 +947,7 @@
         { question: `成绩 refers to the grades or results of an exam.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
         { question: `合适 means that something is suitable or fits well.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
         { question: `增加 means to decrease the number or amount of something.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
-        { question: `Based on "然后她再<span style="color:#f59e0b;font-weight:bold;">辅导</span>我一个小时的语法," the colored word means ________.`, answer: "Grammar", timeLimit: 50 },
+        { question: `Based on "然后她再辅导我一个小时的<span style="color:#f59e0b;font-weight:bold;">语法</span>," the colored word means ________.`, answer: "Grammar", timeLimit: 50 },
         { question: `In "我先坐两个小时的飞机到香港，在那儿<span style="color:#f59e0b;font-weight:bold;">转机</span>," the colored word means ________.`, answer: "To transfer (flights) / To change planes", timeLimit: 50 },
         { question: `In "我<span style="color:#f59e0b;font-weight:bold;">原来</span>想在这儿学习半年，现在觉得汉语很有意思," the colored word means ________.`, answer: "Originally / In the beginning", timeLimit: 50 },
         { question: `In "我已经跟她学了三个星期了，觉得<span style="color:#f59e0b;font-weight:bold;">效果</span>不错," the colored word means ________.`, answer: "Effect / Result / Effectiveness", timeLimit: 50 },
@@ -1110,6 +1110,15 @@
             if (data.correctAnswer !== undefined) {
               const correctOpt = $(`opt-${data.correctAnswer}`);
               if (correctOpt) correctOpt.classList.add('correct');
+            }
+            // For fill-in-the-blank, show the correct answer if provided
+            if (data.answerText) {
+              const resultEl = $('resultStatus');
+              if (resultEl) {
+                resultEl.textContent = `Answer: ${data.answerText}`;
+                resultEl.style.color = '#f59e0b';
+                resultEl.style.display = 'block';
+              }
             }
           }
           break;
@@ -1613,7 +1622,8 @@
 
       publishEvent('stop-question', {
         type: 'stop-question',
-        correctAnswer: q.correctAnswer
+        correctAnswer: q.correctAnswer,
+        answerText: q.answer
       });
     }
 
@@ -1773,9 +1783,14 @@
       const currentQ = questions[currentQuestionIndex];
       if (!currentQ) return;
 
-      // Flexible answer checking - accept if user's answer contains any key phrase (case insensitive)
+      // Very flexible answer checking - extract key words from accepted answers
       const acceptedAnswers = currentQ.answer.split('/').map(a => a.trim().toLowerCase());
-      const isCorrect = acceptedAnswers.some(a => userAnswer.includes(a));
+      // Extract key words (first word of each alternative, removing common prefixes)
+      const keyWords = acceptedAnswers.flatMap(a => {
+        const words = a.replace(/[()]/g, '').split(/\s+/);
+        return words.filter(w => w.length > 2).slice(0, 2);
+      });
+      const isCorrect = keyWords.some(kw => userAnswer.includes(kw) || kw.includes(userAnswer));
       const timeTaken = (Date.now() - questionStartTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((currentQ.timeLimit - timeTaken) * 50));
       const points = isCorrect ? 1000 + timeBonus : 0;
