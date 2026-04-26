@@ -1723,8 +1723,9 @@
 
     function updatePlayerList(playerList) {
       players = playerList;
-      $('playerCount').textContent = players.length;
-      $('teacherPlayerList').innerHTML = players.map(p => `
+      const students = players.filter(p => p.id !== myPlayerId);
+      $('playerCount').textContent = students.length;
+      $('teacherPlayerList').innerHTML = students.map(p => `
         <div class="player-card">
           <div class="player-avatar">${p.avatar || (p.name || '?').charAt(0).toUpperCase()}</div>
           <div class="player-info">
