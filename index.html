@@ -653,6 +653,10 @@
 
     <!-- 学生答题 -->
     <div id="studentQuiz" class="card hidden">
+      <div id="studentPlayerInfo" style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 10px; margin-bottom: 10px; background: var(--glass); border-radius: 12px;">
+        <span style="font-size: 2rem;" id="studentAvatarDisplay"></span>
+        <span style="font-size: 1.2rem; font-weight: 600;" id="studentNameDisplay"></span>
+      </div>
       <div class="question-box" style="padding: 12px;">
         <div class="question-number" id="studentQuestionNumber" style="margin-bottom: 4px;">第 1 题 / 共 10 题</div>
         <div class="timer-display timer-normal" id="studentTimer" style="font-size: 1.2rem; padding: 4px 12px; margin-bottom: 8px;">15</div>
@@ -1442,6 +1446,9 @@
       hide('studentWaiting');
       hide('studentResult');
       hide('studentRanking');
+      // Show player info
+      $('studentAvatarDisplay').textContent = selectedAvatar;
+      $('studentNameDisplay').textContent = $('playerName').value.trim() || '玩家';
       $('studentQuestionNumber').textContent = `第 ${qIndex + 1} 题 / 共 ${questions.length} 题`;
       $('studentTimer').textContent = q.timeLimit;
       $('studentTimer').className = 'timer-display timer-normal';
