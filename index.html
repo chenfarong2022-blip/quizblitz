@@ -623,10 +623,10 @@
     <audio id="gameMusic" loop>
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/game-music.mp3" type="audio/mpeg">
     </audio>
-    <audio id="victorySound">
+    <audio id="victorySound" loop>
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/Glockenspiel%20Victory.mp3" type="audio/mpeg">
     </audio>
-    <audio id="finalMusic">
+    <audio id="finalMusic" loop>
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/End%20Glitter%20Wins!.mp3" type="audio/mpeg">
     </audio>
     <div style="position: relative; margin-bottom: 30px;">
@@ -1078,6 +1078,11 @@
             bgMusic.pause();
             gameMusic.pause();
             updateWaitingStatus('游戏开始！');
+          } else {
+            // Teacher side: play game music
+            const gameMusic = document.getElementById('gameMusic');
+            gameMusic.currentTime = 0;
+            gameMusic.play().catch(() => {});
           }
           break;
 
@@ -1731,6 +1736,13 @@
       $('studentTimer').className = 'timer-display timer-normal';
       hasAnswered = false;
       window.selectedAnswer = null;
+
+      // Play game music on student side
+      const gameMusic = document.getElementById('gameMusic');
+      if (gameMusic) {
+        gameMusic.currentTime = 0;
+        gameMusic.play().catch(() => {});
+      }
 
       if (q.options && q.options.length > 0) {
         $('studentOptions').innerHTML = q.options.map((opt, i) => `
