@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.14</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.15</p>
   </div>
 
   <style>
@@ -1585,6 +1585,8 @@
       $('teacherQuestionText').innerHTML = q.question.replace(/\n/g, '<br>');
       $('teacherTimerDisplay').textContent = q.timeLimit;
       $('teacherTimerDisplay').className = 'timer-display timer-normal';
+      $('teacherAnswerDisplay').textContent = '';
+      $('teacherAnswerDisplay').style.display = 'none';
 
       if (q.options && q.options.length > 0) {
         $('teacherOptionsDisplay').innerHTML = q.options.map((opt, i) => `
@@ -1594,7 +1596,7 @@
           </div>
         `).join('');
       } else {
-        $('teacherOptionsDisplay').innerHTML = `<div style="text-align:center;color:var(--accent);">填空题</div>`;
+        $('teacherOptionsDisplay').innerHTML = ``;
       }
 
       startTeacherTimer(q.timeLimit);
@@ -1608,6 +1610,23 @@
       $('showRankingBtn').disabled = false;
       showTeacherRankings();
       showMiniRankingPopup();
+
+      // Show answer on teacher side
+      const answerDisplay = $('teacherAnswerDisplay');
+      if (answerDisplay) {
+        let answerText = '';
+        if (q.answer) {
+          // Fill-in-blank question
+          answerText = q.answer;
+        } else if (q.options && q.correctAnswer !== undefined) {
+          // Choice or T/F question
+          answerText = q.options[q.correctAnswer];
+        }
+        if (answerText) {
+          answerDisplay.textContent = `正确答案: ${answerText}`;
+          answerDisplay.style.display = 'block';
+        }
+      }
 
       const rankings = [...players].sort((a, b) => b.score - a.score);
       publishEvent('show-ranking', { type: 'show-ranking', rankings: rankings });
