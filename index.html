@@ -504,6 +504,9 @@
     <audio id="gameMusic" loop>
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/game-music.mp3" type="audio/mpeg">
     </audio>
+    <audio id="victorySound">
+      <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/victory%20sound.mp3" type="audio/mpeg">
+    </audio>
     <div style="position: relative; margin-bottom: 30px;">
       <!-- 小王子星球装饰 -->
       <div style="position: absolute; top: -60px; left: -80px; font-size: 3rem; animation: float 3s ease-in-out infinite;">🌟</div>
@@ -1491,10 +1494,15 @@
       const popup = $('miniRankingPopup');
       const overlay = $('miniRankingOverlay');
 
-      // Pause game music when ranking popup shows
+      // Pause game music and play victory sound
       const gameMusic = document.getElementById('gameMusic');
+      const victorySound = document.getElementById('victorySound');
       if (gameMusic) {
         gameMusic.pause();
+      }
+      if (victorySound) {
+        victorySound.currentTime = 0;
+        victorySound.play().catch(() => {});
       }
 
       container.innerHTML = sorted.slice(0, 5).map((p, i) => `
@@ -1513,8 +1521,13 @@
     function hideMiniRanking() {
       $('miniRankingPopup').style.display = 'none';
       $('miniRankingOverlay').style.display = 'none';
-      // Resume game music when ranking popup closes
+      // Stop victory sound and resume game music
       const gameMusic = document.getElementById('gameMusic');
+      const victorySound = document.getElementById('victorySound');
+      if (victorySound) {
+        victorySound.pause();
+        victorySound.currentTime = 0;
+      }
       if (gameMusic) {
         gameMusic.currentTime = 0;
         gameMusic.play().catch(() => {});
