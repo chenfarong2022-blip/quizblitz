@@ -544,7 +544,11 @@
             <div class="qr-url" id="qrUrl" style="margin-top: 12px;"></div>
             <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 10px;">学生扫码直接加入房间</p>
           </div>
-          <div class="game-controls" style="justify-content: center;">
+          <div id="joinedStudents" style="margin-top: 15px; padding: 10px; background: var(--glass); border-radius: 8px; min-height: 60px;">
+            <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 8px;">已加入的学生</div>
+            <div id="joinedStudentsList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+          </div>
+          <div class="game-controls" style="justify-content: center; margin-top: 15px;">
             <button class="btn btn-primary" onclick="showTeacherEditor()">📝 编辑题目</button>
             <button class="btn btn-success" onclick="startGame()">🎮 开始游戏</button>
             <button class="btn btn-danger" onclick="resetGame()">🔄 重置</button>
@@ -920,6 +924,7 @@
           if (data.players) {
             players = data.players;
             updatePlayerList(players);
+            updateJoinedStudentsList(players);
           }
           break;
 
@@ -1113,7 +1118,7 @@
       myPlayerId = 'host_' + Date.now();
       gameStatus = 'waiting';
       questions = [];
-      players = [{ id: myPlayerId, name: '老师', score: 0 }];
+      players = [{ id: myPlayerId, name: '老师', avatar: '👨‍🏫', score: 0 }];
 
       $('teacherRoomCode').textContent = roomCode;
       hide('teacherCreate');
@@ -1128,6 +1133,7 @@
       generateQR(joinUrl, 'qrcode');
 
       updatePlayerList(players);
+      updateJoinedStudentsList(players);
       subscribeToRoom(roomCode);
 
       showToast('房间创建成功！');
@@ -1627,6 +1633,22 @@
           </div>
         </div>
       `).join('');
+    }
+
+    function updateJoinedStudentsList(playerList) {
+      const container = $('joinedStudentsList');
+      if (!container) return;
+      const students = playerList.filter(p => p.id !== myPlayerId);
+      if (students.length === 0) {
+        container.innerHTML = '<div style="color: rgba(255,255,255,0.4); font-size: 0.85rem;">暂无学生加入</div>';
+      } else {
+        container.innerHTML = students.map(p => `
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--glass); padding: 6px 12px; border-radius: 20px;">
+            <span style="font-size: 1.2rem;">${p.avatar || '👤'}</span>
+            <span style="font-size: 0.9rem;">${escapeHtml(p.name || '未知')}</span>
+          </div>
+        `).join('');
+      }
     }
 
     // ===== 计时器 =====
