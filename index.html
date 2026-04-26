@@ -1640,13 +1640,13 @@
       const popup = $('miniRankingPopup');
       const overlay = $('miniRankingOverlay');
 
-      // Pause game music and play victory sound
+      // Teacher side: pause game music and play victory sound
       const gameMusic = document.getElementById('gameMusic');
       const victorySound = document.getElementById('victorySound');
       if (gameMusic) {
         gameMusic.pause();
       }
-      if (victorySound) {
+      if (isHost && victorySound) {
         victorySound.currentTime = 0;
         victorySound.play().catch(() => {});
       }
@@ -1667,14 +1667,14 @@
     function hideMiniRanking() {
       $('miniRankingPopup').style.display = 'none';
       $('miniRankingOverlay').style.display = 'none';
-      // Stop victory sound and resume game music
+      // Teacher side: stop victory and resume game music
       const gameMusic = document.getElementById('gameMusic');
       const victorySound = document.getElementById('victorySound');
       if (victorySound) {
         victorySound.pause();
         victorySound.currentTime = 0;
       }
-      if (gameMusic) {
+      if (isHost && gameMusic) {
         gameMusic.currentTime = 0;
         gameMusic.play().catch(() => {});
       }
@@ -1736,13 +1736,6 @@
       $('studentTimer').className = 'timer-display timer-normal';
       hasAnswered = false;
       window.selectedAnswer = null;
-
-      // Play game music on student side
-      const gameMusic = document.getElementById('gameMusic');
-      if (gameMusic) {
-        gameMusic.currentTime = 0;
-        gameMusic.play().catch(() => {});
-      }
 
       if (q.options && q.options.length > 0) {
         $('studentOptions').innerHTML = q.options.map((opt, i) => `
@@ -1911,9 +1904,9 @@
       const sorted = [...rankings].sort((a, b) => b.score - a.score);
       const top3 = sorted.slice(0, 3);
 
-      // Play final music
+      // Teacher side: play final music
       const finalMusic = document.getElementById('finalMusic');
-      if (finalMusic) {
+      if (isHost && finalMusic) {
         finalMusic.currentTime = 0;
         finalMusic.play().catch(() => {});
       }
