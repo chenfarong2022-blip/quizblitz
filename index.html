@@ -342,6 +342,125 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
       50% { box-shadow: 0 0 20px 5px rgba(245,158,11,0.5); }
     }
+    /* Final ranking page */
+    .final-ranking-page {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .final-ranking-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #ffd700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 40px;
+      animation: titleGlow 2s ease-in-out infinite;
+    }
+    @keyframes slideInTop3 {
+      0% { opacity: 0; transform: scale(0.5) translateY(-50px); }
+      60% { transform: scale(1.1) translateY(0); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes moveToPodium {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(var(--podium-y, 0)) scale(0.7); }
+    }
+    .podium-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .podium-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: slideInTop3 0.8s ease-out backwards;
+    }
+    .podium-item.rank-1 { --podium-y: -30px; animation-delay: 0.5s; }
+    .podium-item.rank-2 { --podium-y: -15px; animation-delay: 0.8s; }
+    .podium-item.rank-3 { --podium-y: 0px; animation-delay: 1.1s; }
+    .podium-item.settling { animation: moveToPodium 0.5s ease-in forwards; }
+    .podium-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      border: 3px solid var(--accent);
+    }
+    .podium-rank-1 .podium-avatar { border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.5); }
+    .podium-rank-2 .podium-avatar { border-color: #c0c0c0; box-shadow: 0 0 20px rgba(192,192,192,0.4); }
+    .podium-rank-3 .podium-avatar { border-color: #cd7f32; box-shadow: 0 0 20px rgba(205,127,50,0.4); }
+    .podium-name {
+      font-size: 1rem;
+      font-weight: 600;
+      max-width: 100px;
+      word-break: break-all;
+    }
+    .podium-score {
+      font-size: 1.2rem;
+      color: var(--accent);
+      font-family: 'Orbitron', sans-serif;
+      margin-top: 5px;
+    }
+    .podium-base {
+      width: 100px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+      border-radius: 10px 10px 0 0;
+      padding: 15px 10px;
+      border: 1px solid var(--glass-border);
+    }
+    .podium-base.rank-1 { height: 120px; background: linear-gradient(180deg, rgba(255,215,0,0.2) 0%, rgba(255,215,0,0.1) 100%); }
+    .podium-base.rank-2 { height: 90px; background: linear-gradient(180deg, rgba(192,192,192,0.15) 0%, rgba(192,192,192,0.08) 100%); }
+    .podium-base.rank-3 { height: 60px; }
+    .final-ranking-actions {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+    }
+    .final-ranking-actions .btn {
+      padding: 12px 30px;
+      font-size: 1rem;
+    }
+    /* Transition page */
+    .transition-page {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .transition-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 20px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
     .ranking-you { color: var(--primary); font-size: 0.85rem; margin-left: 8px; }
     .status-badge {
       display: inline-block;
@@ -506,6 +625,9 @@
     </audio>
     <audio id="victorySound">
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/Glockenspiel%20Victory.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="finalMusic">
+      <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/End%20Glitter%20Wins!.mp3" type="audio/mpeg">
     </audio>
     <div style="position: relative; margin-bottom: 30px;">
       <!-- 小王子星球装饰 -->
@@ -748,6 +870,22 @@
       <div id="studentRanking" class="ranking-list hidden"></div>
     </div>
 
+    <!-- 答题结束过渡页 -->
+    <div id="transitionPage" class="transition-page hidden">
+      <div class="transition-text">🎉 答题结束 🎉</div>
+      <div style="color: rgba(255,255,255,0.7); font-size: 1.2rem;">即将揭晓最终排名...</div>
+    </div>
+
+    <!-- 最终排名领奖台页 -->
+    <div id="finalRankingPage" class="final-ranking-page hidden">
+      <div class="final-ranking-title">🏆 最终排名 🏆</div>
+      <div class="podium-container" id="podiumContainer"></div>
+      <div class="final-ranking-actions">
+        <button class="btn btn-secondary" onclick="resetGame()">再来一轮</button>
+        <button class="btn btn-secondary" onclick="backToHome()">返回主页</button>
+      </div>
+    </div>
+
     <!-- 最终排名 -->
     <div id="finalRanking" class="card hidden">
       <div class="winner-container" id="winnerContainer"></div>
@@ -977,7 +1115,7 @@
         case 'game-finished':
           gameStatus = 'finished';
           if (!isHost) {
-            showFinalRanking(data.rankings);
+            showFinalRankingFlow(data.rankings);
           }
           break;
 
@@ -1399,6 +1537,9 @@
         $('nextQuestionBtn').textContent = '游戏结束';
         $('nextQuestionBtn').disabled = true;
         $('stopAnswerBtn').disabled = true;
+        // Stop game music and show final ranking flow for teacher
+        hideMiniRanking();
+        showTransitionPage();
         return;
       }
 
@@ -1557,13 +1698,16 @@
       myScore = 0;
       players.forEach(p => p.score = 0);
 
-      // Switch back to cover music
-      const bgMusic = document.getElementById('bgMusic');
+      // Stop final music and game music
+      const finalMusic = document.getElementById('finalMusic');
       const gameMusic = document.getElementById('gameMusic');
+      if (finalMusic) finalMusic.pause();
       gameMusic.pause();
       gameMusic.currentTime = 0;
-      bgMusic.currentTime = 0;
-      bgMusic.play().catch(() => {});
+
+      // Hide final ranking pages
+      hide('finalRankingPage');
+      hide('transitionPage');
 
       showTeacherRoom();
       hide('teacherRankings');
@@ -1736,6 +1880,83 @@
           <span class="ranking-score">${p.score || 0} 分</span>
         </div>
       `).join('');
+    }
+
+    function showTransitionPage() {
+      // Stop game music
+      const gameMusic = document.getElementById('gameMusic');
+      if (gameMusic) gameMusic.pause();
+
+      show('transitionPage');
+      setTimeout(() => {
+        hide('transitionPage');
+        showFinalRankingFlow(players);
+      }, 2000);
+    }
+
+    function showFinalRankingFlow(rankings) {
+      if (!rankings) rankings = players;
+      const sorted = [...rankings].sort((a, b) => b.score - a.score);
+      const top3 = sorted.slice(0, 3);
+
+      // Play final music
+      const finalMusic = document.getElementById('finalMusic');
+      if (finalMusic) {
+        finalMusic.currentTime = 0;
+        finalMusic.play().catch(() => {});
+      }
+
+      show('finalRankingPage');
+      const container = $('podiumContainer');
+
+      // Create initial podium items (floating)
+      container.innerHTML = `
+        <div class="podium-item rank-2" id="podium-rank-2" style="opacity:0;">
+          <div class="podium-avatar">${top3[1]?.avatar || '🥈'}</div>
+          <div class="podium-name">${escapeHtml(top3[1]?.name || '未知')}</div>
+          <div class="podium-score">${top3[1]?.score || 0}</div>
+          <div class="podium-base rank-2"></div>
+        </div>
+        <div class="podium-item rank-1" id="podium-rank-1" style="opacity:0;">
+          <div class="podium-avatar">${top3[0]?.avatar || '🏆'}</div>
+          <div class="podium-name">${escapeHtml(top3[0]?.name || '未知')}</div>
+          <div class="podium-score">${top3[0]?.score || 0}</div>
+          <div class="podium-base rank-1"></div>
+        </div>
+        <div class="podium-item rank-3" id="podium-rank-3" style="opacity:0;">
+          <div class="podium-avatar">${top3[2]?.avatar || '🥉'}</div>
+          <div class="podium-name">${escapeHtml(top3[2]?.name || '未知')}</div>
+          <div class="podium-score">${top3[2]?.score || 0}</div>
+          <div class="podium-base rank-3"></div>
+        </div>
+      `;
+
+      // Animate top3 one by one
+      setTimeout(() => { $('podium-rank-3').style.opacity = '1'; }, 500);
+      setTimeout(() => {
+        $('podium-rank-3').classList.add('settling');
+      }, 2000);
+
+      setTimeout(() => { $('podium-rank-2').style.opacity = '1'; }, 2500);
+      setTimeout(() => {
+        $('podium-rank-2').classList.add('settling');
+      }, 4000);
+
+      setTimeout(() => { $('podium-rank-1').style.opacity = '1'; }, 4500);
+      setTimeout(() => {
+        $('podium-rank-1').classList.add('settling');
+      }, 6000);
+    }
+
+    function backToHome() {
+      const finalMusic = document.getElementById('finalMusic');
+      if (finalMusic) finalMusic.pause();
+      hide('finalRankingPage');
+      if (isHost) {
+        showTeacherRoom();
+      } else {
+        showModeSelection();
+      }
     }
 
     function playAgain() {
