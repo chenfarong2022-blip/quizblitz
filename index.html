@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.09</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.10</p>
   </div>
 
   <style>
@@ -947,11 +947,11 @@
         { question: `成绩 refers to the grades or results of an exam.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
         { question: `合适 means that something is suitable or fits well.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
         { question: `增加 means to decrease the number or amount of something.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
-        { question: `Based on "然后她再辅导我一个小时的语法," the bolded word means ________. (hint: 辅导)`, answer: "Grammar", timeLimit: 50 },
-        { question: `In "我先坐两个小时的飞机到香港，在那儿转机," the bolded word means ________. (hint: 转机)`, answer: "To transfer (flights) / To change planes", timeLimit: 50 },
-        { question: `In "我原来想在这儿学习半年，现在觉得汉语很有意思," the bolded word means ________. (hint: 原来)`, answer: "Originally / In the beginning", timeLimit: 50 },
-        { question: `In "我已经跟她学了三个星期了，觉得效果不错," the bolded word means ________. (hint: 效果)`, answer: "Effect / Result / Effectiveness", timeLimit: 50 },
-        { question: `In "今年寒假有六个星期呢，我打算先在北京玩儿一两个星期再回国," the bolded word means ________. (hint: 打算)`, answer: "To plan / To intend", timeLimit: 50 }
+        { question: `Based on "然后她再辅导我一个小时的语法," the bolded word means ________.`, answer: "Grammar", timeLimit: 50 },
+        { question: `In "我先坐两个小时的飞机到香港，在那儿转机," the bolded word means ________.`, answer: "To transfer (flights) / To change planes", timeLimit: 50 },
+        { question: `In "我原来想在这儿学习半年，现在觉得汉语很有意思," the bolded word means ________.`, answer: "Originally / In the beginning", timeLimit: 50 },
+        { question: `In "我已经跟她学了三个星期了，觉得效果不错," the bolded word means ________.`, answer: "Effect / Result / Effectiveness", timeLimit: 50 },
+        { question: `In "今年寒假有六个星期呢，我打算先在北京玩儿一两个星期再回国," the bolded word means ________.`, answer: "To plan / To intend", timeLimit: 50 }
       ]
     };
 
@@ -1589,11 +1589,11 @@
         $('teacherOptionsDisplay').innerHTML = q.options.map((opt, i) => `
           <div class="option-btn" style="cursor:default; background: rgba(255,255,255,0.1);">
             <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-            <span style="font-size: 1.2rem;">${escapeHtml(opt)}</span>
+            <span style="font-size: 1.2rem; margin-left: 10px;">${escapeHtml(opt)}</span>
           </div>
         `).join('');
       } else {
-        $('teacherOptionsDisplay').innerHTML = `<div style="text-align:center;color:var(--accent);">填空题 (答案: ${q.answer})</div>`;
+        $('teacherOptionsDisplay').innerHTML = `<div style="text-align:center;color:var(--accent);">填空题</div>`;
       }
 
       startTeacherTimer(q.timeLimit);
@@ -1743,7 +1743,7 @@
       if (q.options && q.options.length > 0) {
         $('studentOptions').innerHTML = q.options.map((opt, i) => `
           <button class="option-btn" onclick="selectOption(${i})" id="opt-${i}">
-            ${String.fromCharCode(65 + i)}
+            ${escapeHtml(opt)}
           </button>
         `).join('');
         $('submitContainer').style.display = 'block';
@@ -1751,10 +1751,10 @@
       } else if (q.answer !== null && q.answer !== undefined) {
         $('studentOptions').innerHTML = `
           <div style="width: 100%; text-align: center;">
-            <input type="text" id="fillAnswerInput" placeholder="请输入答案"
+            <input type="text" id="fillAnswerInput" placeholder="Enter your answer"
               style="text-align: center; font-size: 1.2rem; padding: 16px; width: 80%; max-width: 400px;"
               onkeydown="if(event.key==='Enter')submitFillAnswer()">
-            <button class="btn btn-primary" onclick="submitFillAnswer()" style="margin-top: 16px;">提交答案</button>
+            <button class="btn btn-primary" onclick="submitFillAnswer()" style="margin-top: 16px;">Submit</button>
           </div>
         `;
         $('submitContainer').style.display = 'none';
