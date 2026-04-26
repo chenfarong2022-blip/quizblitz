@@ -571,7 +571,7 @@
             <option value="2">正确答案: C</option>
             <option value="3">正确答案: D</option>
           </select>
-          <input type="number" id="timeLimit" value="15" min="5" max="60">
+          <input type="number" id="timeLimit" value="45" min="10" max="120">
           <button class="btn btn-primary" onclick="addSingleQuestion()" style="width: 100%;">添加题目</button>
         </div>
       </div>
@@ -685,6 +685,7 @@
     let myScore = 0;
     let questionStartTime = 0;
     let players = [];
+    let submittedThisQuestion = [];
 
     // ===== 内置题库 =====
     const BUILT_IN_BANKS = {
@@ -908,6 +909,15 @@
             if (player) {
               player.score = result.totalScore;
               updatePlayerList(players);
+            }
+            // Track submitted players for this question
+            if (!submittedThisQuestion.includes(result.playerId)) {
+              submittedThisQuestion.push(result.playerId);
+            }
+            // Check if all players have submitted (only on host side)
+            if (isHost && players.length > 0 && submittedThisQuestion.length >= players.length) {
+              console.log('All players submitted, auto stopping question');
+              stopAnswer();
             }
             // 如果是教师自己（host）的答案
             if (result.playerId === myPlayerId) {
@@ -1272,6 +1282,7 @@
 
       const question = questions[nextIndex];
       currentQuestionIndex = nextIndex;
+      submittedThisQuestion = []; // Reset for new question
 
       // Restart game music for each question
       const gameMusic = document.getElementById('gameMusic');
