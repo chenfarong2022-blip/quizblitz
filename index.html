@@ -715,7 +715,10 @@
     let goEasyConnected = false;
 
     function initGoEasy() {
-      if (goEasy) return goEasy;
+      if (goEasy) {
+        goEasyConnected = true;
+        return goEasy;
+      }
 
       goEasy = GoEasy.getInstance({
         appkey: GOEASY_APPKEY,
@@ -754,7 +757,19 @@
           doSubscribe(room);
         } else if (attempts > 50) {
           clearInterval(subscribeInterval);
-          console.error('GoEasy connection timeout');
+          console.error('GoEasy connection timeout, retrying...');
+          // Retry connection
+          goEasyConnected = false;
+          goEasy.connect({
+            onSuccess: function() {
+              console.log('GoEasy reconnected!');
+              goEasyConnected = true;
+              doSubscribe(room);
+            },
+            onFailed: function(error) {
+              console.error('GoEasy reconnect failed:', error);
+            }
+          });
         }
       }, 100);
     }
