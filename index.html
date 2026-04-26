@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.20</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.10</p>
   </div>
 
   <style>
@@ -797,7 +797,6 @@
         <div class="question-text" id="teacherQuestionText">等待发题...</div>
         <div class="timer-display timer-normal" id="teacherTimerDisplay" style="font-size: 3rem;">--</div>
         <div class="options-grid" id="teacherOptionsDisplay" style="margin-top: 30px;"></div>
-        <div id="teacherAnswerDisplay" style="margin-top: 20px; font-size: 1.5rem; font-weight: bold; color: #f59e0b; text-align: center;"></div>
       </div>
 
       <div class="game-controls" style="margin-top: 20px;">
@@ -948,36 +947,13 @@
         { question: `成绩 refers to the grades or results of an exam.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
         { question: `合适 means that something is suitable or fits well.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
         { question: `增加 means to decrease the number or amount of something.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
-        { question: `Based on "然后她再辅导我一个小时的<span style="color:#f59e0b;font-weight:bold;">语法</span>," the colored word means ________.`, answer: "Grammar", timeLimit: 50 },
-        { question: `In "我先坐两个小时的飞机到香港，在那儿<span style="color:#f59e0b;font-weight:bold;">转机</span>," the colored word means ________.`, answer: "To transfer (flights) / To change planes", timeLimit: 50 },
-        { question: `In "我<span style="color:#f59e0b;font-weight:bold;">原来</span>想在这儿学习半年，现在觉得汉语很有意思," the colored word means ________.`, answer: "Originally / In the beginning", timeLimit: 50 },
-        { question: `In "我已经跟她学了三个星期了，觉得<span style="color:#f59e0b;font-weight:bold;">效果</span>不错," the colored word means ________.`, answer: "Effect / Result / Effectiveness", timeLimit: 50 },
-        { question: `In "今年寒假有六个星期呢，我<span style="color:#f59e0b;font-weight:bold;">打算</span>先在北京玩儿一两个星期再回国," the colored word means ________.`, answer: "To plan / To intend", timeLimit: 50 }
+        { question: `Based on "然后她再辅导我一个小时的语法," the bolded word means ________.`, answer: "Grammar", timeLimit: 50 },
+        { question: `In "我先坐两个小时的飞机到香港，在那儿转机," the bolded word means ________.`, answer: "To transfer (flights) / To change planes", timeLimit: 50 },
+        { question: `In "我原来想在这儿学习半年，现在觉得汉语很有意思," the bolded word means ________.`, answer: "Originally / In the beginning", timeLimit: 50 },
+        { question: `In "我已经跟她学了三个星期了，觉得效果不错," the bolded word means ________.`, answer: "Effect / Result / Effectiveness", timeLimit: 50 },
+        { question: `In "今年寒假有六个星期呢，我打算先在北京玩儿一两个星期再回国," the bolded word means ________.`, answer: "To plan / To intend", timeLimit: 50 }
       ]
-    },
-    "中国基本知识 (Basic China Knowledge)": [
-      { question: `What is the capital city of China?`, options: ["Shanghai", "Beijing", "Guangzhou", "Xi'an"], correctAnswer: 1, timeLimit: 45, rationale: "Beijing is the political and cultural center of the country and has served as the capital for several dynasties." },
-      { question: `Which river is known as the "Mother River" of China?`, options: ["Yangtze River", "Pearl River", "Yellow River", "Mekong River"], correctAnswer: 2, timeLimit: 45, rationale: "The Yellow River is considered the cradle of Chinese civilization because its basin was the birthplace of ancient Chinese politics, economy, and culture." },
-      { question: `Which of these is NOT one of the "Four Great Inventions" of ancient China?`, options: ["Compass", "Gunpowder", "Paper making", "Steam engine"], correctAnswer: 3, timeLimit: 45, rationale: "The steam engine was a product of the Industrial Revolution in Europe, while the others were developed in ancient China." },
-      { question: `What is the official currency of China?`, options: ["Yen", "Won", "Renminbi (Yuan)", "Baht"], correctAnswer: 2, timeLimit: 45, rationale: "The Renminbi (RMB) is the official currency, and the 'Yuan' is its primary unit." },
-      { question: `Which animal is considered a national treasure in China?`, options: ["Red Panda", "Giant Panda", "Siberian Tiger", "Golden Monkey"], correctAnswer: 1, timeLimit: 45, rationale: "The Giant Panda is native to south-central China and is a global symbol of wildlife conservation." },
-      { question: `In which year was the People's Republic of China founded?`, options: ["1912", "1945", "1949", "1978"], correctAnswer: 2, timeLimit: 45, rationale: "The PRC was officially proclaimed by Mao Zedong on October 1st, 1949, in Tiananmen Square." },
-      { question: `Which dynasty was the first to unify China?`, options: ["Han Dynasty", "Tang Dynasty", "Qin Dynasty", "Ming Dynasty"], correctAnswer: 2, timeLimit: 45, rationale: "Qin Shi Huang unified the warring states in 221 BC and became the first emperor of a unified China." },
-      { question: `What is the official language of China?`, options: ["Cantonese", "Standard Mandarin", "Shanghainese", "Hokkien"], correctAnswer: 1, timeLimit: 45, rationale: "Standard Mandarin (Putonghua) is the official national language used for education, media, and government." },
-      { question: `Which is the highest plateau in China, often called the "Roof of the World"?`, options: ["Loess Plateau", "Tibetan Plateau", "Yunnan-Guizhou Plateau", "Inner Mongolian Plateau"], correctAnswer: 1, timeLimit: 45, rationale: "The Tibetan Plateau is the highest and largest plateau in the world, with an average elevation of over 4,500 meters." },
-      { question: `How many officially recognized ethnic groups are there in China?`, options: ["10", "25", "56", "100"], correctAnswer: 2, timeLimit: 45, rationale: "The Han group is the majority, and there are 55 other officially recognized minority ethnic groups." },
-      { question: `Mount Everest is located on the border between China and Nepal.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20, rationale: "The summit of Mount Everest (Qomolangma) sits exactly on the international border between the Tibet Autonomous Region of China and Nepal." },
-      { question: `The Great Wall of China is a single, continuous wall built in one dynasty.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20, rationale: "The wall consists of many segments built over different dynasties, including the Qin, Han, and Ming." },
-      { question: `China is the most populous country in the world as of 2024.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20, rationale: "Recent demographic data indicates that India has overtaken China as the world's most populous nation." },
-      { question: `The Spring Festival is the most important traditional holiday in China.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20, rationale: "Also known as Chinese New Year, it is a time for family reunions and is the most widely celebrated festival in the country." },
-      { question: `China officially uses five different time zones for the whole country.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20, rationale: "Although China spans five geographical time zones, the entire country officially follows a single standard time (Beijing Time)." },
-      { question: `The Yangtze River is the longest river in Asia.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20, rationale: "The Yangtze is approximately 6,300 kilometers long, making it the longest in Asia and the third longest in the world." },
-      { question: `Confucius was a famous philosopher whose teachings influenced Chinese culture for centuries.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20, rationale: "Confucianism has been a fundamental part of Chinese social structure, ethics, and education for over 2,000 years." },
-      { question: `The Chinese flag has five yellow stars on a red background.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20, rationale: "The flag features one large star and four smaller stars arranged in an arc, symbolizing the unity of the people under the leadership of the Party." },
-      { question: `Hong Kong returned to Chinese sovereignty from the United Kingdom in 1999.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20, rationale: "Hong Kong was handed back to China in 1997; Macau was the territory that returned in 1999 (from Portugal)." },
-      { question: `Table Tennis (Ping-pong) is considered a "national ball game" in China.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20, rationale: "China has a long history of dominance in international table tennis competitions, and the sport is immensely popular nationwide." }
-    ]
-  };
+    };
 
     // ===== GoEasy 初始化 =====
     let goEasyConnected = false;
@@ -1608,9 +1584,6 @@
       $('teacherQuestionText').innerHTML = q.question.replace(/\n/g, '<br>');
       $('teacherTimerDisplay').textContent = q.timeLimit;
       $('teacherTimerDisplay').className = 'timer-display timer-normal';
-      $('teacherAnswerDisplay').textContent = '';
-      $('teacherAnswerDisplay').style.display = 'none';
-      $('teacherAnswerDisplay').style.whiteSpace = 'normal';
 
       if (q.options && q.options.length > 0) {
         $('teacherOptionsDisplay').innerHTML = q.options.map((opt, i) => `
@@ -1620,7 +1593,7 @@
           </div>
         `).join('');
       } else {
-        $('teacherOptionsDisplay').innerHTML = ``;
+        $('teacherOptionsDisplay').innerHTML = `<div style="text-align:center;color:var(--accent);">填空题</div>`;
       }
 
       startTeacherTimer(q.timeLimit);
@@ -1634,28 +1607,6 @@
       $('showRankingBtn').disabled = false;
       showTeacherRankings();
       showMiniRankingPopup();
-
-      // Show answer on teacher side
-      const answerDisplay = $('teacherAnswerDisplay');
-      if (answerDisplay) {
-        let answerText = '';
-        if (q.answer) {
-          // Fill-in-blank question
-          answerText = q.answer;
-        } else if (q.options && q.correctAnswer !== undefined) {
-          // Choice or T/F question
-          answerText = q.options[q.correctAnswer];
-        }
-        if (answerText) {
-          let displayText = `正确答案: ${answerText}`;
-          if (q.rationale) {
-            displayText += `\n${q.rationale}`;
-            answerDisplay.style.whiteSpace = 'pre-line';
-          }
-          answerDisplay.textContent = displayText;
-          answerDisplay.style.display = 'block';
-        }
-      }
 
       const rankings = [...players].sort((a, b) => b.score - a.score);
       publishEvent('show-ranking', { type: 'show-ranking', rankings: rankings });
@@ -1792,7 +1743,7 @@
       if (q.options && q.options.length > 0) {
         $('studentOptions').innerHTML = q.options.map((opt, i) => `
           <button class="option-btn" onclick="selectOption(${i})" id="opt-${i}">
-            ${String.fromCharCode(65 + i)}
+            ${escapeHtml(opt)}
           </button>
         `).join('');
         $('submitContainer').style.display = 'block';
@@ -1816,20 +1767,13 @@
       if (hasAnswered) return;
       const input = $('fillAnswerInput');
       if (!input) return;
-      const userAnswer = input.value.trim().toLowerCase();
+      const userAnswer = input.value.trim();
       if (!userAnswer) { showToast('请输入答案'); return; }
 
       const currentQ = questions[currentQuestionIndex];
       if (!currentQ) return;
 
-      // Very flexible answer checking - extract key words from accepted answers
-      const acceptedAnswers = currentQ.answer.split('/').map(a => a.trim().toLowerCase());
-      // Extract key words (first word of each alternative, removing common prefixes)
-      const keyWords = acceptedAnswers.flatMap(a => {
-        const words = a.replace(/[()]/g, '').split(/\s+/);
-        return words.filter(w => w.length > 2).slice(0, 2);
-      });
-      const isCorrect = keyWords.some(kw => userAnswer.includes(kw) || kw.includes(userAnswer));
+      const isCorrect = userAnswer === currentQ.answer;
       const timeTaken = (Date.now() - questionStartTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((currentQ.timeLimit - timeTaken) * 50));
       const points = isCorrect ? 1000 + timeBonus : 0;
@@ -1841,7 +1785,7 @@
       qsa('.option-btn').forEach(btn => btn.disabled = true);
 
       const resultEl = $('resultStatus');
-      resultEl.textContent = isCorrect ? `✓ Correct! +${points}` : `✗ Answer: ${currentQ.answer}`;
+      resultEl.textContent = isCorrect ? `✓ 回答正确！+${points} 分` : `✗ 正确答案是：${currentQ.answer}`;
       resultEl.style.color = isCorrect ? '#10b981' : '#ef4444';
       $('myScore').textContent = myScore;
       show('studentResult');
