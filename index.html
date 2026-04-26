@@ -1490,6 +1490,13 @@
       const container = $('miniRankingList');
       const popup = $('miniRankingPopup');
       const overlay = $('miniRankingOverlay');
+
+      // Pause game music when ranking popup shows
+      const gameMusic = document.getElementById('gameMusic');
+      if (gameMusic) {
+        gameMusic.pause();
+      }
+
       container.innerHTML = sorted.slice(0, 5).map((p, i) => `
         <div class="mini-ranking-item ${i < 3 ? 'highlight' : ''}" style="animation: slideInRankings 0.4s ease-out ${i * 0.1}s backwards;">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
@@ -1506,6 +1513,12 @@
     function hideMiniRanking() {
       $('miniRankingPopup').style.display = 'none';
       $('miniRankingOverlay').style.display = 'none';
+      // Resume game music when ranking popup closes
+      const gameMusic = document.getElementById('gameMusic');
+      if (gameMusic) {
+        gameMusic.currentTime = 0;
+        gameMusic.play().catch(() => {});
+      }
     }
 
     function showStudentRanking(rankings) {
