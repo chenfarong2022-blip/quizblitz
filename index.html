@@ -617,16 +617,16 @@
     <div style="position: absolute; top: 20px; right: 80px;">
       <button id="musicBtn" onclick="toggleMusic()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 14px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">🔊</button>
     </div>
-    <audio id="bgMusic" loop autoplay>
+    <audio id="bgMusic" loop preload="auto">
       <source id="musicSource" src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/%E5%B0%81%E9%9D%A2%E9%A1%B5Kalimba%20Loop.mp3" type="audio/mpeg">
     </audio>
-    <audio id="gameMusic" loop>
+    <audio id="gameMusic" loop preload="auto">
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/game-music.mp3" type="audio/mpeg">
     </audio>
-    <audio id="victorySound" loop>
+    <audio id="victorySound" preload="auto">
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/Glockenspiel%20Victory.mp3" type="audio/mpeg">
     </audio>
-    <audio id="finalMusic" loop>
+    <audio id="finalMusic" loop preload="auto">
       <source src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/End%20Glitter%20Wins!.mp3" type="audio/mpeg">
     </audio>
     <div style="position: relative; margin-bottom: 30px;">
@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.25</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.26</p>
   </div>
 
   <style>
@@ -674,7 +674,7 @@
         music.pause();
         btn.textContent = '🎵';
       } else {
-        music.play().catch(() => {});
+        playMusicSafely('bgMusic', true);
         btn.textContent = '🔊';
       }
       isMusicPlaying = !isMusicPlaying;
@@ -925,6 +925,33 @@
     let players = [];
     let submittedThisQuestion = [];
 
+    // ===== 音频播放辅助 =====
+    function playMusicSafely(audioId, loop = false) {
+      const audio = document.getElementById(audioId);
+      if (!audio) return;
+      audio.loop = loop;
+      audio.pause();
+      audio.currentTime = 0;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.log('Audio play failed, will retry on user interaction:', audioId);
+          // Mark for retry on next user interaction
+          audio.dataset.needsRetry = 'true';
+        });
+      }
+    }
+
+    function tryResumePendingAudio() {
+      ['bgMusic', 'gameMusic', 'victorySound', 'finalMusic'].forEach(id => {
+        const audio = document.getElementById(id);
+        if (audio && audio.dataset.needsRetry === 'true') {
+          audio.play().catch(() => {});
+          audio.dataset.needsRetry = 'false';
+        }
+      });
+    }
+
     // ===== 内置题库 =====
     const BUILT_IN_BANKS = {
       "词汇练习 (Lessons 4-6)": [
@@ -1148,9 +1175,7 @@
             updateWaitingStatus('Game started!');
           } else {
             // Teacher side: play game music
-            const gameMusic = document.getElementById('gameMusic');
-            gameMusic.currentTime = 0;
-            gameMusic.play().catch(() => {});
+            playMusicSafely('gameMusic', true);
           }
           break;
 
@@ -1587,11 +1612,9 @@
 
       // Switch to game music
       const bgMusic = document.getElementById('bgMusic');
-      const gameMusic = document.getElementById('gameMusic');
       bgMusic.pause();
       bgMusic.currentTime = 0;
-      gameMusic.currentTime = 0;
-      gameMusic.play().catch(() => {});
+      playMusicSafely('gameMusic', true);
 
       showTeacherControl();
       $('gameStatus').textContent = '游戏进行中';
@@ -1629,9 +1652,7 @@
       submittedThisQuestion = []; // Reset for new question
 
       // Restart game music for each question
-      const gameMusic = document.getElementById('gameMusic');
-      gameMusic.currentTime = 0;
-      gameMusic.play().catch(() => {});
+      playMusicSafely('gameMusic', true);
 
       showQuestionToTeacher(nextIndex, question);
 
@@ -1746,9 +1767,8 @@
       if (gameMusic) {
         gameMusic.pause();
       }
-      if (isHost && victorySound) {
-        victorySound.currentTime = 0;
-        victorySound.play().catch(() => {});
+      if (isHost) {
+        playMusicSafely('victorySound', false);
       }
 
       container.innerHTML = sorted.slice(0, 5).map((p, i) => `
@@ -1774,9 +1794,8 @@
         victorySound.pause();
         victorySound.currentTime = 0;
       }
-      if (isHost && gameMusic) {
-        gameMusic.currentTime = 0;
-        gameMusic.play().catch(() => {});
+      if (isHost) {
+        playMusicSafely('gameMusic', true);
       }
     }
 
@@ -2016,10 +2035,8 @@
       const top3 = sorted.slice(0, 3);
 
       // Teacher side: play final music
-      const finalMusic = document.getElementById('finalMusic');
-      if (isHost && finalMusic) {
-        finalMusic.currentTime = 0;
-        finalMusic.play().catch(() => {});
+      if (isHost) {
+        playMusicSafely('finalMusic', true);
       }
 
       show('finalRankingPage');
@@ -2174,6 +2191,9 @@
 
     function init() {
       populateBuiltInBankSelect();
+      // Add click listener to resume blocked audio
+      document.addEventListener('click', tryResumePendingAudio, { once: false, passive: true });
+      document.addEventListener('touchstart', tryResumePendingAudio, { once: false, passive: true });
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get('room');
       if (roomParam) {
