@@ -1181,6 +1181,18 @@
 
         case 'show-ranking':
           if (!isHost) {
+            // Update result display with actual outcome when ranking is shown
+            if (window.lastAnswerResult) {
+              const result = window.lastAnswerResult;
+              const resultEl = $('resultStatus');
+              if (result.isCorrect) {
+                resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
+                resultEl.style.color = '#10b981';
+              } else {
+                resultEl.textContent = '✗ 回答错误';
+                resultEl.style.color = '#ef4444';
+              }
+            }
             showStudentRanking(data.rankings);
           }
           break;
@@ -1236,18 +1248,14 @@
               console.log('All students submitted, auto stopping question');
               stopAnswer();
             }
-            // 如果是教师自己（host）的答案
+            // 如果是教师自己（host）的答案 - 也延迟显示，等排名公布
             if (result.playerId === myPlayerId) {
               hasAnswered = true;
               stopTimers();
+              window.lastAnswerResult = { isCorrect: result.isCorrect, points: result.points };
               const resultEl = $('resultStatus');
-              if (result.isCorrect) {
-                resultEl.textContent = `✓ 回答正确！+${result.points} 分`;
-                resultEl.style.color = '#10b981';
-              } else {
-                resultEl.textContent = '✗ 回答错误';
-                resultEl.style.color = '#ef4444';
-              }
+              resultEl.textContent = '已提交，等待结果公布...';
+              resultEl.style.color = 'rgba(255,255,255,0.6)';
               myScore = result.totalScore;
               $('myScore').textContent = myScore;
               show('studentResult');
@@ -1859,6 +1867,9 @@
       const userAnswer = input.value.trim().toLowerCase();
       if (!userAnswer) { showToast('请输入答案'); return; }
 
+      hasAnswered = true;
+      stopTimers();
+
       const currentQ = questions[currentQuestionIndex];
       if (!currentQ) return;
 
@@ -1874,15 +1885,14 @@
       const timeBonus = Math.max(0, Math.floor((currentQ.timeLimit - timeTaken) * 50));
       const points = isCorrect ? 1000 + timeBonus : 0;
 
-      hasAnswered = true;
-      stopTimers();
-
       myScore += points;
       qsa('.option-btn').forEach(btn => btn.disabled = true);
 
+      // Don't show result immediately - wait for ranking reveal
+      window.lastAnswerResult = { isCorrect, points };
       const resultEl = $('resultStatus');
-      resultEl.textContent = isCorrect ? `✓ Correct! +${points}` : `✗ Answer: ${currentQ.answer}`;
-      resultEl.style.color = isCorrect ? '#10b981' : '#ef4444';
+      resultEl.textContent = '已提交，等待结果公布...';
+      resultEl.style.color = 'rgba(255,255,255,0.6)';
       $('myScore').textContent = myScore;
       show('studentResult');
 
@@ -1935,9 +1945,11 @@
 
       qsa('.option-btn').forEach(btn => btn.disabled = true);
 
+      // Don't show result immediately - wait for ranking reveal
+      window.lastAnswerResult = { isCorrect, points };
       const resultEl = $('resultStatus');
-      resultEl.textContent = isCorrect ? `✓ 回答正确！+${points} 分` : '✗ 回答错误';
-      resultEl.style.color = isCorrect ? '#10b981' : '#ef4444';
+      resultEl.textContent = '已提交，等待结果公布...';
+      resultEl.style.color = 'rgba(255,255,255,0.6)';
       $('myScore').textContent = myScore;
       show('studentResult');
 
