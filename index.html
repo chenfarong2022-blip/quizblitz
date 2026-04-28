@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.23</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.25</p>
   </div>
 
   <style>
@@ -830,10 +830,10 @@
     <div id="studentMode" class="card hidden" style="padding: 16px;">
       <div id="studentJoin">
         <div style="margin-bottom: 8px;">
-          <input type="text" id="roomCode" placeholder="房间码" maxlength="6" style="text-transform: uppercase; font-size: 1rem; text-align: center; letter-spacing: 4px; padding: 8px; width: 100%;">
+          <input type="text" id="roomCode" placeholder="Room Code" maxlength="6" style="text-transform: uppercase; font-size: 1rem; text-align: center; letter-spacing: 4px; padding: 8px; width: 100%;">
         </div>
         <div style="margin-bottom: 8px;">
-          <input type="text" id="playerName" placeholder="昵称" maxlength="20" style="padding: 8px; font-size: 1rem; width: 100%; text-align: center;">
+          <input type="text" id="playerName" placeholder="Nickname" maxlength="20" style="padding: 8px; font-size: 1rem; width: 100%; text-align: center;">
         </div>
         <div id="avatarSelector" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px;"></div>
         <button class="btn btn-primary" onclick="joinRoom()" style="width: 100%; padding: 10px; font-size: 1rem;">加入房间</button>
@@ -841,13 +841,13 @@
       <div id="studentWaiting" class="hidden">
         <div style="text-align: center; padding: 40px 0;">
           <div class="loading" style="margin: 0 auto 20px;"></div>
-          <p style="color: rgba(255,255,255,0.8);">正在连接服务器<span class="waiting-dots"></span></p>
+          <p style="color: rgba(255,255,255,0.8);">Connecting to server<span class="waiting-dots"></span></p>
         </div>
         <div style="text-align: center;">
           <span class="section-title">房间码</span>
           <div class="room-code-display" id="studentRoomCode" style="font-size: 2rem;"></div>
         </div>
-        <div id="waitingStatus" class="status-badge status-info" style="display: block; margin: 20px auto; width: fit-content;">等待游戏开始...</div>
+        <div id="waitingStatus" class="status-badge status-info" style="display: block; margin: 20px auto; width: fit-content;">Waiting for game to start...</div>
       </div>
     </div>
 
@@ -858,7 +858,7 @@
         <span style="font-size: 1.2rem; font-weight: 600;" id="studentNameDisplay"></span>
       </div>
       <div class="question-box" style="padding: 12px;">
-        <div class="question-number" id="studentQuestionNumber" style="margin-bottom: 4px;">第 1 题 / 共 10 题</div>
+        <div class="question-number" id="studentQuestionNumber" style="margin-bottom: 4px;">Question 1 / 10</div>
         <div class="timer-display timer-normal" id="studentTimer" style="font-size: 1.2rem; padding: 4px 12px; margin-bottom: 8px;">15</div>
         <div class="options-grid" id="studentOptions"></div>
         <div id="submitContainer" style="text-align: center; display: none; margin-top: 12px;">
@@ -867,15 +867,15 @@
       </div>
       <div id="studentResult" class="hidden" style="text-align: center; padding: 30px;">
         <div id="resultStatus" style="font-size: 2rem; margin-bottom: 20px;"></div>
-        <div style="font-size: 1.3rem; color: var(--accent);">当前得分: <span id="myScore">0</span></div>
+        <div style="font-size: 1.3rem; color: var(--accent);">Score: <span id="myScore">0</span></div>
       </div>
       <div id="studentRanking" class="ranking-list hidden"></div>
     </div>
 
     <!-- 答题结束过渡页 -->
     <div id="transitionPage" class="transition-page hidden">
-      <div class="transition-text">🎉 答题结束 🎉</div>
-      <div style="color: rgba(255,255,255,0.7); font-size: 1.2rem;">即将揭晓最终排名...</div>
+      <div class="transition-text">🎉 Answer Submitted 🎉</div>
+      <div style="color: rgba(255,255,255,0.7); font-size: 1.2rem;">Final ranking coming soon...</div>
     </div>
 
     <!-- 最终排名领奖台页 -->
@@ -1145,7 +1145,7 @@
             const gameMusic = document.getElementById('gameMusic');
             bgMusic.pause();
             gameMusic.pause();
-            updateWaitingStatus('游戏开始！');
+            updateWaitingStatus('Game started!');
           } else {
             // Teacher side: play game music
             const gameMusic = document.getElementById('gameMusic');
@@ -1211,7 +1211,7 @@
           if (!isHost) {
             show('studentWaiting');
             hide('studentQuiz');
-            updateWaitingStatus('游戏已重置，等待再次开始');
+            updateWaitingStatus('Game reset, waiting to start again...');
           }
           break;
 
@@ -1254,7 +1254,7 @@
               stopTimers();
               window.lastAnswerResult = { isCorrect: result.isCorrect, points: result.points };
               const resultEl = $('resultStatus');
-              resultEl.textContent = '已提交，等待结果公布...';
+              resultEl.textContent = 'Submitted, waiting for results...';
               resultEl.style.color = 'rgba(255,255,255,0.6)';
               myScore = result.totalScore;
               $('myScore').textContent = myScore;
@@ -1434,13 +1434,13 @@
       updateJoinedStudentsList(players);
       subscribeToRoom(roomCode);
 
-      showToast('房间创建成功！');
+      showToast('Room created successfully!');
     }
 
     function joinRoom() {
       const code = $('roomCode').value.trim().toUpperCase();
       const name = $('playerName').value.trim() || '玩家' + Math.floor(Math.random() * 1000);
-      if (!code || code.length < 4) { showToast('请输入正确的房间码'); return; }
+      if (!code || code.length < 4) { showToast('Please enter a valid room code'); return; }
 
       roomCode = code;
       myRole = 'student';
@@ -1450,7 +1450,7 @@
       $('studentRoomCode').textContent = roomCode;
       show('studentWaiting');
       hide('studentJoin');
-      updateWaitingStatus('正在连接房间...');
+      updateWaitingStatus('Connecting to room...');
 
       subscribeToRoom(roomCode);
 
@@ -1458,7 +1458,7 @@
         const player = { id: myPlayerId, name: name, avatar: selectedAvatar, score: 0 };
         players.push(player);
         publishEvent('player-joined', { player: player, players: players });
-        updateWaitingStatus('已加入房间，等待游戏开始...');
+        updateWaitingStatus('Joined room, waiting for game to start...');
       }, 500);
     }
 
@@ -1471,7 +1471,7 @@
       const timeLimit = parseInt($('timeLimit').value) || 45;
 
       if (!questionText || options.some(o => !o)) {
-        showToast('请填写完整题目和所有选项');
+        showToast('Please fill in all questions and options');
         return;
       }
 
@@ -1488,14 +1488,14 @@
 
       $('questionText').value = '';
       $('option0').value = ''; $('option1').value = ''; $('option2').value = ''; $('option3').value = '';
-      showToast('题目添加成功');
+      showToast('Question added successfully');
     }
 
     function importQuestions() {
       const text = $('jsonImport').value.trim();
-      if (!text) { showToast('请输入 JSON 数据'); return; }
+      if (!text) { showToast('Please enter JSON data'); return; }
       let imported;
-      try { imported = JSON.parse(text); } catch (e) { showToast('JSON 格式错误'); return; }
+      try { imported = JSON.parse(text); } catch (e) { showToast('JSON format error'); return; }
       if (!Array.isArray(imported)) imported = [imported];
 
       for (let i = 0; i < imported.length; i++) {
@@ -1540,7 +1540,7 @@
 
     function importBuiltInBank() {
       const bankName = $('builtInBankSelect').value;
-      if (!bankName) { showToast('请先选择题库'); return; }
+      if (!bankName) { showToast('Please select a question bank first'); return; }
       const bank = BUILT_IN_BANKS[bankName];
       if (!bank) return;
 
@@ -1564,7 +1564,7 @@
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
-          showToast('无法进入全屏模式');
+          showToast('Unable to enter fullscreen mode');
         });
         $('fullscreenBtn').textContent = '✕';
       } else {
@@ -1580,7 +1580,7 @@
     });
 
     function startGame() {
-      if (questions.length === 0) { showToast('请先添加至少一道题目'); return; }
+      if (questions.length === 0) { showToast('Please add at least one question first'); return; }
 
       gameStatus = 'playing';
       players.forEach(p => p.score = 0);
@@ -1865,7 +1865,7 @@
       const input = $('fillAnswerInput');
       if (!input) return;
       const userAnswer = input.value.trim().toLowerCase();
-      if (!userAnswer) { showToast('请输入答案'); return; }
+      if (!userAnswer) { showToast('Please enter an answer'); return; }
 
       hasAnswered = true;
       stopTimers();
@@ -1891,7 +1891,7 @@
       // Don't show result immediately - wait for ranking reveal
       window.lastAnswerResult = { isCorrect, points };
       const resultEl = $('resultStatus');
-      resultEl.textContent = '已提交，等待结果公布...';
+      resultEl.textContent = 'Submitted, waiting for results...';
       resultEl.style.color = 'rgba(255,255,255,0.6)';
       $('myScore').textContent = myScore;
       show('studentResult');
@@ -1923,7 +1923,7 @@
 
     function confirmAnswer() {
       if (window.selectedAnswer === null || window.selectedAnswer === undefined) {
-        showToast('请先选择一个选项');
+        showToast('Please select an option first');
         return;
       }
       submitAnswer(window.selectedAnswer);
@@ -1948,7 +1948,7 @@
       // Don't show result immediately - wait for ranking reveal
       window.lastAnswerResult = { isCorrect, points };
       const resultEl = $('resultStatus');
-      resultEl.textContent = '已提交，等待结果公布...';
+      resultEl.textContent = 'Submitted, waiting for results...';
       resultEl.style.color = 'rgba(255,255,255,0.6)';
       $('myScore').textContent = myScore;
       show('studentResult');
@@ -2081,7 +2081,7 @@
       } else {
         show('studentWaiting');
         hide('finalRanking');
-        updateWaitingStatus('等待老师开始新游戏...');
+        updateWaitingStatus('Waiting for teacher to start new game...');
       }
     }
 
