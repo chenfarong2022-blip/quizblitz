@@ -1908,6 +1908,7 @@
       $('studentTimer').className = 'timer-display timer-normal';
       hasAnswered = false;
       window.selectedAnswer = null;
+      window.lastAnswerResult = null;
 
       if (q.options && q.options.length > 0) {
         $('studentOptions').innerHTML = q.options.map((opt, i) => `
