@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.28</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.29</p>
   </div>
 
   <style>
@@ -867,7 +867,7 @@
       </div>
       <div id="studentResult" class="hidden" style="text-align: center; padding: 30px;">
         <div id="resultStatus" style="font-size: 2rem; margin-bottom: 20px;"></div>
-        <div style="font-size: 1.3rem; color: var(--accent);">Score: <span id="myScore">0</span></div>
+        <div id="scoreDisplay" style="font-size: 1.3rem; color: var(--accent); display: none;">Score: <span id="myScore">0</span></div>
       </div>
       <div id="studentRanking" class="ranking-list hidden"></div>
     </div>
@@ -1258,7 +1258,7 @@
 
         case 'show-ranking':
           if (!isHost) {
-            // Update result display with actual outcome when ranking is shown
+            // Update result and score when ranking is revealed
             if (window.lastAnswerResult) {
               const result = window.lastAnswerResult;
               const resultEl = $('resultStatus');
@@ -1269,6 +1269,8 @@
                 resultEl.textContent = '✗ 回答错误';
                 resultEl.style.color = '#ef4444';
               }
+              $('myScore').textContent = myScore;
+              $('scoreDisplay').style.display = 'block';
             }
             showStudentRanking(data.rankings);
           }
@@ -1334,7 +1336,6 @@
               resultEl.textContent = 'Submitted, waiting for results...';
               resultEl.style.color = 'rgba(255,255,255,0.6)';
               myScore = result.totalScore;
-              $('myScore').textContent = myScore;
               show('studentResult');
               qsa('.option-btn').forEach(btn => btn.disabled = true);
             }
@@ -1964,7 +1965,6 @@
       const resultEl = $('resultStatus');
       resultEl.textContent = 'Submitted, waiting for results...';
       resultEl.style.color = 'rgba(255,255,255,0.6)';
-      $('myScore').textContent = myScore;
       show('studentResult');
 
       publishEvent('answer-submitted', {
@@ -2021,7 +2021,6 @@
       const resultEl = $('resultStatus');
       resultEl.textContent = 'Submitted, waiting for results...';
       resultEl.style.color = 'rgba(255,255,255,0.6)';
-      $('myScore').textContent = myScore;
       show('studentResult');
 
       publishEvent('answer-submitted', {
