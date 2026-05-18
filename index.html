@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.34</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.35</p>
   </div>
 
   <style>
@@ -1232,6 +1232,44 @@
       { question: `"人手一个"意思是"每个人都有一个"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
       { question: `"越来越多"表示数量慢慢增加。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
       { question: `"他借了银行两百万"和"他跟银行借了两百万"意思相同。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
+    ],
+
+    "口语第九课 (Lesson 9 Speaking)": [
+      { question: `What does "又酸又辣" mean?`, options: ["Only sour", "Only spicy", "Both sour and spicy", "Not sour or spicy"], correctAnswer: 2, timeLimit: 45 },
+      { question: `You want to ask "How do you say this in Chinese?". Which phrase should you use?`, options: ["这是什么？", "这个多少钱？", "这个汉语怎么说？", "怎么说这个？"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"你要哪个？" means:`, options: ["How many do you want?", "Which one do you want?", "Where is it?", "What is it?"], correctAnswer: 1, timeLimit: 45 },
+      { question: `You point at a dish and ask "这个菜怎么样？". You are asking:`, options: ["How much is it?", "Is it spicy?", "How is this dish?", "Who ordered this?"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"这是谁的手机？" means:`, options: ["Where is the phone?", "Is this a new phone?", "Whose phone is this?", "Is this a phone?"], correctAnswer: 2, timeLimit: 45 },
+      { question: `In a restaurant, "请扫码点菜" means:`, options: ["Please pay in cash", "Please scan the QR code to order", "Please call the waiter", "Please read the menu"], correctAnswer: 1, timeLimit: 45 },
+      { question: `What taste is 宫保鸡丁 (gōng bǎo jī dīng)?`, options: ["Sweet", "Salty", "Spicy", "Sour"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"酸菜鱼又酸又辣" — the structure "又……又……" means:`, options: ["either one or the other", "both A and B", "neither A nor B", "more A than B"], correctAnswer: 1, timeLimit: 45 },
+      { question: `In a restaurant, you use "二维码" to:`, options: ["Listen to music", "Scan and order food", "Make a phone call", "Take photos"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"这是什么味道的？""咸的。" — "咸的" means:`, options: ["Sweet", "Sour", "Salty", "Spicy"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"给我看一下，好吗？" — the speaker's tone is:`, options: ["Giving an order", "Making a polite request", "Expressing anger", "Showing worry"], correctAnswer: 1, timeLimit: 45 },
+      { question: `Someone asks "这是辣的吗？" and you answer "不辣。" It means:`, options: ["Very spicy", "A little spicy", "Not spicy", "Extremely spicy"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"三个不卖，你要八个吧。" means:`, options: ["You can buy three", "You need to buy at least eight", "It's free", "Three is too expensive"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"一两小笼包" has about how many pieces?`, options: ["Three", "Eight", "Five", "Ten"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"请问，洗手间在哪儿？" — "洗手间" means:`, options: ["Kitchen", "Bedroom", "Restroom", "Living room"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"你要哪个苹果？""我要青苹果。" — "青" means:`, options: ["Red", "Green", "Yellow", "White"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"你的新手机真漂亮！" — the speaker is:`, options: ["Asking a question", "Giving a compliment", "Expressing anger", "Making an introduction"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"一笼小笼包" means:`, options: ["One piece", "One pound", "One steamer basket", "100 grams"], correctAnswer: 2, timeLimit: 45 },
+      { question: `Someone asks "这是不是包子？" To say "Yes, it is", you say:`, options: ["不是", "是", "有", "没有"], correctAnswer: 1, timeLimit: 45 },
+      { question: `What meat is used in 糖醋里脊 (táng cù lǐjǐ)?`, options: ["Beef", "Chicken", "Pork", "Fish"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"又酸又辣" means a dish has both sour and spicy flavors.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"请问" is a polite way to start a question, similar to "Excuse me" or "May I ask".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"哪个" is used to ask "which one".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"怎么样" can be used to ask someone's opinion about something.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"二维码" is the Chinese term for QR code.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"扫码" means using your phone to scan a QR code.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"一笼小笼包" and "一两小笼包" mean exactly the same thing.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `宫保鸡丁 (gōng bǎo jī dīng) is a sweet dish.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"这是谁的" is used to ask who something belongs to.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"给我看一下" means "Don't touch it, leave it alone."`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `In "青椒肉丝", the character "青" means green.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"一两" in China equals 50 grams.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `The "麻" in 麻婆豆腐 (má pó dòu fu) means "numbing-spicy".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"开水白菜" is the name of a Chinese dish.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"你要牛肉包子还是猪肉包子？" means you are asking the person to choose one.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
     ]
   };
 
