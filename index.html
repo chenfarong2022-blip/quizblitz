@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.33</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.34</p>
   </div>
 
   <style>
@@ -1194,6 +1194,44 @@
       { question: `"第几次"问的是"时间点"而不是"次数"。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
       { question: `在"我吃过烤鸭"中，"过"是动态助词，读轻声。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
       { question: `"售票"的意思是"开始卖票"或"出售票"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
+    ],
+
+    "听力第十一课 (Lesson 11 Listening)": [
+      { question: `"你______怎么去学校的？""我坐公共汽车去的。"`, options: ["是", "在", "有", "也"], correctAnswer: 0, timeLimit: 45 },
+      { question: `"你是______认识他的？""朋友介绍的。"`, options: ["怎么", "什么时候", "在哪儿", "为什么"], correctAnswer: 0, timeLimit: 45 },
+      { question: `他______北京毕业的。`, options: ["在", "从", "到", "去"], correctAnswer: 0, timeLimit: 45 },
+      { question: `毕业两年______我们就结婚了。`, options: ["以前", "以后", "中间", "时候"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"我可没去过那儿。" "可"在这里的作用是：`, options: ["表示转折", "加强语气", "表示可能", "表示时间"], correctAnswer: 1, timeLimit: 45 },
+      { question: `今天的作业还没做______呢，不能出去玩。`, options: ["了", "过", "完", "到"], correctAnswer: 2, timeLimit: 45 },
+      { question: `这套房子三百万，先______了一百万，剩下跟银行借的。`, options: ["借", "还", "租", "交"], correctAnswer: 3, timeLimit: 45 },
+      { question: `他每天工作十二个小时，太______了。`, options: ["幸福", "辛苦", "高兴", "热闹"], correctAnswer: 1, timeLimit: 45 },
+      { question: `手机越来越______，差不多每个人都有。`, options: ["普及", "科学", "丰富", "发展"], correctAnswer: 0, timeLimit: 45 },
+      { question: `在国外留学时，我常常______家乡。`, options: ["纪念", "怀念", "记住", "忘记"], correctAnswer: 1, timeLimit: 45 },
+      { question: `工作之外的时间叫______时间。`, options: ["业余", "休息", "课外", "闲着"], correctAnswer: 0, timeLimit: 45 },
+      { question: `他不喜欢待在屋里，他喜欢______活动。`, options: ["室内", "家里", "户外", "网上"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"人手一个平板电脑"意思是______都有一个。`, options: ["有的人", "每人", "两个人", "没有人"], correctAnswer: 1, timeLimit: 45 },
+      { question: `妈妈："都八点了，______该上学了！"`, options: ["多", "少", "该", "没"], correctAnswer: 2, timeLimit: 45 },
+      { question: `房子很贵，______他们还是买了。`, options: ["而且", "所以", "可是", "因为"], correctAnswer: 2, timeLimit: 45 },
+      { question: `他特别喜欢京剧，是个京剧______。`, options: ["人", "家", "员", "迷"], correctAnswer: 3, timeLimit: 45 },
+      { question: `李明在朋友家______过麻将。`, options: ["做", "玩", "打", "下"], correctAnswer: 2, timeLimit: 45 },
+      { question: `会议______了吗？我等了好久了。`, options: ["完开", "开完", "在开", "正开"], correctAnswer: 1, timeLimit: 45 },
+      { question: `______他不高，______篮球打得特别好。`, options: ["虽然……可是……", "因为……所以……", "不但……而且……", "一……就……"], correctAnswer: 0, timeLimit: 45 },
+      { question: `"你是坐飞机来的吗？" 回答应该是：`, options: ["我坐飞机来", "是的，坐飞机来的", "我明天来", "他来"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"我是昨天来的"回答的是"什么时候来的"的问题。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"我是昨天来的"和"我昨天来了"意思完全一样。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"我可不认识他"和"我不认识他"语气一样强。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"作业做完了"意思是作业已经完成了。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"钓鱼"是一个动宾结构的词组。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"麻将"是一种扑克牌。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"户外活动"指的是在屋子里进行的活动。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"丰富"的意思是东西很多、很充足。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"怀念"的意思是记得、思念过去的某人或某事。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"该……了"表示"应该做某事了"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"业余时间"指工作或学习之外的时间。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"辛苦"的意思是工作轻松、不累。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"人手一个"意思是"每个人都有一个"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"越来越多"表示数量慢慢增加。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"他借了银行两百万"和"他跟银行借了两百万"意思相同。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
     ]
   };
 
