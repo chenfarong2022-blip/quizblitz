@@ -644,7 +644,7 @@
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.35</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.36</p>
   </div>
 
   <style>
@@ -1278,7 +1278,18 @@
 
     function initGoEasy() {
       if (goEasy) {
-        goEasyConnected = true;
+        // Don't trust existing instance — reconnect to be safe
+        goEasyConnected = false;
+        goEasy.connect({
+          onSuccess: function() {
+            console.log('GoEasy reconnected!');
+            goEasyConnected = true;
+          },
+          onFailed: function(error) {
+            console.error('GoEasy reconnect failed:', error);
+            goEasyConnected = false;
+          }
+        });
         return goEasy;
       }
 
@@ -1366,24 +1377,30 @@
         return;
       }
 
-      const eventData = {
-        type: eventName,
-        ...data,
-        room: roomCode,
-        timestamp: Date.now()
-      };
+      const publishData = JSON.stringify(eventData);
 
-      console.log('Publishing:', eventName, eventData);
-      goEasy.pubsub.publish({
-        channel: currentChannelName,
-        message: JSON.stringify(eventData),
-        onSuccess: function() {
-          console.log('Published:', eventName);
-        },
-        onFailed: function(error) {
-          console.error('Publish failed:', error);
-        }
-      });
+      function doPublish(retriesLeft) {
+        goEasy.pubsub.publish({
+          channel: currentChannelName,
+          message: publishData,
+          onSuccess: function() {
+            console.log('Published:', eventName);
+            window._joinRetries = 0;
+          },
+          onFailed: function(error) {
+            console.error('Publish failed:', eventName, error);
+            // Retry player-joined events up to 5 times
+            if (eventName === 'player-joined' && !isHost && retriesLeft > 0) {
+              setTimeout(() => {
+                console.log('Retrying player-joined, attempts left:', retriesLeft);
+                doPublish(retriesLeft - 1);
+              }, 3000);
+            }
+          }
+        });
+      }
+
+      doPublish(eventName === 'player-joined' && !isHost ? 5 : 0);
     }
 
     function handleGoEasyEvent(data) {
@@ -1706,12 +1723,24 @@
 
       subscribeToRoom(roomCode);
 
-      setTimeout(() => {
-        const player = { id: myPlayerId, name: name, avatar: selectedAvatar, score: 0 };
-        players.push(player);
+      // Wait for GoEasy connection before publishing join event
+      const player = { id: myPlayerId, name: name, avatar: selectedAvatar, score: 0 };
+      players.push(player);
+      waitForConnectionAndJoin(player, 0);
+    }
+
+    function waitForConnectionAndJoin(player, attempt) {
+      if (goEasyConnected) {
         publishEvent('player-joined', { player: player, players: players });
         updateWaitingStatus('Joined room, waiting for game to start...');
-      }, 500);
+        return;
+      }
+      if (attempt > 100) {
+        updateWaitingStatus('Connection failed. Please refresh and try again.');
+        showToast('Connection failed! Please refresh the page and try again.');
+        return;
+      }
+      setTimeout(() => waitForConnectionAndJoin(player, attempt + 1), 200);
     }
 
     // ===== 教师功能 =====
