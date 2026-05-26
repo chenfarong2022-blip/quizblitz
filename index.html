@@ -168,6 +168,22 @@
     }
     .mode-icon { font-size: 4rem; margin-bottom: 20px; display: block; animation: bounce 2s ease-in-out infinite; }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes joinPop {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .join-pop { animation: joinPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes scoreCount {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); color: #f59e0b; }
+      100% { transform: scale(1); }
+    }
+    .score-tick { animation: scoreCount 0.3s ease-out; }
+    @keyframes sparkleFloat {
+      0% { transform: scale(0) rotate(0deg); opacity: 1; }
+      100% { transform: scale(1.5) rotate(180deg) translateY(-40px); opacity: 0; }
+    }
     .mode-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
     .mode-desc { color: #64748b; font-size: 0.95rem; }
     .btn {
@@ -703,7 +719,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.41</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.42</p>
   </div>
 
   <style>
@@ -859,7 +875,8 @@
         <div id="teacherAnswerDisplay" style="margin-top: 20px; font-size: 1.5rem; font-weight: bold; color: #f59e0b; text-align: center;"></div>
       </div>
 
-      <div class="game-controls" style="margin-top: 20px;">
+      <div id="submitStatus" style="text-align: center; font-size: 1.2rem; font-weight: 600; margin-top: 16px; color: #6366f1; min-height: 28px;"></div>
+      <div class="game-controls" style="margin-top: 16px;">
         <button class="btn btn-primary" id="nextQuestionBtn" onclick="nextQuestion()">下一题</button>
         <button class="btn btn-danger" id="stopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
         <button class="btn btn-success" id="showRankingBtn" onclick="showRanking()" disabled>显示排名</button>
@@ -973,7 +990,7 @@
     let questions = [];
     let selectedAvatar = '😺';
 
-    const AVATARS = ['😺','🐱','🐶','🐰','🦊','🐻','🐼','🐨','🦁','🐸','🐵','🐷','🐮','🐔','🐧','🐦','🦋','🐝','🐢','🐍','🦎','🐙','🦀','🐠','🐳','🦄','👻','🤖','👾','🎃','👻','🎅','🤡','👴','👵','👶','🧒','👧','🧑','👨','👩','💃','🕺','🚀','⭐','🌙','☀️','🌈','🍎','🍓','🍕','🎈','🎁','🎮','🎯','🏆'];
+    const AVATARS = ['😺','🐱','🐶','🐰','🦊','🐻','🐼','🐨','🦁','🐸','🐵','🐷','🐮','🐔','🐧','🐦','🦋','🐝','🐢','🐍','🦎','🐙','🦀','🐠','🐳','🦄','🐲','🐉','🦕','🦖','🐥','🦜','🦩','🦢','🐿️','🦔','🦫','🦥','🐾','🐉','🌵','🎄','🌻','🌺','🌸','💐','🍄','🍀','🌍','⭐','🌟','✨','💫','🔥','🌈','☀️','🌙','⚡','💧','❄️','🎃','👻','🤖','👾','🎅','👑','🤠','👩‍🚀','🧙‍♂️','🧚','🦸','🧛','🦹','👨‍🎓','👩‍🎓','👨‍🏫','🎓','💃','🕺','🚀','🛸','🎮','🎯','🏆','🥇','🎪','🎭','🎨','🎵','🎸','🎹','🥁','🎲','🎳','⚽','🏀','🎾','🏈','🍎','🍓','🍕','🍔','🌮','🍩','🎂','🍭','🎈','🎁','💎','🔮','💡','🗝️','❤️','💚','💙','💜','🖤','🤍','💖'];
     let currentQuestionIndex = -1;
     let gameStatus = 'waiting';
     let timerInterval = null;
@@ -1570,6 +1587,11 @@
             // Track submitted players for this question
             if (!submittedThisQuestion.includes(result.playerId)) {
               submittedThisQuestion.push(result.playerId);
+              // Teacher notification when a student submits
+              if (isHost && result.playerId !== myPlayerId) {
+                playBeepSound();
+                updateSubmitStatus();
+              }
             }
             // Check if all students have submitted (only on host side, exclude teacher)
             const studentCount = players.filter(p => p.id !== myPlayerId).length;
@@ -1617,7 +1639,7 @@
     function initAvatarSelector() {
       const container = $('avatarSelector');
       if (!container) return;
-      container.innerHTML = AVATARS.slice(0, 24).map(av => `
+      container.innerHTML = AVATARS.slice(0, 36).map(av => `
         <div class="avatar-option ${av === selectedAvatar ? 'selected' : ''}" onclick="selectAvatar('${av}')">${av}</div>
       `).join('');
     }
@@ -1647,18 +1669,24 @@
     function showConfetti() {
       const container = document.createElement('div');
       container.className = 'confetti';
+      container.style.pointerEvents = 'none';
       document.body.appendChild(container);
-      const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#ef4444', '#ffd700'];
-      for (let i = 0; i < 100; i++) {
+      const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#ef4444', '#ffd700', '#ff6b6b', '#48dbfb', '#ff9ff3', '#feca57'];
+      const shapes = ['50%', '0', '30%'];
+      for (let i = 0; i < 150; i++) {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece';
         piece.style.left = Math.random() * 100 + '%';
+        piece.style.top = -(Math.random() * 30) + 'px';
         piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDelay = Math.random() * 0.5 + 's';
-        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        piece.style.animationDelay = Math.random() * 0.8 + 's';
+        piece.style.animationDuration = (2.5 + Math.random() * 4) + 's';
+        piece.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+        piece.style.width = (8 + Math.random() * 12) + 'px';
+        piece.style.height = (8 + Math.random() * 12) + 'px';
         container.appendChild(piece);
       }
-      setTimeout(() => container.remove(), 4000);
+      setTimeout(() => container.remove(), 5000);
     }
 
     function generateQR(text, canvasId = 'qrcode') {
@@ -1965,6 +1993,7 @@
       const question = questions[nextIndex];
       currentQuestionIndex = nextIndex;
       submittedThisQuestion = []; // Reset for new question
+      const ss = $('submitStatus'); if (ss) ss.textContent = '';
 
       // Restart game music for each question
       playMusicSafely('gameMusic', true);
@@ -2065,9 +2094,16 @@
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span style="font-size: 1.5rem;">${p.avatar || ''}</span>
           <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
-          <span class="ranking-score">${p.score || 0} 分</span>
+          <span class="ranking-score roll-score" data-target="${p.score || 0}">0 分</span>
         </div>
       `).join('');
+      // Animate score rolls after render
+      setTimeout(() => {
+        container.querySelectorAll('.roll-score').forEach(el => {
+          const target = parseInt(el.dataset.target);
+          animateScoreRoll(el, target, 800 + Math.random() * 400);
+        });
+      }, 100);
     }
 
     function showMiniRankingPopup() {
@@ -2091,12 +2127,18 @@
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="rank-avatar">${p.avatar || '👤'}</span>
           <span class="rank-name">${escapeHtml(p.name || '未知')}</span>
-          <span class="rank-score">${p.score || 0}</span>
+          <span class="rank-score roll-score" data-target="${p.score || 0}">0</span>
         </div>
       `).join('');
       overlay.style.display = 'block';
       popup.style.display = 'block';
       popup.style.animation = 'slideInRankings 0.5s ease-out';
+      setTimeout(() => {
+        container.querySelectorAll('.roll-score').forEach(el => {
+          const target = parseInt(el.dataset.target);
+          animateScoreRoll(el, target, 700 + Math.random() * 300);
+        });
+      }, 150);
     }
 
     function hideMiniRanking() {
@@ -2122,11 +2164,16 @@
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span style="font-size: 1.5rem;">${p.avatar || ''}</span>
-          <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
-          <span class="ranking-score">${p.score || 0} 分</span>
+          <span class="ranking-score roll-score" data-target="${p.score || 0}">0 分</span>
         </div>
       `).join('');
+      setTimeout(() => {
+        container.querySelectorAll('.roll-score').forEach(el => {
+          const target = parseInt(el.dataset.target);
+          animateScoreRoll(el, target, 800 + Math.random() * 400);
+        });
+      }, 100);
     }
 
     function resetGame() {
@@ -2302,6 +2349,83 @@
       if (el) el.textContent = text;
     }
 
+    // ===== 提交提示音效 =====
+    function playBeepSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.15);
+      } catch(e) {
+        // Silently fail if audio context isn't available
+      }
+    }
+
+    function playTickSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = 1200;
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.05);
+      } catch(e) {}
+    }
+
+    function updateSubmitStatus() {
+      const el = $('submitStatus');
+      if (!el) return;
+      const studentCount = players.filter(p => p.id !== myPlayerId).length;
+      const submitted = submittedThisQuestion.length;
+      if (submitted > 0 && studentCount > 0) {
+        el.textContent = `📝 已提交: ${submitted} / ${studentCount}`;
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = 'scoreCount 0.3s ease-out';
+      } else {
+        el.textContent = '';
+      }
+    }
+
+    // ===== 分数滚动动画 =====
+    function animateScoreRoll(el, endVal, duration) {
+      if (!el) return;
+      const currentText = el.textContent.replace(/[^0-9]/g, '');
+      const startVal = parseInt(currentText) || 0;
+      if (startVal === endVal) { el.textContent = endVal + ' 分'; return; }
+      const startTime = performance.now();
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease-out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(startVal + (endVal - startVal) * eased);
+        el.textContent = current + ' 分';
+        if (current > startVal && current % 50 === 0) playTickSound();
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = endVal + ' 分';
+          el.style.animation = 'none';
+          el.offsetHeight;
+          el.style.animation = 'scoreCount 0.4s ease-out';
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
     function showFinalRanking(rankings) {
       if (!rankings) return;
       hideAllScreens();
@@ -2356,43 +2480,74 @@
       show('finalRankingPage');
       const container = $('podiumContainer');
 
-      // Create initial podium items (floating)
+      // Trophy sparkle at top
+      const sparkles = Array.from({length: 12}, (_, i) => {
+        const angle = (i / 12) * 360;
+        const radius = 80 + Math.random() * 40;
+        const dx = Math.cos(angle * Math.PI / 180) * radius;
+        const dy = Math.sin(angle * Math.PI / 180) * radius;
+        return `<span class="sparkle" style="position:absolute;top:calc(50% + ${dy}px);left:calc(50% + ${dx}px);font-size:${0.8 + Math.random() * 1.2}rem;animation: sparkleFloat ${1.5 + Math.random() * 2}s ease-out ${Math.random() * 0.5}s forwards;">${['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)]}</span>`;
+      }).join('');
+
       container.innerHTML = `
-        <div class="podium-item rank-2" id="podium-rank-2" style="opacity:0;">
-          <div class="podium-avatar">${top3[1]?.avatar || '🥈'}</div>
-          <div class="podium-name">${escapeHtml(top3[1]?.name || '未知')}</div>
-          <div class="podium-score">${top3[1]?.score || 0}</div>
-          <div class="podium-base rank-2"></div>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
+          <div class="winner-trophy" style="animation: trophyBounce 0.6s ease-out, trophyBounce 1.5s 0.6s ease-in-out infinite;">🏆</div>
+          <div class="winner-title" style="font-size:2.2rem;margin-bottom:30px;">${top3[0]?.name || '冠军'}</div>
+          ${sparkles}
         </div>
-        <div class="podium-item rank-1" id="podium-rank-1" style="opacity:0;">
-          <div class="podium-avatar">${top3[0]?.avatar || '🏆'}</div>
-          <div class="podium-name">${escapeHtml(top3[0]?.name || '未知')}</div>
-          <div class="podium-score">${top3[0]?.score || 0}</div>
-          <div class="podium-base rank-1"></div>
-        </div>
-        <div class="podium-item rank-3" id="podium-rank-3" style="opacity:0;">
-          <div class="podium-avatar">${top3[2]?.avatar || '🥉'}</div>
-          <div class="podium-name">${escapeHtml(top3[2]?.name || '未知')}</div>
-          <div class="podium-score">${top3[2]?.score || 0}</div>
-          <div class="podium-base rank-3"></div>
+        <div class="podium-container" style="margin-top:20px;">
+          <div class="podium-item rank-2" id="podium-rank-2" style="opacity:0;transform:translateY(50px);">
+            <div class="podium-avatar">${top3[1]?.avatar || '🥈'}</div>
+            <div class="podium-name">${escapeHtml(top3[1]?.name || '未知')}</div>
+            <div class="podium-score roll-score" data-target="${top3[1]?.score || 0}">0</div>
+            <div class="podium-base rank-2"></div>
+          </div>
+          <div class="podium-item rank-1" id="podium-rank-1" style="opacity:0;transform:translateY(50px);">
+            <div class="podium-avatar" style="font-size:3rem;">${top3[0]?.avatar || '🏆'}</div>
+            <div class="podium-name">${escapeHtml(top3[0]?.name || '未知')}</div>
+            <div class="podium-score roll-score" data-target="${top3[0]?.score || 0}">0</div>
+            <div class="podium-base rank-1"></div>
+          </div>
+          <div class="podium-item rank-3" id="podium-rank-3" style="opacity:0;transform:translateY(50px);">
+            <div class="podium-avatar">${top3[2]?.avatar || '🥉'}</div>
+            <div class="podium-name">${escapeHtml(top3[2]?.name || '未知')}</div>
+            <div class="podium-score roll-score" data-target="${top3[2]?.score || 0}">0</div>
+            <div class="podium-base rank-3"></div>
+          </div>
         </div>
       `;
 
-      // Animate top3 one by one
-      setTimeout(() => { $('podium-rank-3').style.opacity = '1'; }, 500);
-      setTimeout(() => {
-        $('podium-rank-3').classList.add('settling');
-      }, 2000);
+      // Launch confetti
+      showConfetti();
 
-      setTimeout(() => { $('podium-rank-2').style.opacity = '1'; }, 2500);
-      setTimeout(() => {
-        $('podium-rank-2').classList.add('settling');
-      }, 4000);
+      // Dramatic reveal sequence
+      const revealItem = (id, delay) => {
+        setTimeout(() => {
+          const el = $(id);
+          if (el) {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+          }
+        }, delay);
+      };
 
-      setTimeout(() => { $('podium-rank-1').style.opacity = '1'; }, 4500);
+      revealItem('podium-rank-3', 800);
+      revealItem('podium-rank-2', 1800);
+      revealItem('podium-rank-1', 2800);
+
+      // Animate score rolls for podium
       setTimeout(() => {
-        $('podium-rank-1').classList.add('settling');
-      }, 6000);
+        container.querySelectorAll('.roll-score').forEach((el, i) => {
+          const target = parseInt(el.dataset.target);
+          setTimeout(() => {
+            animateScoreRoll(el, target, 1200 + i * 300);
+          }, i * 200);
+        });
+      }, 3600);
+
+      // Burst more confetti for winner
+      setTimeout(() => showConfetti(), 4000);
     }
 
     function backToHome() {
@@ -2417,33 +2572,41 @@
     }
 
     function updatePlayerList(playerList) {
+      const oldIds = players.map(p => p.id);
       players = playerList;
       const students = players.filter(p => p.id !== myPlayerId);
       $('playerCount').textContent = students.length;
-      $('teacherPlayerList').innerHTML = students.map(p => `
-        <div class="player-card">
+      $('teacherPlayerList').innerHTML = students.map(p => {
+        const isNew = !oldIds.includes(p.id);
+        return `
+        <div class="player-card ${isNew ? 'join-pop' : ''}">
           <div class="player-avatar">${p.avatar || (p.name || '?').charAt(0).toUpperCase()}</div>
           <div class="player-info">
             <div class="player-name">${escapeHtml(p.name || '未知')}</div>
             <div class="player-score">${p.score || 0} 分</div>
           </div>
         </div>
-      `).join('');
+      `}).join('');
     }
 
+    let shownStudentIds = [];
     function updateJoinedStudentsList(playerList) {
       const container = $('joinedStudentsList');
       if (!container) return;
       const students = playerList.filter(p => p.id !== myPlayerId);
       if (students.length === 0) {
+        shownStudentIds = [];
         container.innerHTML = '<div style="color: #94a3b8; font-size: 0.85rem;">暂无学生加入</div>';
       } else {
-        container.innerHTML = students.map(p => `
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--glass); padding: 6px 12px; border-radius: 20px;">
+        container.innerHTML = students.map(p => {
+          const isNew = !shownStudentIds.includes(p.id);
+          return `
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--glass); padding: 6px 12px; border-radius: 20px; ${isNew ? 'animation: joinPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);' : ''}">
             <span style="font-size: 1.2rem;">${p.avatar || '👤'}</span>
             <span style="font-size: 0.9rem;">${escapeHtml(p.name || '未知')}</span>
           </div>
-        `).join('');
+        `}).join('');
+        shownStudentIds = students.map(s => s.id);
       }
     }
 
