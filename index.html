@@ -9,26 +9,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #a78bfa;
-      --primary-dark: #7c3aed;
-      --secondary: #f472b6;
+      --primary: #38bdf8;
+      --primary-dark: #0284c7;
+      --secondary: #fb7185;
       --accent: #fbbf24;
       --success: #34d399;
-      --danger: #f87171;
-      --dark: #1e1b4b;
-      --darker: #0c0a20;
+      --danger: #fb7185;
+      --dark: #0f172a;
+      --darker: #020617;
       --light: #f8fafc;
-      --glass: rgba(255,255,255,0.08);
-      --glass-hover: rgba(255,255,255,0.14);
-      --glass-border: rgba(255,255,255,0.15);
-      --glow-primary: rgba(167,139,250,0.5);
-      --glow-secondary: rgba(244,114,182,0.4);
+      --glass: rgba(255,255,255,0.1);
+      --glass-hover: rgba(255,255,255,0.16);
+      --glass-border: rgba(255,255,255,0.18);
+      --glow-primary: rgba(56,189,248,0.5);
+      --glow-secondary: rgba(251,113,133,0.4);
       --glow-accent: rgba(251,191,36,0.4);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Noto Sans SC', sans-serif;
-      background: linear-gradient(135deg, #0c0a20 0%, #1e1b4b 30%, #312e81 60%, #1e1b4b 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
       min-height: 100vh;
       color: var(--light);
       overflow-x: hidden;
@@ -46,7 +46,7 @@
       position: absolute;
       top: -30%; left: -20%;
       width: 80%; height: 80%;
-      background: radial-gradient(circle at center, rgba(139,92,246,0.3) 0%, transparent 60%);
+      background: radial-gradient(circle at center, rgba(56,189,248,0.25) 0%, transparent 60%);
       border-radius: 50%;
       filter: blur(60px);
       animation: orbFloat1 20s ease-in-out infinite;
@@ -68,7 +68,7 @@
       position: absolute;
       top: 5%; right: 5%;
       width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
-      background: radial-gradient(circle at center, rgba(236,72,153,0.25) 0%, transparent 60%);
+      background: radial-gradient(circle at center, rgba(251,113,133,0.22) 0%, transparent 60%);
       border-radius: 50%;
       filter: blur(50px);
       animation: orbFloat2 25s ease-in-out infinite;
@@ -78,7 +78,7 @@
       position: absolute;
       bottom: 0%; left: 10%;
       width: 40vw; height: 40vw; max-width: 500px; max-height: 500px;
-      background: radial-gradient(circle at center, rgba(245,158,11,0.2) 0%, transparent 60%);
+      background: radial-gradient(circle at center, rgba(251,191,36,0.2) 0%, transparent 60%);
       border-radius: 50%;
       filter: blur(55px);
       animation: orbFloat3 22s ease-in-out infinite;
@@ -110,7 +110,7 @@
       font-size: clamp(2.5rem, 8vw, 4rem);
       font-weight: 900;
       text-align: center;
-      background: linear-gradient(135deg, #c4b5fd 0%, #f472b6 40%, #fbbf24 80%);
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #f472b6 80%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -170,14 +170,14 @@
     }
     .mode-card:hover {
       transform: translateY(-8px) scale(1.02);
-      border-color: rgba(167,139,250,0.6);
-      background: rgba(167,139,250,0.15);
+      border-color: rgba(56,189,248,0.6);
+      background: rgba(56,189,248,0.12);
       box-shadow: 0 12px 40px var(--glow-primary);
     }
     .mode-icon { font-size: 4rem; margin-bottom: 20px; display: block; animation: bounce 2s ease-in-out infinite; }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     .mode-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: white; }
-    .mode-desc { color: rgba(255,255,255,0.5); font-size: 0.95rem; }
+    .mode-desc { color: rgba(255,255,255,0.55); font-size: 0.95rem; }
     .btn {
       padding: 14px 28px;
       border: 1px solid rgba(255,255,255,0.18);
@@ -191,11 +191,11 @@
       -webkit-backdrop-filter: blur(8px);
     }
     .btn-primary {
-      background: linear-gradient(135deg, rgba(139,92,246,0.4) 0%, rgba(124,58,237,0.4) 100%);
+      background: linear-gradient(135deg, rgba(56,189,248,0.35) 0%, rgba(2,132,199,0.35) 100%);
       color: white;
-      box-shadow: 0 4px 15px rgba(139,92,246,0.3);
+      box-shadow: 0 4px 15px rgba(56,189,248,0.3);
     }
-    .btn-primary:hover { transform: translateY(-2px); background: rgba(139,92,246,0.55); box-shadow: 0 8px 25px var(--glow-primary); }
+    .btn-primary:hover { transform: translateY(-2px); background: rgba(56,189,248,0.5); box-shadow: 0 8px 25px var(--glow-primary); }
     .btn-success { background: linear-gradient(135deg, rgba(52,211,153,0.35) 0%, rgba(16,185,129,0.35) 100%); color: white; }
     .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52,211,153,0.4); }
     .btn-danger { background: linear-gradient(135deg, rgba(248,113,113,0.35) 0%, rgba(239,68,68,0.35) 100%); color: white; }
@@ -220,22 +220,22 @@
     input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.4); }
     input:focus, textarea:focus, select:focus {
       outline: none;
-      border-color: rgba(167,139,250,0.6);
+      border-color: rgba(56,189,248,0.6);
       box-shadow: 0 0 20px var(--glow-primary);
-      background: rgba(167,139,250,0.12);
+      background: rgba(56,189,248,0.1);
     }
-    select option { background: #1a1a2e; color: white; }
+    select option { background: #1e293b; color: white; }
     .room-code-display {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(2rem, 10vw, 4rem);
       font-weight: 900;
       text-align: center;
       padding: 30px;
-      background: linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(244,114,182,0.15) 100%);
+      background: linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(99,102,241,0.15) 100%);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-radius: 20px;
-      border: 2px solid rgba(167,139,250,0.4);
+      border: 2px solid rgba(56,189,248,0.4);
       animation: codePulse 2s ease-in-out infinite;
       letter-spacing: 12px;
       margin: 20px 0;
@@ -309,15 +309,15 @@
       }
     }
     .option-btn:hover:not(:disabled) {
-      background: rgba(167,139,250,0.25);
-      border-color: rgba(167,139,250,0.6);
+      background: rgba(56,189,248,0.2);
+      border-color: rgba(56,189,248,0.5);
       box-shadow: 0 0 24px var(--glow-primary);
       transform: translateY(-2px);
     }
     .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
     .option-btn.correct { background: rgba(52,211,153,0.25) !important; border-color: var(--success) !important; box-shadow: 0 0 20px rgba(52,211,153,0.4) !important; }
-    .option-btn.wrong { background: rgba(248,113,113,0.25) !important; border-color: var(--danger) !important; box-shadow: 0 0 20px rgba(248,113,113,0.4) !important; }
-    .option-btn.selected { background: rgba(167,139,250,0.3) !important; border-color: rgba(167,139,250,0.7) !important; box-shadow: 0 0 24px var(--glow-primary) !important; }
+    .option-btn.wrong { background: rgba(251,113,133,0.25) !important; border-color: var(--danger) !important; box-shadow: 0 0 20px rgba(251,113,133,0.4) !important; }
+    .option-btn.selected { background: rgba(56,189,248,0.25) !important; border-color: rgba(56,189,248,0.6) !important; box-shadow: 0 0 24px var(--glow-primary) !important; }
     .ranking-list { margin-top: 20px; }
     .ranking-item {
       display: flex;
@@ -542,10 +542,10 @@
       border: 1px solid rgba(255,255,255,0.1);
     }
     @keyframes statusPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    .status-info { background: rgba(129,140,248,0.15); color: var(--primary); }
+    .status-info { background: rgba(56,189,248,0.15); color: var(--primary); }
     .status-success { background: rgba(52,211,153,0.15); color: var(--success); }
     .status-warning { background: rgba(251,191,36,0.15); color: var(--accent); }
-    .status-danger { background: rgba(248,113,113,0.15); color: var(--danger); }
+    .status-danger { background: rgba(251,113,133,0.15); color: var(--danger); }
     .qr-container { text-align: center; padding: 30px; background: white; border-radius: 20px; display: inline-block; margin: 20px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
     .qr-url {
       font-family: monospace;
@@ -652,8 +652,8 @@
     }
     .player-avatar {
       width: 44px; height: 44px;
-      background: linear-gradient(135deg, rgba(129,140,248,0.3) 0%, rgba(244,114,182,0.3) 100%);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(135deg, rgba(56,189,248,0.35) 0%, rgba(99,102,241,0.3) 100%);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -693,7 +693,7 @@
   <div id="miniRankingOverlay" class="mini-ranking-overlay" style="display: none;" onclick="hideMiniRanking()"></div>
 
   <!-- 封面 -->
-  <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0c0a20 0%, #1e1b4b 30%, #312e81 60%, #1e1b4b 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+  <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f172a 0%, #0f2b4a 40%, #1e3a5f 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
     <!-- 音乐控制 -->
     <div style="position: absolute; top: 20px; right: 80px;">
       <button id="musicBtn" onclick="toggleMusic()" style="background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); color: white; padding: 10px 14px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">🔊</button>
@@ -719,13 +719,13 @@
       <div style="position: absolute; bottom: -50px; left: -50px; font-size: 1.8rem; animation: float 3s ease-in-out infinite 0.8s;">🦊</div>
       <div style="position: absolute; bottom: -40px; right: -70px; font-size: 2rem; animation: float 4s ease-in-out infinite 1.2s;">🌹</div>
     </div>
-    <h1 style="font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 5rem); font-weight: 900; background: linear-gradient(135deg, #c4b5fd 0%, #f472b6 40%, #fbbf24 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; filter: drop-shadow(0 0 30px rgba(167,139,250,0.6));">QUIZBLITZ</h1>
+    <h1 style="font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 5rem); font-weight: 900; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #f472b6 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; filter: drop-shadow(0 0 30px rgba(56,189,248,0.5));">QUIZBLITZ</h1>
     <p style="font-size: 1.5rem; color: rgba(255,255,255,0.8); margin-bottom: 8px; letter-spacing: 4px;">🌟 小王子的汉语题库 🌟</p>
     <p style="font-size: 1rem; color: rgba(255,255,255,0.6); margin-bottom: 50px;">—— 你准备好了吗 ——</p>
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
-    <button onclick="enterApp()" style="background: linear-gradient(135deg, rgba(167,139,250,0.5) 0%, rgba(124,58,237,0.5) 100%); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(167,139,250,0.4); color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(139,92,246,0.4);">✨ 进入游戏 ✨</button>
+    <button onclick="enterApp()" style="background: linear-gradient(135deg, rgba(56,189,248,0.4) 0%, rgba(99,102,241,0.4) 100%); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(56,189,248,0.4); color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(56,189,248,0.35);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.38</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.39</p>
   </div>
 
   <style>
@@ -793,7 +793,7 @@
     <div id="teacherJoin" class="card hidden">
       <h2>👨‍🏫 老师控制台</h2>
       <div id="teacherRoomInfo" class="hidden">
-        <div id="roomInfoCollapsedBar" style="display: none; justify-content: space-between; align-items: center; background: rgba(129,140,248,0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleRoomInfo()">
+        <div id="roomInfoCollapsedBar" style="display: none; justify-content: space-between; align-items: center; background: rgba(56,189,248,0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleRoomInfo()">
           <span>🎮 房间: <span id="miniRoomCode"></span></span>
           <span id="roomInfoToggle">▲</span>
         </div>
