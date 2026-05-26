@@ -182,7 +182,11 @@
     .score-tick { animation: scoreCount 0.3s ease-out; }
     @keyframes sparkleFloat {
       0% { transform: scale(0) rotate(0deg); opacity: 1; }
-      100% { transform: scale(1.5) rotate(180deg) translateY(-40px); opacity: 0; }
+      100% { transform: scale(1.8) rotate(180deg) translateY(-50px); opacity: 0; }
+    }
+    @keyframes championGlow {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(255,215,0,0.4)); }
+      50% { filter: drop-shadow(0 0 60px rgba(255,215,0,0.8)); }
     }
     .mode-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
     .mode-desc { color: #64748b; font-size: 0.95rem; }
@@ -719,7 +723,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.42</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.43</p>
   </div>
 
   <style>
@@ -995,6 +999,7 @@
     let gameStatus = 'waiting';
     let timerInterval = null;
     let timeLeft = 0;
+    let prevScores = {}; // track previous scores for roll animation
     let hasAnswered = false;
     let myScore = 0;
     let questionStartTime = 0;
@@ -2089,21 +2094,27 @@
       const sorted = [...players].sort((a, b) => b.score - a.score);
       const container = $('teacherRankings');
       container.classList.remove('hidden');
-      container.innerHTML = sorted.slice(0, 10).map((p, i) => `
-        <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
+      container.innerHTML = sorted.slice(0, 10).map((p, i) => {
+        const prevScore = prevScores[p.id] || 0;
+        const target = p.score || 0;
+        return `
+        <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}" data-player-id="${p.id}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span style="font-size: 1.5rem;">${p.avatar || ''}</span>
           <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
-          <span class="ranking-score roll-score" data-target="${p.score || 0}">0 分</span>
+          <span class="ranking-score roll-score" data-start="${prevScore}" data-target="${target}">${prevScore} 分</span>
         </div>
-      `).join('');
+      `}).join('');
       // Animate score rolls after render
       setTimeout(() => {
         container.querySelectorAll('.roll-score').forEach(el => {
+          const start = parseInt(el.dataset.start);
           const target = parseInt(el.dataset.target);
-          animateScoreRoll(el, target, 800 + Math.random() * 400);
+          animateScoreRoll(el, target, 800 + Math.random() * 400, start);
         });
       }, 100);
+      // Save current scores for next roll
+      sorted.forEach(p => { prevScores[p.id] = p.score || 0; });
     }
 
     function showMiniRankingPopup() {
@@ -2122,21 +2133,25 @@
         playMusicSafely('victorySound', false);
       }
 
-      container.innerHTML = sorted.slice(0, 5).map((p, i) => `
+      container.innerHTML = sorted.slice(0, 5).map((p, i) => {
+        const prevScore = prevScores[p.id] || 0;
+        const target = p.score || 0;
+        return `
         <div class="mini-ranking-item ${i < 3 ? 'highlight' : ''}" style="animation: slideInRankings 0.4s ease-out ${i * 0.1}s backwards;">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="rank-avatar">${p.avatar || '👤'}</span>
           <span class="rank-name">${escapeHtml(p.name || '未知')}</span>
-          <span class="rank-score roll-score" data-target="${p.score || 0}">0</span>
+          <span class="rank-score roll-score" data-start="${prevScore}" data-target="${target}">${prevScore}</span>
         </div>
-      `).join('');
+      `}).join('');
       overlay.style.display = 'block';
       popup.style.display = 'block';
       popup.style.animation = 'slideInRankings 0.5s ease-out';
       setTimeout(() => {
         container.querySelectorAll('.roll-score').forEach(el => {
+          const start = parseInt(el.dataset.start);
           const target = parseInt(el.dataset.target);
-          animateScoreRoll(el, target, 700 + Math.random() * 300);
+          animateScoreRoll(el, target, 700 + Math.random() * 300, start);
         });
       }, 150);
     }
@@ -2160,20 +2175,26 @@
       if (!rankings) return;
       const container = $('studentRanking');
       container.classList.remove('hidden');
-      container.innerHTML = rankings.slice(0, 10).map((p, i) => `
+      container.innerHTML = rankings.slice(0, 10).map((p, i) => {
+        const prevScore = prevScores[p.id] || 0;
+        const target = p.score || 0;
+        return `
         <div class="ranking-item ${i < 3 ? 'top-3' : ''} rank-${i + 1}">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span style="font-size: 1.5rem;">${p.avatar || ''}</span>
           <span class="ranking-name">${escapeHtml(p.name || '未知')}</span>
-          <span class="ranking-score roll-score" data-target="${p.score || 0}">0 分</span>
+          <span class="ranking-score roll-score" data-start="${prevScore}" data-target="${target}">${prevScore} 分</span>
         </div>
-      `).join('');
+      `}).join('');
       setTimeout(() => {
         container.querySelectorAll('.roll-score').forEach(el => {
+          const start = parseInt(el.dataset.start);
           const target = parseInt(el.dataset.target);
-          animateScoreRoll(el, target, 800 + Math.random() * 400);
+          animateScoreRoll(el, target, 800 + Math.random() * 400, start);
         });
       }, 100);
+      // Save current scores for next roll
+      rankings.forEach(p => { prevScores[p.id] = p.score || 0; });
     }
 
     function resetGame() {
@@ -2400,10 +2421,9 @@
     }
 
     // ===== 分数滚动动画 =====
-    function animateScoreRoll(el, endVal, duration) {
+    function animateScoreRoll(el, endVal, duration, forceStart) {
       if (!el) return;
-      const currentText = el.textContent.replace(/[^0-9]/g, '');
-      const startVal = parseInt(currentText) || 0;
+      const startVal = (forceStart !== undefined) ? forceStart : (parseInt(el.textContent.replace(/[^0-9]/g, '')) || 0);
       if (startVal === endVal) { el.textContent = endVal + ' 分'; return; }
       const startTime = performance.now();
       function step(now) {
@@ -2472,7 +2492,6 @@
       const sorted = [...rankings].sort((a, b) => b.score - a.score);
       const top3 = sorted.slice(0, 3);
 
-      // Teacher side: play final music
       if (isHost) {
         playMusicSafely('finalMusic', true);
       }
@@ -2480,74 +2499,96 @@
       show('finalRankingPage');
       const container = $('podiumContainer');
 
-      // Trophy sparkle at top
-      const sparkles = Array.from({length: 12}, (_, i) => {
-        const angle = (i / 12) * 360;
-        const radius = 80 + Math.random() * 40;
+      // Champion crown sparkles
+      const sparkles = Array.from({length: 16}, (_, i) => {
+        const angle = (i / 16) * 360;
+        const radius = 90 + Math.random() * 50;
         const dx = Math.cos(angle * Math.PI / 180) * radius;
         const dy = Math.sin(angle * Math.PI / 180) * radius;
-        return `<span class="sparkle" style="position:absolute;top:calc(50% + ${dy}px);left:calc(50% + ${dx}px);font-size:${0.8 + Math.random() * 1.2}rem;animation: sparkleFloat ${1.5 + Math.random() * 2}s ease-out ${Math.random() * 0.5}s forwards;">${['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)]}</span>`;
+        return `<span class="sparkle" style="position:absolute;top:calc(50% + ${dy}px);left:calc(50% + ${dx}px);font-size:${0.8 + Math.random() * 1.4}rem;animation: sparkleFloat ${1.5 + Math.random() * 2.5}s ease-out ${Math.random() * 0.8}s forwards;">${['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)]}</span>`;
       }).join('');
 
       container.innerHTML = `
-        <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-          <div class="winner-trophy" style="animation: trophyBounce 0.6s ease-out, trophyBounce 1.5s 0.6s ease-in-out infinite;">🏆</div>
-          <div class="winner-title" style="font-size:2.2rem;margin-bottom:30px;">${top3[0]?.name || '冠军'}</div>
-          ${sparkles}
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;min-height:280px;">
+          <!-- Champion area with suspense reveal -->
+          <div id="championReveal" style="display:flex;flex-direction:column;align-items:center;opacity:0;transform:scale(0.3);">
+            <div style="font-size:5rem;animation: trophyBounce 0.8s ease-out, trophyBounce 1.8s 0.8s ease-in-out infinite;filter:drop-shadow(0 0 40px rgba(255,215,0,0.6));">👑</div>
+            <div class="winner-trophy" style="font-size:4rem;animation: trophyBounce 0.6s ease-out 0.3s, trophyBounce 1.5s 0.9s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(255,215,0,0.4));">🏆</div>
+            <div class="winner-title" style="font-size:2.8rem;margin-top:10px;background:linear-gradient(135deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 15px rgba(255,215,0,0.5));">${top3[0]?.name || '🏅'}</div>
+            <div class="podium-score roll-score" data-start="0" data-target="${top3[0]?.score || 0}" style="font-size:2.2rem;font-family:'Orbitron',sans-serif;color:#f59e0b;margin-top:8px;">0</div>
+            ${sparkles}
+          </div>
         </div>
         <div class="podium-container" style="margin-top:20px;">
-          <div class="podium-item rank-2" id="podium-rank-2" style="opacity:0;transform:translateY(50px);">
+          <div class="podium-item rank-2" id="podium-rank-2" style="opacity:0;transform:translateY(40px);">
             <div class="podium-avatar">${top3[1]?.avatar || '🥈'}</div>
             <div class="podium-name">${escapeHtml(top3[1]?.name || '未知')}</div>
-            <div class="podium-score roll-score" data-target="${top3[1]?.score || 0}">0</div>
+            <div class="podium-score roll-score" data-start="0" data-target="${top3[1]?.score || 0}">0</div>
             <div class="podium-base rank-2"></div>
           </div>
-          <div class="podium-item rank-1" id="podium-rank-1" style="opacity:0;transform:translateY(50px);">
-            <div class="podium-avatar" style="font-size:3rem;">${top3[0]?.avatar || '🏆'}</div>
-            <div class="podium-name">${escapeHtml(top3[0]?.name || '未知')}</div>
-            <div class="podium-score roll-score" data-target="${top3[0]?.score || 0}">0</div>
-            <div class="podium-base rank-1"></div>
-          </div>
-          <div class="podium-item rank-3" id="podium-rank-3" style="opacity:0;transform:translateY(50px);">
+          <div class="podium-item rank-3" id="podium-rank-3" style="opacity:0;transform:translateY(40px);">
             <div class="podium-avatar">${top3[2]?.avatar || '🥉'}</div>
             <div class="podium-name">${escapeHtml(top3[2]?.name || '未知')}</div>
-            <div class="podium-score roll-score" data-target="${top3[2]?.score || 0}">0</div>
+            <div class="podium-score roll-score" data-start="0" data-target="${top3[2]?.score || 0}">0</div>
             <div class="podium-base rank-3"></div>
           </div>
         </div>
       `;
 
-      // Launch confetti
+      // Light confetti on entry
       showConfetti();
 
-      // Dramatic reveal sequence
-      const revealItem = (id, delay) => {
+      // Reveal sequence: 3rd -> 2nd with quick animations
+      const revealPodium = (id, delay, scale) => {
         setTimeout(() => {
           const el = $(id);
           if (el) {
             el.style.opacity = '1';
             el.style.transform = 'translateY(0)';
-            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            el.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
           }
         }, delay);
       };
 
-      revealItem('podium-rank-3', 800);
-      revealItem('podium-rank-2', 1800);
-      revealItem('podium-rank-1', 2800);
+      revealPodium('podium-rank-3', 500);
+      revealPodium('podium-rank-2', 1200);
 
-      // Animate score rolls for podium
+      // Animate 2nd/3rd scores
       setTimeout(() => {
-        container.querySelectorAll('.roll-score').forEach((el, i) => {
-          const target = parseInt(el.dataset.target);
-          setTimeout(() => {
-            animateScoreRoll(el, target, 1200 + i * 300);
-          }, i * 200);
+        ['podium-rank-2','podium-rank-3'].forEach(id => {
+          const el = $(id);
+          if (!el) return;
+          const scoreEl = el.querySelector('.roll-score');
+          if (scoreEl) {
+            const target = parseInt(scoreEl.dataset.target);
+            animateScoreRoll(scoreEl, target, 1000);
+          }
         });
-      }, 3600);
+      }, 2000);
 
-      // Burst more confetti for winner
-      setTimeout(() => showConfetti(), 4000);
+      // CHAMPION reveal after 3.5 seconds of anticipation
+      setTimeout(() => {
+        const champion = $('championReveal');
+        if (champion) {
+          champion.style.opacity = '1';
+          champion.style.transform = 'scale(1)';
+          champion.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        }
+        // Big confetti burst for champion
+        showConfetti();
+        setTimeout(() => showConfetti(), 600);
+      }, 3500);
+
+      // Champion score roll
+      setTimeout(() => {
+        const champion = $('championReveal');
+        if (!champion) return;
+        const scoreEl = champion.querySelector('.roll-score');
+        if (scoreEl) {
+          const target = parseInt(scoreEl.dataset.target);
+          animateScoreRoll(scoreEl, target, 1800);
+        }
+      }, 4500);
     }
 
     function backToHome() {
