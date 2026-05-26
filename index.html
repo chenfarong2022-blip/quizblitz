@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuizBlitz - 实时答题竞赛</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <!-- Using system fonts to avoid Google Fonts being blocked in China -->
   <style>
     :root {
       --primary: #6366f1;
@@ -27,7 +25,7 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Noto Sans SC', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
       background: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 30%, #fef3c7 60%, #e0e7ff 100%);
       min-height: 100vh;
       color: var(--light);
@@ -98,7 +96,7 @@
     }
     .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; text-align: center; }
     h1 {
-      font-family: 'Orbitron', sans-serif;
+      font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
       font-size: clamp(2.5rem, 8vw, 4rem);
       font-weight: 900;
       text-align: center;
@@ -236,7 +234,7 @@
     }
     select option { background: white; color: #1e293b; }
     .room-code-display {
-      font-family: 'Orbitron', sans-serif;
+      font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
       font-size: clamp(2rem, 10vw, 4rem);
       font-weight: 900;
       text-align: center;
@@ -269,7 +267,7 @@
     .question-number { font-size: 0.9rem; color: #64748b; margin-bottom: 10px; letter-spacing: 4px; text-transform: uppercase; }
     .question-text { font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 30px; position: relative; line-height: 1.5; color: #1e293b; }
     .timer-display {
-      font-family: 'Orbitron', sans-serif;
+      font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
       font-size: clamp(3rem, 12vw, 6rem);
       font-weight: 900;
       margin: 20px 0;
@@ -350,7 +348,7 @@
     .rank-2 .rank-badge { filter: drop-shadow(0 0 8px silver); }
     .rank-3 .rank-badge { filter: drop-shadow(0 0 8px #cd7f32); }
     .ranking-name { flex: 1; font-weight: 600; font-size: 1.1rem; }
-    .ranking-score { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; color: #d97706; }
+    .ranking-score { font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace; font-size: 1.3rem; font-weight: 700; color: #d97706; }
     .mini-ranking-container {
       position: fixed !important;
       top: 50% !important;
@@ -394,7 +392,7 @@
     .mini-ranking-item .rank-badge { font-size: 1.8rem; width: 50px; text-align: center; }
     .mini-ranking-item .rank-avatar { font-size: 1.8rem; margin-right: 15px; }
     .mini-ranking-item .rank-name { flex: 1; font-weight: 600; font-size: 1.2rem; }
-    .mini-ranking-item .rank-score { color: #d97706; font-weight: 700; font-family: 'Orbitron', sans-serif; font-size: 1.3rem; }
+    .mini-ranking-item .rank-score { color: #d97706; font-weight: 700; font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace; font-size: 1.3rem; }
     @keyframes slideInRankings {
       from { opacity: 0; transform: translateY(-20px) scale(0.9); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -418,7 +416,7 @@
       padding: 20px;
     }
     .final-ranking-title {
-      font-family: 'Orbitron', sans-serif;
+      font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
       font-size: 2.5rem;
       font-weight: 900;
       background: linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #ffd700 100%);
@@ -479,7 +477,7 @@
     .podium-score {
       font-size: 1.2rem;
       color: #d97706;
-      font-family: 'Orbitron', sans-serif;
+      font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
       margin-top: 5px;
     }
     .podium-base {
@@ -519,7 +517,7 @@
       padding: 20px;
     }
     .transition-text {
-      font-family: 'Orbitron', sans-serif;
+      font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
       font-size: 2rem;
       font-weight: 700;
       color: var(--accent);
@@ -562,7 +560,7 @@
       50% { transform: translateY(-20px) rotate(5deg); }
     }
     .winner-title {
-      font-family: 'Orbitron', sans-serif;
+      font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
       font-size: 2rem;
       font-weight: 900;
       margin: 20px 0;
@@ -717,13 +715,13 @@
       <div style="position: absolute; bottom: -50px; left: -50px; font-size: 1.8rem; animation: float 3s ease-in-out infinite 0.8s;">🦊</div>
       <div style="position: absolute; bottom: -40px; right: -70px; font-size: 2rem; animation: float 4s ease-in-out infinite 1.2s;">🌹</div>
     </div>
-    <h1 style="font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 5rem); font-weight: 900; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #f472b6 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; filter: drop-shadow(0 0 30px rgba(56,189,248,0.5));">QUIZBLITZ</h1>
+    <h1 style="font-family: "SF Mono", "Menlo", "Consolas", "Courier New", monospace; font-size: clamp(3rem, 10vw, 5rem); font-weight: 900; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #f472b6 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; filter: drop-shadow(0 0 30px rgba(56,189,248,0.5));">QUIZBLITZ</h1>
     <p style="font-size: 1.5rem; color: #475569; margin-bottom: 8px; letter-spacing: 4px;">🌟 小王子的汉语题库 🌟</p>
     <p style="font-size: 1rem; color: #64748b; margin-bottom: 50px;">—— 你准备好了吗 ——</p>
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.43</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.44</p>
   </div>
 
   <style>
@@ -2515,7 +2513,7 @@
             <div style="font-size:5rem;animation: trophyBounce 0.8s ease-out, trophyBounce 1.8s 0.8s ease-in-out infinite;filter:drop-shadow(0 0 40px rgba(255,215,0,0.6));">👑</div>
             <div class="winner-trophy" style="font-size:4rem;animation: trophyBounce 0.6s ease-out 0.3s, trophyBounce 1.5s 0.9s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(255,215,0,0.4));">🏆</div>
             <div class="winner-title" style="font-size:2.8rem;margin-top:10px;background:linear-gradient(135deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 15px rgba(255,215,0,0.5));">${top3[0]?.name || '🏅'}</div>
-            <div class="podium-score roll-score" data-start="0" data-target="${top3[0]?.score || 0}" style="font-size:2.2rem;font-family:'Orbitron',sans-serif;color:#f59e0b;margin-top:8px;">0</div>
+            <div class="podium-score roll-score" data-start="0" data-target="${top3[0]?.score || 0}" style="font-size:2.2rem;font-family:'SF Mono','Menlo','Consolas',monospace;color:#f59e0b;margin-top:8px;">0</div>
             ${sparkles}
           </div>
         </div>
