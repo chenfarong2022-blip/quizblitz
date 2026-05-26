@@ -9,21 +9,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #818cf8;
-      --primary-dark: #6366f1;
-      --secondary: #f472b6;
-      --accent: #fbbf24;
-      --success: #34d399;
-      --danger: #f87171;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
       --dark: #0f172a;
-      --darker: #06060f;
+      --darker: #020617;
       --light: #f8fafc;
-      --glass: rgba(255,255,255,0.06);
-      --glass-hover: rgba(255,255,255,0.1);
-      --glass-border: rgba(255,255,255,0.12);
-      --glow-primary: rgba(129,140,248,0.4);
-      --glow-secondary: rgba(244,114,182,0.3);
-      --glow-accent: rgba(251,191,36,0.3);
+      --glass: rgba(255,255,255,0.1);
+      --glass-border: rgba(255,255,255,0.2);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -40,20 +36,18 @@
       z-index: -1;
       overflow: hidden;
     }
-    .bg-animation::after {
+    .bg-animation::before {
       content: '';
       position: absolute;
-      top: -30%; left: -20%;
-      width: 80%; height: 80%;
-      background: radial-gradient(circle at center, rgba(129,140,248,0.12) 0%, transparent 70%);
-      border-radius: 50%;
-      filter: blur(80px);
-      animation: orbFloat1 20s ease-in-out infinite;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.3) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 70%, rgba(236,72,153,0.2) 0%, transparent 50%);
+      animation: bgPulse 15s ease-in-out infinite;
     }
-    @keyframes orbFloat1 {
-      0%, 100% { transform: translate(0, 0); }
-      33% { transform: translate(15%, -10%); }
-      66% { transform: translate(-10%, 15%); }
+    @keyframes bgPulse {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-5%, -5%) scale(1.1); }
     }
     .particles {
       position: fixed;
@@ -62,49 +56,21 @@
       z-index: -1;
       pointer-events: none;
     }
-    /* Glass floating orbs */
-    .particles::before {
-      content: '';
-      position: absolute;
-      top: 10%; right: 10%;
-      width: 50vw; height: 50vw; max-width: 600px; max-height: 600px;
-      background: radial-gradient(circle at center, rgba(244,114,182,0.12) 0%, transparent 70%);
-      border-radius: 50%;
-      filter: blur(60px);
-      animation: orbFloat2 25s ease-in-out infinite;
-    }
-    .particles::after {
-      content: '';
-      position: absolute;
-      bottom: 5%; left: 15%;
-      width: 40vw; height: 40vw; max-width: 500px; max-height: 500px;
-      background: radial-gradient(circle at center, rgba(251,191,36,0.1) 0%, transparent 70%);
-      border-radius: 50%;
-      filter: blur(70px);
-      animation: orbFloat3 22s ease-in-out infinite;
-    }
-    @keyframes orbFloat2 {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(-8%, 12%); }
-    }
-    @keyframes orbFloat3 {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(10%, -8%); }
-    }
     .particle {
       position: absolute;
-      width: 3px; height: 3px;
-      background: rgba(255,255,255,0.3);
+      width: 4px; height: 4px;
+      background: var(--primary);
       border-radius: 50%;
-      animation: floatParticle 25s infinite linear;
+      opacity: 0.5;
+      animation: float 20s infinite linear;
     }
-    @keyframes floatParticle {
+    @keyframes float {
       0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.3; }
-      90% { opacity: 0.3; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
       100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
     }
-    .container { max-width: 1000px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; text-align: center; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; text-align: center; }
     h1 {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(2.5rem, 8vw, 4rem);
@@ -118,26 +84,25 @@
       letter-spacing: 4px;
     }
     @keyframes titleGlow {
-      0%, 100% { filter: drop-shadow(0 0 15px var(--glow-primary)); }
-      50% { filter: drop-shadow(0 0 35px var(--glow-secondary)); }
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(99,102,241,0.5)); }
+      50% { filter: drop-shadow(0 0 40px rgba(236,72,153,0.7)); }
     }
     .subtitle {
       text-align: center;
-      color: rgba(255,255,255,0.5);
-      font-size: 1rem;
+      color: rgba(255,255,255,0.6);
+      font-size: 1.1rem;
       margin-bottom: 40px;
       letter-spacing: 8px;
       text-transform: uppercase;
     }
     .card {
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
       border-radius: 24px;
       padding: 40px;
       margin-bottom: 24px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
       animation: cardAppear 0.6s ease-out;
     }
     @keyframes cardAppear {
@@ -157,105 +122,91 @@
       gap: 24px;
     }
     .mode-card {
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 2px solid rgba(255,255,255,0.08);
+      background: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(236,72,153,0.1) 100%);
+      border: 2px solid transparent;
       border-radius: 20px;
       padding: 40px 30px;
       text-align: center;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     }
     .mode-card:hover {
       transform: translateY(-8px) scale(1.02);
-      border-color: rgba(129,140,248,0.4);
-      background: rgba(129,140,248,0.08);
-      box-shadow: 0 12px 40px var(--glow-primary);
+      border-color: var(--primary);
+      box-shadow: 0 20px 40px rgba(99,102,241,0.3);
     }
     .mode-icon { font-size: 4rem; margin-bottom: 20px; display: block; animation: bounce 2s ease-in-out infinite; }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     .mode-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: white; }
-    .mode-desc { color: rgba(255,255,255,0.5); font-size: 0.95rem; }
+    .mode-desc { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
     .btn {
-      padding: 14px 28px;
-      border: 1px solid rgba(255,255,255,0.15);
+      padding: 16px 32px;
+      border: none;
       border-radius: 14px;
       cursor: pointer;
       font-size: 1rem;
       font-weight: 600;
       font-family: inherit;
       transition: all 0.3s ease;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
     }
     .btn-primary {
-      background: linear-gradient(135deg, rgba(129,140,248,0.3) 0%, rgba(99,102,241,0.3) 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
-      box-shadow: 0 4px 15px rgba(99,102,241,0.2);
+      box-shadow: 0 4px 15px rgba(99,102,241,0.4);
     }
-    .btn-primary:hover { transform: translateY(-2px); background: rgba(129,140,248,0.45); box-shadow: 0 8px 25px var(--glow-primary); }
-    .btn-success { background: linear-gradient(135deg, rgba(52,211,153,0.3) 0%, rgba(16,185,129,0.3) 100%); color: white; }
-    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52,211,153,0.3); }
-    .btn-danger { background: linear-gradient(135deg, rgba(248,113,113,0.3) 0%, rgba(239,68,68,0.3) 100%); color: white; }
-    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(248,113,113,0.3); }
-    .btn-secondary { background: rgba(255,255,255,0.06); color: white; }
-    .btn-secondary:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
+    .btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; }
+    .btn-success:hover { transform: translateY(-3px); }
+    .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%); color: white; }
+    .btn-danger:hover { transform: translateY(-3px); }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
     .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
     input, textarea, select {
       width: 100%;
-      padding: 14px 18px;
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.12);
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid var(--glass-border);
       border-radius: 12px;
       font-size: 1rem;
       font-family: inherit;
       color: white;
       transition: all 0.3s ease;
     }
-    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.35); }
+    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.4); }
     input:focus, textarea:focus, select:focus {
       outline: none;
-      border-color: rgba(129,140,248,0.5);
-      box-shadow: 0 0 20px var(--glow-primary);
-      background: rgba(129,140,248,0.08);
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(99,102,241,0.3);
     }
-    select option { background: #1a1a2e; color: white; }
+    select option { background: var(--dark); color: white; }
     .room-code-display {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(2rem, 10vw, 4rem);
       font-weight: 900;
       text-align: center;
       padding: 30px;
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(236,72,153,0.2) 100%);
       border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 2px solid var(--primary);
       animation: codePulse 2s ease-in-out infinite;
       letter-spacing: 12px;
       margin: 20px 0;
     }
     @keyframes codePulse {
-      0%, 100% { box-shadow: 0 0 20px var(--glow-primary); }
-      50% { box-shadow: 0 0 40px var(--glow-secondary); }
+      0%, 100% { box-shadow: 0 0 30px rgba(99,102,241,0.3); }
+      50% { box-shadow: 0 0 50px rgba(236,72,153,0.5); }
     }
     .question-box {
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(135deg, rgba(99,102,241,0.4) 0%, rgba(236,72,153,0.3) 100%);
+      border: 2px solid var(--glass-border);
       border-radius: 24px;
       padding: 40px;
       text-align: center;
       position: relative;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
-    .question-number { font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 10px; letter-spacing: 4px; text-transform: uppercase; }
+    .question-number { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 10px; letter-spacing: 4px; }
     .question-text { font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: 30px; position: relative; line-height: 1.5; }
     .timer-display {
       font-family: 'Orbitron', sans-serif;
@@ -270,7 +221,7 @@
       50% { transform: scale(1.2); }
       100% { transform: scale(1); opacity: 1; }
     }
-    .timer-normal { color: white; text-shadow: 0 0 30px rgba(255,255,255,0.3); }
+    .timer-normal { color: white; text-shadow: 0 0 30px rgba(255,255,255,0.5); }
     .timer-warning { color: var(--accent); animation: timerShake 0.5s ease-in-out infinite; }
     .timer-danger { color: var(--danger); animation: timerShake 0.2s ease-in-out infinite; }
     @keyframes timerShake {
@@ -284,10 +235,8 @@
     }
     .option-btn {
       padding: 20px 16px;
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.1);
+      border: 2px solid var(--glass-border);
       border-radius: 14px;
       color: white;
       font-size: 1.4rem;
@@ -309,26 +258,21 @@
       }
     }
     .option-btn:hover:not(:disabled) {
-      background: rgba(129,140,248,0.15);
-      border-color: rgba(129,140,248,0.5);
-      box-shadow: 0 0 20px var(--glow-primary);
-      transform: translateY(-2px);
+      background: rgba(99,102,241,0.3);
+      border-color: var(--primary);
     }
-    .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
-    .option-btn.correct { background: rgba(52,211,153,0.15) !important; border-color: var(--success) !important; box-shadow: 0 0 15px rgba(52,211,153,0.3) !important; }
-    .option-btn.wrong { background: rgba(248,113,113,0.15) !important; border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(248,113,113,0.3) !important; }
-    .option-btn.selected { background: rgba(129,140,248,0.2) !important; border-color: rgba(129,140,248,0.6) !important; box-shadow: 0 0 20px var(--glow-primary) !important; }
+    .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+    .option-btn.correct { background: rgba(16,185,129,0.3) !important; border-color: var(--success) !important; }
+    .option-btn.wrong { background: rgba(239,68,68,0.3) !important; border-color: var(--danger) !important; }
+    .option-btn.selected { background: rgba(99,102,241,0.4) !important; border-color: var(--primary) !important; }
     .ranking-list { margin-top: 20px; }
     .ranking-item {
       display: flex;
       align-items: center;
-      padding: 16px 20px;
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.08);
+      padding: 20px;
+      background: rgba(255,255,255,0.05);
       border-radius: 16px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       animation: rankingAppear 0.5s ease-out backwards;
     }
     .ranking-item:nth-child(1) { animation-delay: 0.1s; }
@@ -339,13 +283,13 @@
       to { opacity: 1; transform: translateX(0); }
     }
     .ranking-item.top-3 {
-      background: rgba(251,191,36,0.08);
-      border: 1px solid rgba(251,191,36,0.2);
+      background: linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(245,158,11,0.1) 100%);
+      border: 1px solid rgba(245,158,11,0.3);
     }
-    .rank-badge { font-size: 1.8rem; margin-right: 16px; width: 50px; text-align: center; }
-    .rank-1 .rank-badge { filter: drop-shadow(0 0 8px gold); }
-    .rank-2 .rank-badge { filter: drop-shadow(0 0 8px silver); }
-    .rank-3 .rank-badge { filter: drop-shadow(0 0 8px #cd7f32); }
+    .rank-badge { font-size: 2rem; margin-right: 16px; width: 50px; text-align: center; }
+    .rank-1 .rank-badge { filter: drop-shadow(0 0 10px gold); }
+    .rank-2 .rank-badge { filter: drop-shadow(0 0 10px silver); }
+    .rank-3 .rank-badge { filter: drop-shadow(0 0 10px #cd7f32); }
     .ranking-name { flex: 1; font-weight: 600; font-size: 1.1rem; }
     .ranking-score { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent); }
     .mini-ranking-container {
@@ -354,22 +298,18 @@
       left: 50% !important;
       transform: translate(-50%, -50%) !important;
       z-index: 1001 !important;
-      background: rgba(10,10,30,0.95) !important;
-      backdrop-filter: blur(30px) !important;
-      -webkit-backdrop-filter: blur(30px) !important;
-      border: 1px solid rgba(255,255,255,0.15) !important;
-      border-radius: 24px !important;
+      background: linear-gradient(135deg, rgba(15,23,42,0.99) 0%, rgba(2,6,23,0.99) 100%) !important;
+      border: 2px solid var(--accent) !important;
+      border-radius: 20px !important;
       padding: 30px 40px !important;
       width: 90% !important;
       max-width: 600px !important;
-      box-shadow: 0 0 60px rgba(129,140,248,0.2), 0 0 100px rgba(0,0,0,0.5) !important;
+      box-shadow: 0 0 60px rgba(245,158,11,0.5), 0 0 100px rgba(0,0,0,0.8) !important;
     }
     .mini-ranking-overlay {
       position: fixed !important;
       top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-      background: rgba(0,0,0,0.6) !important;
-      backdrop-filter: blur(4px) !important;
-      -webkit-backdrop-filter: blur(4px) !important;
+      background: rgba(0,0,0,0.7) !important;
       z-index: 1000 !important;
       animation: fadeIn 0.3s ease-out;
     }
@@ -387,10 +327,9 @@
     .mini-ranking-list { display: flex; flex-direction: column; gap: 12px; }
     .mini-ranking-item {
       display: flex; align-items: center; padding: 15px 20px;
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px; transition: all 0.3s ease;
+      background: rgba(255,255,255,0.05); border-radius: 16px; transition: all 0.3s ease;
     }
-    .mini-ranking-item.highlight { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.2); transform: scale(1.03); }
+    .mini-ranking-item.highlight { background: rgba(245,158,11,0.2); transform: scale(1.03); }
     .mini-ranking-item .rank-badge { font-size: 1.8rem; width: 50px; text-align: center; }
     .mini-ranking-item .rank-avatar { font-size: 1.8rem; margin-right: 15px; }
     .mini-ranking-item .rank-name { flex: 1; font-weight: 600; font-size: 1.2rem; }
@@ -407,8 +346,7 @@
     .final-ranking-page {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, rgba(10,10,26,0.98) 0%, rgba(26,26,46,0.98) 50%, rgba(15,12,41,0.98) 100%);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
       z-index: 2000;
       display: flex;
       flex-direction: column;
@@ -456,19 +394,17 @@
     .podium-avatar {
       width: 80px; height: 80px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: var(--glass);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2.5rem;
       margin-bottom: 10px;
-      border: 2px solid rgba(255,255,255,0.12);
+      border: 3px solid var(--accent);
     }
-    .podium-rank-1 .podium-avatar { border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.3); }
-    .podium-rank-2 .podium-avatar { border-color: #c0c0c0; box-shadow: 0 0 20px rgba(192,192,192,0.25); }
-    .podium-rank-3 .podium-avatar { border-color: #cd7f32; box-shadow: 0 0 20px rgba(205,127,50,0.25); }
+    .podium-rank-1 .podium-avatar { border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.5); }
+    .podium-rank-2 .podium-avatar { border-color: #c0c0c0; box-shadow: 0 0 20px rgba(192,192,192,0.4); }
+    .podium-rank-3 .podium-avatar { border-color: #cd7f32; box-shadow: 0 0 20px rgba(205,127,50,0.4); }
     .podium-name {
       font-size: 1rem;
       font-weight: 600;
@@ -483,15 +419,13 @@
     }
     .podium-base {
       width: 100px;
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
       border-radius: 10px 10px 0 0;
       padding: 15px 10px;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid var(--glass-border);
     }
-    .podium-base.rank-1 { height: 120px; background: rgba(255,215,0,0.08); border-color: rgba(255,215,0,0.2); }
-    .podium-base.rank-2 { height: 90px; background: rgba(192,192,192,0.05); border-color: rgba(192,192,192,0.15); }
+    .podium-base.rank-1 { height: 120px; background: linear-gradient(180deg, rgba(255,215,0,0.2) 0%, rgba(255,215,0,0.1) 100%); }
+    .podium-base.rank-2 { height: 90px; background: linear-gradient(180deg, rgba(192,192,192,0.15) 0%, rgba(192,192,192,0.08) 100%); }
     .podium-base.rank-3 { height: 60px; }
     .final-ranking-actions {
       margin-top: 30px;
@@ -506,9 +440,7 @@
     .transition-page {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(10,10,26,0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
       z-index: 2000;
       display: flex;
       flex-direction: column;
@@ -537,16 +469,13 @@
       font-weight: 600;
       text-align: center;
       animation: statusPulse 2s ease-in-out infinite;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.1);
     }
     @keyframes statusPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    .status-info { background: rgba(129,140,248,0.15); color: var(--primary); }
-    .status-success { background: rgba(52,211,153,0.15); color: var(--success); }
-    .status-warning { background: rgba(251,191,36,0.15); color: var(--accent); }
-    .status-danger { background: rgba(248,113,113,0.15); color: var(--danger); }
-    .qr-container { text-align: center; padding: 30px; background: white; border-radius: 20px; display: inline-block; margin: 20px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .status-info { background: rgba(99,102,241,0.3); color: var(--primary); }
+    .status-success { background: rgba(16,185,129,0.3); color: var(--success); }
+    .status-warning { background: rgba(245,158,11,0.3); color: var(--accent); }
+    .status-danger { background: rgba(239,68,68,0.3); color: var(--danger); }
+    .qr-container { text-align: center; padding: 30px; background: white; border-radius: 20px; display: inline-block; margin: 20px 0; }
     .qr-url {
       font-family: monospace;
       background: var(--darker);
@@ -589,21 +518,18 @@
     }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
-    .form-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; }
+    .form-section { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 24px; }
     .form-section h3 { font-size: 1.1rem; margin-bottom: 16px; color: var(--primary); }
     .question-list { margin-top: 24px; }
     .question-item {
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 12px;
       border-left: 4px solid var(--primary);
     }
     .question-item-header { font-weight: 600; margin-bottom: 8px; }
-    .question-item-options { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+    .question-item-options { font-size: 0.9rem; color: rgba(255,255,255,0.6); }
     .correct-badge { color: var(--success); font-weight: 700; }
     .hidden { display: none !important; }
     .loading {
@@ -622,14 +548,11 @@
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(10,10,30,0.9);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--dark);
       color: white;
       padding: 16px 32px;
-      border-radius: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       animation: toastIn 0.5s ease-out, toastOut 0.5s ease-in 2.5s forwards;
       z-index: 1000;
     }
@@ -640,11 +563,9 @@
     @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
     .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
     .player-card {
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
       padding: 16px;
       display: flex;
       align-items: center;
@@ -652,8 +573,7 @@
     }
     .player-avatar {
       width: 44px; height: 44px;
-      background: linear-gradient(135deg, rgba(129,140,248,0.3) 0%, rgba(244,114,182,0.3) 100%);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -672,13 +592,12 @@
       align-items: center;
       justify-content: center;
       font-size: 1.4rem;
-      border: 2px solid rgba(255,255,255,0.1);
+      border: 3px solid transparent;
       transition: all 0.2s ease;
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(4px);
+      background: var(--glass);
     }
-    .avatar-option:hover { transform: scale(1.1); border-color: var(--primary); box-shadow: 0 0 12px var(--glow-primary); }
-    .avatar-option.selected { border-color: var(--accent); transform: scale(1.15); box-shadow: 0 0 20px var(--glow-accent); }
+    .avatar-option:hover { transform: scale(1.1); border-color: var(--primary); }
+    .avatar-option.selected { border-color: var(--accent); transform: scale(1.15); box-shadow: 0 0 20px rgba(245,158,11,0.5); }
   </style>
 </head>
 <body>
@@ -693,10 +612,10 @@
   <div id="miniRankingOverlay" class="mini-ranking-overlay" style="display: none;" onclick="hideMiniRanking()"></div>
 
   <!-- 封面 -->
-  <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 40%, #151530 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+  <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
     <!-- 音乐控制 -->
     <div style="position: absolute; top: 20px; right: 80px;">
-      <button id="musicBtn" onclick="toggleMusic()" style="background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); color: white; padding: 10px 14px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">🔊</button>
+      <button id="musicBtn" onclick="toggleMusic()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 14px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">🔊</button>
     </div>
     <audio id="bgMusic" loop preload="auto">
       <source id="musicSource" src="https://raw.githubusercontent.com/chenfarong2022-blip/quizblitz/master/%E5%B0%81%E9%9D%A2%E9%A1%B5Kalimba%20Loop.mp3" type="audio/mpeg">
@@ -723,9 +642,9 @@
     <p style="font-size: 1.5rem; color: rgba(255,255,255,0.8); margin-bottom: 8px; letter-spacing: 4px;">🌟 小王子的汉语题库 🌟</p>
     <p style="font-size: 1rem; color: rgba(255,255,255,0.6); margin-bottom: 50px;">—— 你准备好了吗 ——</p>
     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
-    <button onclick="enterApp()" style="background: rgba(129,140,248,0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(129,140,248,0.3); color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(129,140,248,0.2);">✨ 进入游戏 ✨</button>
+    <button onclick="enterApp()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: rgba(255,255,255,0.4);">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.32</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.3);">v1.36</p>
   </div>
 
   <style>
@@ -767,7 +686,7 @@
 
   <div class="container">
     <div style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
-      <button onclick="toggleFullscreen()" id="fullscreenBtn" style="background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 1.2rem;">⛶</button>
+      <button onclick="toggleFullscreen()" id="fullscreenBtn" style="background: rgba(99,102,241,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 1.2rem;">⛶</button>
     </div>
     <h1>QUIZBLITZ</h1>
     <p class="subtitle">实时答题竞赛</p>
@@ -793,12 +712,12 @@
     <div id="teacherJoin" class="card hidden">
       <h2>👨‍🏫 老师控制台</h2>
       <div id="teacherRoomInfo" class="hidden">
-        <div id="roomInfoCollapsedBar" style="display: none; justify-content: space-between; align-items: center; background: rgba(129,140,248,0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleRoomInfo()">
+        <div id="roomInfoCollapsedBar" style="display: none; justify-content: space-between; align-items: center; background: rgba(99,102,241,0.3); padding: 6px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleRoomInfo()">
           <span>🎮 房间: <span id="miniRoomCode"></span></span>
           <span id="roomInfoToggle">▲</span>
         </div>
         <div id="roomInfoContent">
-          <div id="roomInfoHeader" style="display: flex; justify-content: space-between; align-items: center; background: rgba(129,140,248,0.1); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 8px; margin-bottom: 15px;">
+          <div id="roomInfoHeader" style="display: flex; justify-content: space-between; align-items: center; background: rgba(99,102,241,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 15px;">
             <span>📋 房间信息</span>
             <button onclick="toggleRoomInfo()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">▼ 收起</button>
           </div>
@@ -1203,6 +1122,154 @@
       { question: `"会说一点儿" shows Chinese modesty.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
       { question: `"不太舒服" means not feeling well.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
       { question: `"钥匙丢了" means the key was found.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 }
+    ],
+    "听力第九课 (Lesson 9 Listening)": [
+      { question: `A: 我在楼上等你，你快______吧。 B: 好，我马上过去。`, options: ["上来", "上去", "下来", "下去"], correctAnswer: 0, timeLimit: 45 },
+      { question: `已经十点钟了，咱们快______参观吧，别在门口站着了。`, options: ["进来", "进去", "出来", "出去"], correctAnswer: 1, timeLimit: 45 },
+      { question: `我的书忘在宿舍了，我现在______拿。`, options: ["回来", "回去", "过来", "过去"], correctAnswer: 1, timeLimit: 45 },
+      { question: `A: 王老师在办公室吗？ B: 不在，他刚______办事。`, options: ["进来", "出来", "进去", "出去"], correctAnswer: 3, timeLimit: 45 },
+      { question: `刚才玛丽从楼上跑______了，好像有什么急事。`, options: ["上来", "下去", "下来", "上去"], correctAnswer: 2, timeLimit: 45 },
+      { question: `这个字太难了，我没记______。`, options: ["下来", "过去", "进来", "回去"], correctAnswer: 0, timeLimit: 45 },
+      { question: `爸爸下个月要从北京______上海看我。`, options: ["去", "来", "走", "回"], correctAnswer: 1, timeLimit: 45 },
+      { question: `那个球滚到床______了，请帮我拿出来。`, options: ["上边", "下边", "前边", "后边"], correctAnswer: 1, timeLimit: 45 },
+      { question: `他从兜里拿______一支笔，准备写字。`, options: ["出来", "进去", "起来", "过来"], correctAnswer: 0, timeLimit: 45 },
+      { question: `A: 谁把我的画册拿______了？ B: 是小李借走了。`, options: ["来", "去", "到", "在"], correctAnswer: 1, timeLimit: 45 },
+      { question: `这里的风景太美了，快把相机拿______。`, options: ["出来", "进去", "下来", "起来"], correctAnswer: 0, timeLimit: 45 },
+      { question: `A: 我们可以进教室吗？ B: 老师还没来，请在门外等一______。`, options: ["下儿", "遍", "次", "刻"], correctAnswer: 0, timeLimit: 45 },
+      { question: `这里的空气很好，傍晚可以去操场______身体。`, options: ["练习", "锻炼", "学习", "休息"], correctAnswer: 1, timeLimit: 45 },
+      { question: `这碗面条儿太烫了，我想换______包子。`, options: ["到", "成", "在", "给"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"他昨天刚回来" 的意思是：`, options: ["他昨天刚回到这里", "他昨天刚离开这里", "他每天都回来", "他明天才回来"], correctAnswer: 0, timeLimit: 45 },
+      { question: `考试的时候，______看手机。`, options: ["可以", "以后", "顺便", "不能"], correctAnswer: 3, timeLimit: 45 },
+      { question: `请帮我取一______快递。`, options: ["条", "件", "支", "本"], correctAnswer: 1, timeLimit: 45 },
+      { question: `他的______很有水平，大家都很尊敬他。`, options: ["记忆", "学术", "科学", "办事"], correctAnswer: 1, timeLimit: 45 },
+      { question: `A: 什么时候喝茶最好？ B: 饭后一______。`, options: ["小时", "分钟", "刻钟", "时候"], correctAnswer: 0, timeLimit: 45 },
+      { question: `他说得太快了，我没听______他说了什么。`, options: ["清楚", "干净", "简单", "方便"], correctAnswer: 0, timeLimit: 45 },
+      { question: `"下去" shows movement toward the speaker.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"上来" shows movement toward the speaker.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `The sentence "我来北京已经一年了" is grammatically correct.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `The sentence "我去北京已经一年了" is grammatically correct.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"拿出来" means taking something from inside to outside.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"拿去" means bringing something to the speaker.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `The correct structure is "把 A 换成 B", not "换 A 成 B".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"记下来" means to write down or remember information.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"锻炼身体" is a correct verb-object collocation.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"等一下儿" means to wait for a short time.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `Directional complement 来 / 去 must be used after verbs.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"在 + location" is the correct way to express position.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
+    ],
+
+    "听力第十课 (Lesson 10 Listening)": [
+      { question: `这家餐厅环境好，______交通也很方便。`, options: ["不过", "而且", "所以", "因为"], correctAnswer: 1, timeLimit: 45 },
+      { question: `我______没见过这么美丽的风景。`, options: ["从来", "已经", "正在", "快要"], correctAnswer: 0, timeLimit: 45 },
+      { question: `你这是______来北京？`, options: ["什么时候", "第几次", "怎么", "为什么"], correctAnswer: 1, timeLimit: 45 },
+      { question: `他______过很多比赛，拿了不少奖。`, options: ["参加", "举行", "演奏", "表演"], correctAnswer: 0, timeLimit: 45 },
+      { question: `中国的______地区冬天也很暖和。`, options: ["南方", "东方", "西方", "北方"], correctAnswer: 0, timeLimit: 45 },
+      { question: `我______暑假去海边旅行。`, options: ["打算", "已经", "从来", "正在"], correctAnswer: 0, timeLimit: 45 },
+      { question: `咖啡喝多了容易______。`, options: ["睡觉", "失眠", "起床", "做梦"], correctAnswer: 1, timeLimit: 45 },
+      { question: `你可以______一______这道菜，很好吃。`, options: ["看", "闻", "尝", "听"], correctAnswer: 2, timeLimit: 45 },
+      { question: `他______北京生活了十年，对这里很了解。`, options: ["在", "从", "去", "到"], correctAnswer: 0, timeLimit: 45 },
+      { question: `贝多芬是一位______的音乐家。`, options: ["名字", "知道", "著名", "认识"], correctAnswer: 2, timeLimit: 45 },
+      { question: `她是一个很______的人，总是穿最新款的衣服。`, options: ["时尚", "高兴", "年轻", "聪明"], correctAnswer: 0, timeLimit: 45 },
+      { question: `以下哪个"过"表示"度过"而非"经历"？`, options: ["我吃过烤鸭", "我去过上海", "今年在北京过春节", "我没看过这本书"], correctAnswer: 2, timeLimit: 45 },
+      { question: `他说要给我写信，可是到现在一封信也没______过。`, options: ["写", "看", "拿", "买"], correctAnswer: 0, timeLimit: 45 },
+      { question: `我______他不来了，没想到他准时到了。`, options: ["以为", "觉得", "知道", "发现"], correctAnswer: 0, timeLimit: 45 },
+      { question: `在北京，很多年轻人______房子住，因为买不起。`, options: ["借", "租", "要", "送"], correctAnswer: 1, timeLimit: 45 },
+      { question: `婚礼将在下个月______。`, options: ["发生", "举行", "开始", "打开"], correctAnswer: 1, timeLimit: 45 },
+      { question: `请______一下，我马上回来。`, options: ["等", "来", "看", "坐"], correctAnswer: 0, timeLimit: 45 },
+      { question: `毕业______我们再也没有见过面。`, options: ["以前", "以后", "中间", "时候"], correctAnswer: 1, timeLimit: 45 },
+      { question: `他______这儿工作三年了。`, options: ["在", "来", "去", "到"], correctAnswer: 0, timeLimit: 45 },
+      { question: `Which statement about the pronunciation of "过" is correct?`, options: ["Always guò", "Always guo (neutral)", "guò as a verb, guo (neutral) as an aspect particle", "No difference"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"我从来没去过哈尔滨"的意思是"我去过哈尔滨"。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"V + 过（guo）"用来表达过去的经验或经历。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"尝一尝"和"吃一吃"的意思完全相同。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"失眠"的意思是"睡眠很好"。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"时尚"的意思是 fashionable。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"放假"的意思是"开始工作和学习"。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"举行音乐会"是一个正确的汉语搭配。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"年底"指的是一年的中间。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"留学"的意思是"出国学习"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"我没去过长城"和"我从来没去过长城"在语气和强调程度上完全一样。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"一次也没 V 过"的意思是"从来没有做过某事（一次都没有）"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"租房子"和"买房子"是同一个意思。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"第几次"问的是"时间点"而不是"次数"。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `在"我吃过烤鸭"中，"过"是动态助词，读轻声。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"售票"的意思是"开始卖票"或"出售票"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
+    ],
+
+    "听力第十一课 (Lesson 11 Listening)": [
+      { question: `"你______怎么去学校的？""我坐公共汽车去的。"`, options: ["是", "在", "有", "也"], correctAnswer: 0, timeLimit: 45 },
+      { question: `"你是______认识他的？""朋友介绍的。"`, options: ["怎么", "什么时候", "在哪儿", "为什么"], correctAnswer: 0, timeLimit: 45 },
+      { question: `他______北京毕业的。`, options: ["在", "从", "到", "去"], correctAnswer: 0, timeLimit: 45 },
+      { question: `毕业两年______我们就结婚了。`, options: ["以前", "以后", "中间", "时候"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"我可没去过那儿。" "可"在这里的作用是：`, options: ["表示转折", "加强语气", "表示可能", "表示时间"], correctAnswer: 1, timeLimit: 45 },
+      { question: `今天的作业还没做______呢，不能出去玩。`, options: ["了", "过", "完", "到"], correctAnswer: 2, timeLimit: 45 },
+      { question: `这套房子三百万，先______了一百万，剩下跟银行借的。`, options: ["借", "还", "租", "交"], correctAnswer: 3, timeLimit: 45 },
+      { question: `他每天工作十二个小时，太______了。`, options: ["幸福", "辛苦", "高兴", "热闹"], correctAnswer: 1, timeLimit: 45 },
+      { question: `手机越来越______，差不多每个人都有。`, options: ["普及", "科学", "丰富", "发展"], correctAnswer: 0, timeLimit: 45 },
+      { question: `在国外留学时，我常常______家乡。`, options: ["纪念", "怀念", "记住", "忘记"], correctAnswer: 1, timeLimit: 45 },
+      { question: `工作之外的时间叫______时间。`, options: ["业余", "休息", "课外", "闲着"], correctAnswer: 0, timeLimit: 45 },
+      { question: `他不喜欢待在屋里，他喜欢______活动。`, options: ["室内", "家里", "户外", "网上"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"人手一个平板电脑"意思是______都有一个。`, options: ["有的人", "每人", "两个人", "没有人"], correctAnswer: 1, timeLimit: 45 },
+      { question: `妈妈："都八点了，______该上学了！"`, options: ["多", "少", "该", "没"], correctAnswer: 2, timeLimit: 45 },
+      { question: `房子很贵，______他们还是买了。`, options: ["而且", "所以", "可是", "因为"], correctAnswer: 2, timeLimit: 45 },
+      { question: `他特别喜欢京剧，是个京剧______。`, options: ["人", "家", "员", "迷"], correctAnswer: 3, timeLimit: 45 },
+      { question: `李明在朋友家______过麻将。`, options: ["做", "玩", "打", "下"], correctAnswer: 2, timeLimit: 45 },
+      { question: `会议______了吗？我等了好久了。`, options: ["完开", "开完", "在开", "正开"], correctAnswer: 1, timeLimit: 45 },
+      { question: `______他不高，______篮球打得特别好。`, options: ["虽然……可是……", "因为……所以……", "不但……而且……", "一……就……"], correctAnswer: 0, timeLimit: 45 },
+      { question: `"你是坐飞机来的吗？" 回答应该是：`, options: ["我坐飞机来", "是的，坐飞机来的", "我明天来", "他来"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"我是昨天来的"回答的是"什么时候来的"的问题。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"我是昨天来的"和"我昨天来了"意思完全一样。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"我可不认识他"和"我不认识他"语气一样强。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"作业做完了"意思是作业已经完成了。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"钓鱼"是一个动宾结构的词组。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"麻将"是一种扑克牌。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"户外活动"指的是在屋子里进行的活动。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"丰富"的意思是东西很多、很充足。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"怀念"的意思是记得、思念过去的某人或某事。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"该……了"表示"应该做某事了"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"业余时间"指工作或学习之外的时间。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"辛苦"的意思是工作轻松、不累。`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"人手一个"意思是"每个人都有一个"。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"越来越多"表示数量慢慢增加。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"他借了银行两百万"和"他跟银行借了两百万"意思相同。`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
+    ],
+
+    "口语第九课 (Lesson 9 Speaking)": [
+      { question: `What does "又酸又辣" mean?`, options: ["Only sour", "Only spicy", "Both sour and spicy", "Not sour or spicy"], correctAnswer: 2, timeLimit: 45 },
+      { question: `You want to ask "How do you say this in Chinese?". Which phrase should you use?`, options: ["这是什么？", "这个多少钱？", "这个汉语怎么说？", "怎么说这个？"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"你要哪个？" means:`, options: ["How many do you want?", "Which one do you want?", "Where is it?", "What is it?"], correctAnswer: 1, timeLimit: 45 },
+      { question: `You point at a dish and ask "这个菜怎么样？". You are asking:`, options: ["How much is it?", "Is it spicy?", "How is this dish?", "Who ordered this?"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"这是谁的手机？" means:`, options: ["Where is the phone?", "Is this a new phone?", "Whose phone is this?", "Is this a phone?"], correctAnswer: 2, timeLimit: 45 },
+      { question: `In a restaurant, "请扫码点菜" means:`, options: ["Please pay in cash", "Please scan the QR code to order", "Please call the waiter", "Please read the menu"], correctAnswer: 1, timeLimit: 45 },
+      { question: `What taste is 宫保鸡丁 (gōng bǎo jī dīng)?`, options: ["Sweet", "Salty", "Spicy", "Sour"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"酸菜鱼又酸又辣" — the structure "又……又……" means:`, options: ["either one or the other", "both A and B", "neither A nor B", "more A than B"], correctAnswer: 1, timeLimit: 45 },
+      { question: `In a restaurant, you use "二维码" to:`, options: ["Listen to music", "Scan and order food", "Make a phone call", "Take photos"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"这是什么味道的？""咸的。" — "咸的" means:`, options: ["Sweet", "Sour", "Salty", "Spicy"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"给我看一下，好吗？" — the speaker's tone is:`, options: ["Giving an order", "Making a polite request", "Expressing anger", "Showing worry"], correctAnswer: 1, timeLimit: 45 },
+      { question: `Someone asks "这是辣的吗？" and you answer "不辣。" It means:`, options: ["Very spicy", "A little spicy", "Not spicy", "Extremely spicy"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"三个不卖，你要八个吧。" means:`, options: ["You can buy three", "You need to buy at least eight", "It's free", "Three is too expensive"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"一两小笼包" has about how many pieces?`, options: ["Three", "Eight", "Five", "Ten"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"请问，洗手间在哪儿？" — "洗手间" means:`, options: ["Kitchen", "Bedroom", "Restroom", "Living room"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"你要哪个苹果？""我要青苹果。" — "青" means:`, options: ["Red", "Green", "Yellow", "White"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"你的新手机真漂亮！" — the speaker is:`, options: ["Asking a question", "Giving a compliment", "Expressing anger", "Making an introduction"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"一笼小笼包" means:`, options: ["One piece", "One pound", "One steamer basket", "100 grams"], correctAnswer: 2, timeLimit: 45 },
+      { question: `Someone asks "这是不是包子？" To say "Yes, it is", you say:`, options: ["不是", "是", "有", "没有"], correctAnswer: 1, timeLimit: 45 },
+      { question: `What meat is used in 糖醋里脊 (táng cù lǐjǐ)?`, options: ["Beef", "Chicken", "Pork", "Fish"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"又酸又辣" means a dish has both sour and spicy flavors.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"请问" is a polite way to start a question, similar to "Excuse me" or "May I ask".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"哪个" is used to ask "which one".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"怎么样" can be used to ask someone's opinion about something.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"二维码" is the Chinese term for QR code.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"扫码" means using your phone to scan a QR code.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"一笼小笼包" and "一两小笼包" mean exactly the same thing.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `宫保鸡丁 (gōng bǎo jī dīng) is a sweet dish.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"这是谁的" is used to ask who something belongs to.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"给我看一下" means "Don't touch it, leave it alone."`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `In "青椒肉丝", the character "青" means green.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"一两" in China equals 50 grams.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `The "麻" in 麻婆豆腐 (má pó dòu fu) means "numbing-spicy".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"开水白菜" is the name of a Chinese dish.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"你要牛肉包子还是猪肉包子？" means you are asking the person to choose one.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
     ]
   };
 
@@ -1211,7 +1278,18 @@
 
     function initGoEasy() {
       if (goEasy) {
-        goEasyConnected = true;
+        // Don't trust existing instance — reconnect to be safe
+        goEasyConnected = false;
+        goEasy.connect({
+          onSuccess: function() {
+            console.log('GoEasy reconnected!');
+            goEasyConnected = true;
+          },
+          onFailed: function(error) {
+            console.error('GoEasy reconnect failed:', error);
+            goEasyConnected = false;
+          }
+        });
         return goEasy;
       }
 
@@ -1299,24 +1377,30 @@
         return;
       }
 
-      const eventData = {
-        type: eventName,
-        ...data,
-        room: roomCode,
-        timestamp: Date.now()
-      };
+      const publishData = JSON.stringify(eventData);
 
-      console.log('Publishing:', eventName, eventData);
-      goEasy.pubsub.publish({
-        channel: currentChannelName,
-        message: JSON.stringify(eventData),
-        onSuccess: function() {
-          console.log('Published:', eventName);
-        },
-        onFailed: function(error) {
-          console.error('Publish failed:', error);
-        }
-      });
+      function doPublish(retriesLeft) {
+        goEasy.pubsub.publish({
+          channel: currentChannelName,
+          message: publishData,
+          onSuccess: function() {
+            console.log('Published:', eventName);
+            window._joinRetries = 0;
+          },
+          onFailed: function(error) {
+            console.error('Publish failed:', eventName, error);
+            // Retry player-joined events up to 5 times
+            if (eventName === 'player-joined' && !isHost && retriesLeft > 0) {
+              setTimeout(() => {
+                console.log('Retrying player-joined, attempts left:', retriesLeft);
+                doPublish(retriesLeft - 1);
+              }, 3000);
+            }
+          }
+        });
+      }
+
+      doPublish(eventName === 'player-joined' && !isHost ? 5 : 0);
     }
 
     function handleGoEasyEvent(data) {
@@ -1639,12 +1723,24 @@
 
       subscribeToRoom(roomCode);
 
-      setTimeout(() => {
-        const player = { id: myPlayerId, name: name, avatar: selectedAvatar, score: 0 };
-        players.push(player);
+      // Wait for GoEasy connection before publishing join event
+      const player = { id: myPlayerId, name: name, avatar: selectedAvatar, score: 0 };
+      players.push(player);
+      waitForConnectionAndJoin(player, 0);
+    }
+
+    function waitForConnectionAndJoin(player, attempt) {
+      if (goEasyConnected) {
         publishEvent('player-joined', { player: player, players: players });
         updateWaitingStatus('Joined room, waiting for game to start...');
-      }, 500);
+        return;
+      }
+      if (attempt > 100) {
+        updateWaitingStatus('Connection failed. Please refresh and try again.');
+        showToast('Connection failed! Please refresh the page and try again.');
+        return;
+      }
+      setTimeout(() => waitForConnectionAndJoin(player, attempt + 1), 200);
     }
 
     // ===== 教师功能 =====
