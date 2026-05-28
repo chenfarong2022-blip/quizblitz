@@ -821,7 +821,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.57</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.58</p>
   </div>
 
   <style>
@@ -1886,6 +1886,8 @@
 
     function createRoom() {
       roomCode = generateRoomCode();
+      alert('✅ createRoom被调用! 房间码=' + roomCode);
+
       myRole = 'teacher';
       isHost = true;
       myPlayerId = 'host_' + Date.now();
@@ -1893,25 +1895,30 @@
       questions = [];
       players = [{ id: myPlayerId, name: '老师', avatar: '👨‍🏫', score: 0 }];
 
+      // 设置原有的 teacherRoomCode
       const codeEl = $('teacherRoomCode');
-      console.log('createRoom: roomCode=' + roomCode + ', codeEl found=' + !!codeEl);
-
-      // 激进方案：用 JS 完全重建房间码元素，绕过所有 CSS 继承问题
-      const newCodeEl = document.createElement('div');
-      newCodeEl.id = 'teacherRoomCode';
-      newCodeEl.textContent = roomCode;
-      newCodeEl.style.cssText = 'font-family:monospace;font-size:3rem;font-weight:900;' +
+      codeEl.textContent = roomCode;
+      codeEl.style.cssText = 'font-family:monospace;font-size:3rem;font-weight:900;' +
         'padding:20px;margin:10px 0;border-radius:12px;' +
         'background:#ffffff;border:3px solid #333333;color:#000000;' +
-        'text-align:center;min-height:60px;display:block;';
-      codeEl.parentNode.replaceChild(newCodeEl, codeEl);
-      console.log('createRoom: new element created, textContent=' + newCodeEl.textContent);
+        'text-align:center;min-height:60px;display:block;position:relative;z-index:1;';
+
+      // 额外：直接插入一个固定定位的红色横幅到 body，彻底绕过卡片 CSS
+      const banner = document.createElement('div');
+      banner.id = 'roomCodeBanner';
+      banner.textContent = '🏠 房间码: ' + roomCode;
+      banner.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);' +
+        'z-index:99999;background:#ef4444;color:#ffffff;padding:16px 40px;' +
+        'border-radius:12px;font-size:2rem;font-weight:900;' +
+        'letter-spacing:8px;box-shadow:0 8px 30px rgba(0,0,0,0.3);';
+      document.body.appendChild(banner);
 
       $('miniRoomCode').textContent = roomCode;
       hide('teacherCreate');
       show('teacherRoomInfo');
       hide('roomInfoCollapsedBar');
-      console.log('createRoom: teacherRoomInfo visible=' + !$('teacherRoomInfo').classList.contains('hidden'));
+
+      alert('✅ UI已更新，房间码元素已创建');
 
       let baseUrl = window.location.origin;
       if (window.location.pathname.includes('/quizblitz/')) {
