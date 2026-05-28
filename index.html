@@ -821,7 +821,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.56</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.57</p>
   </div>
 
   <style>
@@ -1895,13 +1895,23 @@
 
       const codeEl = $('teacherRoomCode');
       console.log('createRoom: roomCode=' + roomCode + ', codeEl found=' + !!codeEl);
-      $('teacherRoomCode').innerHTML = roomCode;
-      $('teacherRoomCode').textContent = roomCode;
+
+      // 激进方案：用 JS 完全重建房间码元素，绕过所有 CSS 继承问题
+      const newCodeEl = document.createElement('div');
+      newCodeEl.id = 'teacherRoomCode';
+      newCodeEl.textContent = roomCode;
+      newCodeEl.style.cssText = 'font-family:monospace;font-size:3rem;font-weight:900;' +
+        'padding:20px;margin:10px 0;border-radius:12px;' +
+        'background:#ffffff;border:3px solid #333333;color:#000000;' +
+        'text-align:center;min-height:60px;display:block;';
+      codeEl.parentNode.replaceChild(newCodeEl, codeEl);
+      console.log('createRoom: new element created, textContent=' + newCodeEl.textContent);
+
       $('miniRoomCode').textContent = roomCode;
       hide('teacherCreate');
       show('teacherRoomInfo');
       hide('roomInfoCollapsedBar');
-      console.log('createRoom: teacherRoomInfo hidden=' + $('teacherRoomInfo').classList.contains('hidden') + ', textContent=' + $('teacherRoomCode').textContent);
+      console.log('createRoom: teacherRoomInfo visible=' + !$('teacherRoomInfo').classList.contains('hidden'));
 
       let baseUrl = window.location.origin;
       if (window.location.pathname.includes('/quizblitz/')) {
