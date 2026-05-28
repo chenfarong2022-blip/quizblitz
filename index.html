@@ -821,7 +821,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.55</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.56</p>
   </div>
 
   <style>
@@ -893,7 +893,7 @@
       <div id="teacherRoomInfo" class="hidden" style="text-align: center;">
         <div class="section-title" style="font-size: 1rem;">房间码</div>
         <div id="teacherRoomCode"
-             style="font-family: 'SF Mono','Menlo','Consolas',monospace; font-size: clamp(2.5rem,10vw,4.5rem); font-weight:900; letter-spacing:12px; padding:20px; margin:10px 0; border-radius:16px; background:rgba(99,102,241,0.08); border:2px solid rgba(99,102,241,0.3); color:#4f46e5;">
+             style="font-family: 'SF Mono','Menlo','Consolas',monospace; font-size: clamp(2.5rem,10vw,4.5rem); font-weight:900; letter-spacing:12px; padding:20px; margin:10px 0; border-radius:16px; background:rgba(99,102,241,0.08); border:2px solid rgba(99,102,241,0.3); color:#4f46e5; position:relative; z-index:1;">
         </div>
         <div class="qr-container" style="background: white; border-radius: 16px; padding: 20px; display: inline-block; margin-top: 10px;">
           <canvas id="qrcode" width="180" height="180"></canvas>
@@ -1893,12 +1893,15 @@
       questions = [];
       players = [{ id: myPlayerId, name: '老师', avatar: '👨‍🏫', score: 0 }];
 
-      alert('房间码: ' + roomCode);
+      const codeEl = $('teacherRoomCode');
+      console.log('createRoom: roomCode=' + roomCode + ', codeEl found=' + !!codeEl);
+      $('teacherRoomCode').innerHTML = roomCode;
       $('teacherRoomCode').textContent = roomCode;
       $('miniRoomCode').textContent = roomCode;
       hide('teacherCreate');
       show('teacherRoomInfo');
       hide('roomInfoCollapsedBar');
+      console.log('createRoom: teacherRoomInfo hidden=' + $('teacherRoomInfo').classList.contains('hidden') + ', textContent=' + $('teacherRoomCode').textContent);
 
       let baseUrl = window.location.origin;
       if (window.location.pathname.includes('/quizblitz/')) {
@@ -2621,7 +2624,6 @@
           el.style.animation = 'scoreCount 0.3s ease-out';
         }
       });
-    }
     }
 
     // ===== 分数滚动动画 =====
