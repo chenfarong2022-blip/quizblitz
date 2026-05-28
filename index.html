@@ -821,7 +821,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.49</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.50</p>
   </div>
 
   <style>
@@ -1693,8 +1693,10 @@
           if (data.player) {
             // Merge new player into existing players list
             const existingIndex = players.findIndex(p => p.id === data.player.id);
-            if (existingIndex === -1) {
+            const isNew = existingIndex === -1;
+            if (isNew) {
               players.push(data.player);
+              if (isHost) playJoinSound();
             } else {
               players[existingIndex] = data.player;
             }
@@ -2564,6 +2566,37 @@
         gain.connect(ctx.destination);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.15);
+      } catch(e) {
+        // Silently fail if audio context isn't available
+      }
+    }
+
+    function playJoinSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const t = ctx.currentTime;
+        // First tone: pleasant mid "ding"
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.value = 660;
+        gain1.gain.setValueAtTime(0.15, t);
+        gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(t);
+        osc1.stop(t + 0.2);
+        // Second tone: higher "dong"
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.value = 880;
+        gain2.gain.setValueAtTime(0.12, t + 0.12);
+        gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(t + 0.12);
+        osc2.stop(t + 0.35);
       } catch(e) {
         // Silently fail if audio context isn't available
       }
