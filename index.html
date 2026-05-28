@@ -821,7 +821,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.52</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.53</p>
   </div>
 
   <style>
@@ -1905,12 +1905,17 @@
       questions = [];
       players = [{ id: myPlayerId, name: '老师', avatar: '👨‍🏫', score: 0 }];
 
-      $('teacherRoomCode').textContent = roomCode;
-      $('miniRoomCode').textContent = roomCode;
+      // 设置房间码显示（使用 innerHTML 确保可靠性）
+      const codeEl = $('teacherRoomCode');
+      if (codeEl) codeEl.innerHTML = '<span style="color:#4f46e5;font-weight:900;">' + roomCode + '</span>';
+      const miniEl = $('miniRoomCode');
+      if (miniEl) miniEl.textContent = roomCode;
       hide('teacherCreate');
       show('teacherRoomInfo');
-      $('roomInfoContent').style.display = 'block';
-      $('roomInfoCollapsedBar').style.display = 'none';
+      const contentEl = $('roomInfoContent');
+      if (contentEl) contentEl.style.display = 'block';
+      const barEl = $('roomInfoCollapsedBar');
+      if (barEl) barEl.style.display = 'none';
 
       let baseUrl = window.location.origin;
       if (window.location.pathname.includes('/quizblitz/')) {
@@ -1924,7 +1929,7 @@
       updateJoinedStudentsList(players);
       subscribeToRoom(roomCode);
 
-      showToast('Room created successfully!');
+      showToast('房间创建成功！房间码: ' + roomCode);
     }
 
     function joinRoom() {
