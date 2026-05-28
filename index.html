@@ -821,7 +821,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.53</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.54</p>
   </div>
 
   <style>
@@ -888,36 +888,32 @@
     <!-- 老师模式 -->
     <div id="teacherJoin" class="card hidden">
       <h2>👨‍🏫 老师控制台</h2>
-      <div id="teacherRoomInfo" class="hidden">
-        <div id="roomInfoCollapsedBar" style="display: none; justify-content: space-between; align-items: center; background: rgba(56,189,248,0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleRoomInfo()">
-          <span>🎮 房间: <span id="miniRoomCode"></span></span>
-          <span id="roomInfoToggle">▲</span>
+
+      <!-- 房间信息（创建后显示） -->
+      <div id="teacherRoomInfo" class="hidden" style="text-align: center;">
+        <div class="section-title" style="font-size: 1rem;">房间码</div>
+        <div id="teacherRoomCode"
+             style="font-family: 'SF Mono','Menlo','Consolas',monospace; font-size: clamp(2.5rem,10vw,4.5rem); font-weight:900; letter-spacing:12px; padding:20px; margin:10px 0; border-radius:16px; background:rgba(99,102,241,0.08); border:2px solid rgba(99,102,241,0.3); color:#4f46e5;">
         </div>
-        <div id="roomInfoContent">
-          <div id="roomInfoHeader" style="display: flex; justify-content: space-between; align-items: center; background: rgba(129,140,248,0.1); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 8px; margin-bottom: 15px;">
-            <span>📋 房间信息</span>
-            <button onclick="toggleRoomInfo()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1rem;">▼ 收起</button>
-          </div>
-          <div style="text-align: center; margin-bottom: 20px;">
-            <div class="section-title">房间码</div>
-            <div class="room-code-display" id="teacherRoomCode" style="font-size: 3rem; margin: 15px 0;"></div>
-            <div class="qr-container" style="background: white; border-radius: 16px; padding: 20px; display: inline-block;">
-              <canvas id="qrcode" width="180" height="180"></canvas>
-            </div>
-            <div class="qr-url" id="qrUrl" style="margin-top: 12px;"></div>
-            <p style="color: #64748b; font-size: 0.85rem; margin-top: 10px;">学生扫码直接加入房间</p>
-          </div>
-          <div id="joinedStudents" style="margin-top: 15px; padding: 10px; background: var(--glass); border-radius: 8px; min-height: 60px;">
-            <div style="color: #64748b; font-size: 0.9rem; margin-bottom: 8px;">已加入的学生</div>
-            <div id="joinedStudentsList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-          </div>
-          <div class="game-controls" style="justify-content: center; margin-top: 15px;">
-            <button class="btn btn-primary" onclick="showTeacherEditor()">📝 编辑题目</button>
-            <button class="btn btn-success" onclick="startGame()">🎮 开始游戏</button>
-            <button class="btn btn-danger" onclick="resetGame()">🔄 重置</button>
-          </div>
+        <div class="qr-container" style="background: white; border-radius: 16px; padding: 20px; display: inline-block; margin-top: 10px;">
+          <canvas id="qrcode" width="180" height="180"></canvas>
+        </div>
+        <div class="qr-url" id="qrUrl" style="margin-top: 12px; font-size: 0.85rem; word-break: break-all;"></div>
+        <p style="color: #64748b; font-size: 0.85rem; margin-top: 10px;">学生扫码或输入房间码直接加入</p>
+
+        <div id="joinedStudents" style="margin-top: 15px; padding: 10px; background: var(--glass); border-radius: 8px; min-height: 60px;">
+          <div style="color: #64748b; font-size: 0.9rem; margin-bottom: 8px;">已加入的学生</div>
+          <div id="joinedStudentsList" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;"></div>
+        </div>
+
+        <div class="game-controls" style="justify-content: center; margin-top: 15px;">
+          <button class="btn btn-primary" onclick="showTeacherEditor()">📝 编辑题目</button>
+          <button class="btn btn-success" onclick="startGame()">🎮 开始游戏</button>
+          <button class="btn btn-danger" onclick="resetGame()">🔄 重置</button>
         </div>
       </div>
+
+      <!-- 创建房间按钮 -->
       <div id="teacherCreate">
         <div style="text-align: center; padding: 40px 0;">
           <button class="btn btn-primary" onclick="createRoom()" style="padding: 20px 50px; font-size: 1.2rem;">✨ 创建新房间</button>
@@ -925,6 +921,12 @@
         <div style="text-align: center;">
           <button class="btn btn-secondary" onclick="showModeSelection()">← 返回选择</button>
         </div>
+      </div>
+
+      <!-- 游戏进行中的折叠条 -->
+      <div id="roomInfoCollapsedBar" class="hidden" style="justify-content: space-between; align-items: center; background: rgba(99,102,241,0.1); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(99,102,241,0.2); padding: 8px 16px; border-radius: 10px; cursor: pointer; margin-bottom: 10px;" onclick="showTeacherRoom()">
+        <span>🎮 房间: <span id="miniRoomCode" style="font-weight:700;color:#4f46e5;"></span></span>
+        <span style="font-size: 0.85rem; color:#64748b;">← 返回房间</span>
       </div>
     </div>
 
@@ -1851,16 +1853,17 @@
       exitQuestionFullscreen();
       hideAllScreens();
       show('teacherJoin');
-      show('teacherCreate');
-      hide('teacherRoomInfo');
+      hide('teacherCreate');
+      show('teacherRoomInfo');
+      hide('roomInfoCollapsedBar');
     }
     function showTeacherEditor() {
       hideAllScreens();
       show('teacherJoin');
       show('teacherEditor');
+      hide('teacherCreate');
       show('teacherRoomInfo');
-      $('roomInfoContent').style.display = 'block';
-      $('roomInfoCollapsedBar').style.display = 'none';
+      hide('roomInfoCollapsedBar');
       $('miniRoomCode').textContent = roomCode;
       renderQuestionList();
     }
@@ -1868,24 +1871,9 @@
       hideAllScreens();
       show('teacherJoin');
       show('teacherControl');
-      show('teacherRoomInfo');
-      $('roomInfoContent').style.display = 'none';
-      $('roomInfoCollapsedBar').style.display = 'flex';
+      hide('teacherRoomInfo');
+      show('roomInfoCollapsedBar');
       $('miniRoomCode').textContent = roomCode;
-    }
-
-    function toggleRoomInfo() {
-      const content = $('roomInfoContent');
-      const bar = $('roomInfoCollapsedBar');
-      const toggle = $('roomInfoToggle');
-      if (content.style.display === 'none') {
-        content.style.display = 'block';
-        bar.style.display = 'none';
-      } else {
-        content.style.display = 'none';
-        bar.style.display = 'flex';
-        toggle.textContent = '▲';
-      }
     }
 
     // ===== 房间管理 =====
@@ -1905,17 +1893,11 @@
       questions = [];
       players = [{ id: myPlayerId, name: '老师', avatar: '👨‍🏫', score: 0 }];
 
-      // 设置房间码显示（使用 innerHTML 确保可靠性）
-      const codeEl = $('teacherRoomCode');
-      if (codeEl) codeEl.innerHTML = '<span style="color:#4f46e5;font-weight:900;">' + roomCode + '</span>';
-      const miniEl = $('miniRoomCode');
-      if (miniEl) miniEl.textContent = roomCode;
+      $('teacherRoomCode').textContent = roomCode;
+      $('miniRoomCode').textContent = roomCode;
       hide('teacherCreate');
       show('teacherRoomInfo');
-      const contentEl = $('roomInfoContent');
-      if (contentEl) contentEl.style.display = 'block';
-      const barEl = $('roomInfoCollapsedBar');
-      if (barEl) barEl.style.display = 'none';
+      hide('roomInfoCollapsedBar');
 
       let baseUrl = window.location.origin;
       if (window.location.pathname.includes('/quizblitz/')) {
@@ -2128,9 +2110,7 @@
       $('gameStatus').className = 'status-badge status-success';
 
       // Auto collapse the room info panel
-      $('roomInfoContent').style.display = 'none';
-      $('roomInfoCollapsedBar').style.display = 'flex';
-      $('roomInfoToggle').textContent = '▲';
+      show('roomInfoCollapsedBar');
 
       updatePlayerList(players);
 
