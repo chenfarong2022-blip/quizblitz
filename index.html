@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.67</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.68</p>
   </div>
 
   <style>
@@ -2124,6 +2124,10 @@
     }
 
     function nextQuestion() {
+      if (window._autoAdvanceTimer) {
+        clearTimeout(window._autoAdvanceTimer);
+        window._autoAdvanceTimer = null;
+      }
       const nextIndex = currentQuestionIndex + 1;
 
       if (nextIndex >= questions.length) {
@@ -2257,6 +2261,12 @@
         type: 'stop-question',
         correctAnswer: q.correctAnswer
       });
+
+      // Auto-close ranking popup after 5s and advance to next question
+      if (window._autoAdvanceTimer) clearTimeout(window._autoAdvanceTimer);
+      window._autoAdvanceTimer = setTimeout(function() {
+        nextQuestion();
+      }, 5000);
     }
 
     function showRanking() {
@@ -2361,7 +2371,7 @@
           animList.push({ item: item, scoreEl: scoreEl, start: start, target: target, current: start });
         });
 
-        var DURATION = 2200;
+        var DURATION = 3500;
         var animStart = performance.now();
         var lastReorder = -1;
 
@@ -2374,9 +2384,14 @@
           animList.forEach(function(d) {
             var current = Math.round(d.start + (d.target - d.start) * eased);
             if (current !== d.current) {
+              // Tick sound: crossed any 50-point boundary
+              if (current > d.start) {
+                var prevGroup = Math.floor(d.current / 50);
+                var currGroup = Math.floor(current / 50);
+                if (currGroup > prevGroup) anyCrossed50 = true;
+              }
               d.current = current;
               d.scoreEl.textContent = current + ' 分';
-              if (current > d.start && current % 50 === 0 && current % 100 !== 0) anyCrossed50 = true;
             }
           });
           if (anyCrossed50) playTickSound();
@@ -2479,6 +2494,10 @@
       showTeacherRoom();
       hide('teacherRankings');
       window._stopAnswerGuard = false;
+      if (window._autoAdvanceTimer) {
+        clearTimeout(window._autoAdvanceTimer);
+        window._autoAdvanceTimer = null;
+      }
 
       publishEvent('game-reset', { type: 'game-reset' });
     }
@@ -2906,6 +2925,10 @@
     }
 
     function backToHome() {
+      if (window._autoAdvanceTimer) {
+        clearTimeout(window._autoAdvanceTimer);
+        window._autoAdvanceTimer = null;
+      }
       const finalMusic = document.getElementById('finalMusic');
       if (finalMusic) finalMusic.pause();
       window._stopAnswerGuard = false;
