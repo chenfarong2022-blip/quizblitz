@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.63</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.64</p>
   </div>
 
   <style>
@@ -2288,91 +2288,126 @@
       sorted.forEach(p => { prevScores[p.id] = p.score || 0; });
     }
 
-    function animateRankingOrder(container, newOrder) {
-      const items = container.querySelectorAll('.mini-ranking-item');
-      const oldRects = {};
-      items.forEach(el => {
-        const id = el.dataset.playerId;
-        oldRects[id] = el.getBoundingClientRect();
+    function reorderRankings(container, orderedElements) {
+      var oldRects = {};
+      orderedElements.forEach(function(el) {
+        oldRects[el.dataset.playerId] = el.getBoundingClientRect();
       });
-      const fragment = document.createDocumentFragment();
-      newOrder.forEach((p, i) => {
-        const el = container.querySelector('[data-player-id="' + p.id + '"]');
-        if (!el) return;
-        const badge = el.querySelector('.rank-badge');
+      var frag = document.createDocumentFragment();
+      orderedElements.forEach(function(el, i) {
+        var badge = el.querySelector('.rank-badge');
         if (badge) badge.textContent = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
         el.classList.toggle('highlight', i < 3);
-        if (el._animId) cancelAnimationFrame(el._animId);
-        fragment.appendChild(el);
+        frag.appendChild(el);
       });
       container.innerHTML = '';
-      container.appendChild(fragment);
+      container.appendChild(frag);
       requestAnimationFrame(function() {
-        newOrder.forEach(function(p, i) {
-          const el = container.querySelector('[data-player-id="' + p.id + '"]');
-          if (!el || !oldRects[p.id]) return;
-          const newRect = el.getBoundingClientRect();
-          const dx = oldRects[p.id].left - newRect.left;
-          const dy = oldRects[p.id].top - newRect.top;
+        orderedElements.forEach(function(el) {
+          var id = el.dataset.playerId;
+          if (!oldRects[id]) return;
+          var oldTop = oldRects[id].top;
+          var oldLeft = oldRects[id].left;
+          var newRect = el.getBoundingClientRect();
+          var dx = oldLeft - newRect.left;
+          var dy = oldTop - newRect.top;
           if (dx === 0 && dy === 0) return;
           el.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
           el.style.transition = 'none';
           void el.offsetHeight;
-          el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          el.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
           el.style.transform = '';
         });
       });
     }
 
     function showMiniRankingPopup() {
-      const sorted = [...players].sort((a, b) => b.score - a.score);
-      const container = $('miniRankingList');
-      const popup = $('miniRankingPopup');
-      const overlay = $('miniRankingOverlay');
+      var sorted = [...players].sort(function(a, b) { return b.score - a.score; });
+      var container = document.getElementById('miniRankingList');
+      var popup = document.getElementById('miniRankingPopup');
+      var overlay = document.getElementById('miniRankingOverlay');
 
-      const gameMusic = document.getElementById('gameMusic');
-      const victorySound = document.getElementById('victorySound');
+      var gameMusic = document.getElementById('gameMusic');
+      var victorySound = document.getElementById('victorySound');
       if (gameMusic) gameMusic.pause();
       if (isHost) playMusicSafely('victorySound', false);
 
-      // Step 1: 按旧分数排序显示初始状态
-      const oldOrder = [...players].sort((a, b) => (prevScores[b.id] || 0) - (prevScores[a.id] || 0));
-      container.innerHTML = oldOrder.slice(0, 5).map((p, i) => {
-        const prevScore = prevScores[p.id] || 0;
-        const target = p.score || 0;
-        return `
-        <div class="mini-ranking-item ${i < 3 ? 'highlight' : ''}" data-player-id="${p.id}" style="animation: slideInRankings 0.5s ease-out ${i * 0.15}s backwards;">
-          <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
-          <span class="rank-avatar">${p.avatar || '👤'}</span>
-          <span class="rank-name">${escapeHtml(p.name || '未知')}</span>
-          <span class="rank-score roll-score" data-start="${prevScore}" data-target="${target}">${prevScore}</span>
-        </div>
-      `}).join('');
+      // Show initial ranking (by previous scores)
+      var oldOrder = [...players].sort(function(a, b) { return (prevScores[b.id] || 0) - (prevScores[a.id] || 0); });
+      container.innerHTML = oldOrder.slice(0, 5).map(function(p, i) {
+        var prevScore = prevScores[p.id] || 0;
+        return '<div class="mini-ranking-item ' + (i < 3 ? 'highlight' : '') + '" data-player-id="' + p.id + '" data-target="' + (p.score || 0) + '" style="animation: slideInRankings 0.5s ease-out ' + (i * 0.15) + 's backwards;">' +
+          '<span class="rank-badge">' + (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)) + '</span>' +
+          '<span class="rank-avatar">' + (p.avatar || '👤') + '</span>' +
+          '<span class="rank-name">' + escapeHtml(p.name || '未知') + '</span>' +
+          '<span class="rank-score roll-score">' + prevScore + '</span>' +
+        '</div>';
+      }).join('');
       overlay.style.display = 'block';
       popup.style.display = 'block';
       popup.style.animation = 'slideInRankings 0.5s ease-out';
 
-      // Step 2: 弹出后逐个滚动分数
+      // Step 2: Simultaneous score roll + real-time reorder
       setTimeout(function() {
-        const items = container.querySelectorAll('.mini-ranking-item');
-        items.forEach(function(item, index) {
-          const el = item.querySelector('.roll-score');
-          if (!el) return;
-          const start = parseInt(el.dataset.start);
-          const target = parseInt(el.dataset.target);
-          setTimeout(function() {
-            animateScoreRoll(el, target, 1500, start);
-          }, index * 800);
+        var items = container.querySelectorAll('.mini-ranking-item');
+        var animList = [];
+        items.forEach(function(item) {
+          var scoreEl = item.querySelector('.roll-score');
+          var start = parseInt(scoreEl.textContent) || 0;
+          var target = parseInt(item.dataset.target) || start;
+          animList.push({ item: item, scoreEl: scoreEl, start: start, target: target, current: start });
         });
 
-        // Step 3: 分数滚动完成后动画切换排名
-        const totalDelay = items.length * 800 + 1600;
-        setTimeout(function() {
-          animateRankingOrder(container, sorted.slice(0, 5));
-        }, totalDelay);
+        var DURATION = 2200;
+        var animStart = performance.now();
+        var lastReorder = -1;
+
+        function animStep(now) {
+          var elapsed = now - animStart;
+          var progress = Math.min(elapsed / DURATION, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+
+          var anyCrossed50 = false;
+          animList.forEach(function(d) {
+            var current = Math.round(d.start + (d.target - d.start) * eased);
+            if (current !== d.current) {
+              d.current = current;
+              d.scoreEl.textContent = current + ' 分';
+              if (current > d.start && current % 50 === 0 && current % 100 !== 0) anyCrossed50 = true;
+            }
+          });
+          if (anyCrossed50) playTickSound();
+
+          // Real-time reorder every ~220ms
+          var reorderTick = Math.floor(progress * 10);
+          if (reorderTick !== lastReorder) {
+            lastReorder = reorderTick;
+            var newOrder = animList.slice().sort(function(a, b) { return b.current - a.current; });
+            var needsReorder = false;
+            for (var ci = 0; ci < newOrder.length; ci++) {
+              if (newOrder[ci].item !== container.children[ci]) { needsReorder = true; break; }
+            }
+            if (needsReorder) {
+              reorderRankings(container, newOrder.map(function(d) { return d.item; }));
+            }
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(animStep);
+          } else {
+            // Final exact sort and badges
+            animList.forEach(function(d) { d.scoreEl.textContent = d.target + ' 分'; });
+            var finalElements = sorted.slice(0, 5).map(function(p) {
+              return container.querySelector('[data-player-id="' + p.id + '"]');
+            }).filter(function(el) { return el; });
+            if (finalElements.length > 0) reorderRankings(container, finalElements);
+          }
+        }
+
+        requestAnimationFrame(animStep);
       }, 600);
 
-      sorted.forEach(p => { prevScores[p.id] = p.score || 0; });
+      sorted.forEach(function(p) { prevScores[p.id] = p.score || 0; });
     }
 
     function hideMiniRanking() {
