@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.62</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.63</p>
   </div>
 
   <style>
@@ -2288,27 +2288,60 @@
       sorted.forEach(p => { prevScores[p.id] = p.score || 0; });
     }
 
+    function animateRankingOrder(container, newOrder) {
+      const items = container.querySelectorAll('.mini-ranking-item');
+      const oldRects = {};
+      items.forEach(el => {
+        const id = el.dataset.playerId;
+        oldRects[id] = el.getBoundingClientRect();
+      });
+      const fragment = document.createDocumentFragment();
+      newOrder.forEach((p, i) => {
+        const el = container.querySelector('[data-player-id="' + p.id + '"]');
+        if (!el) return;
+        const badge = el.querySelector('.rank-badge');
+        if (badge) badge.textContent = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
+        el.classList.toggle('highlight', i < 3);
+        if (el._animId) cancelAnimationFrame(el._animId);
+        fragment.appendChild(el);
+      });
+      container.innerHTML = '';
+      container.appendChild(fragment);
+      requestAnimationFrame(function() {
+        newOrder.forEach(function(p, i) {
+          const el = container.querySelector('[data-player-id="' + p.id + '"]');
+          if (!el || !oldRects[p.id]) return;
+          const newRect = el.getBoundingClientRect();
+          const dx = oldRects[p.id].left - newRect.left;
+          const dy = oldRects[p.id].top - newRect.top;
+          if (dx === 0 && dy === 0) return;
+          el.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+          el.style.transition = 'none';
+          void el.offsetHeight;
+          el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          el.style.transform = '';
+        });
+      });
+    }
+
     function showMiniRankingPopup() {
       const sorted = [...players].sort((a, b) => b.score - a.score);
       const container = $('miniRankingList');
       const popup = $('miniRankingPopup');
       const overlay = $('miniRankingOverlay');
 
-      // Teacher side: pause game music and play victory sound
       const gameMusic = document.getElementById('gameMusic');
       const victorySound = document.getElementById('victorySound');
-      if (gameMusic) {
-        gameMusic.pause();
-      }
-      if (isHost) {
-        playMusicSafely('victorySound', false);
-      }
+      if (gameMusic) gameMusic.pause();
+      if (isHost) playMusicSafely('victorySound', false);
 
-      container.innerHTML = sorted.slice(0, 5).map((p, i) => {
+      // Step 1: 按旧分数排序显示初始状态
+      const oldOrder = [...players].sort((a, b) => (prevScores[b.id] || 0) - (prevScores[a.id] || 0));
+      container.innerHTML = oldOrder.slice(0, 5).map((p, i) => {
         const prevScore = prevScores[p.id] || 0;
         const target = p.score || 0;
         return `
-        <div class="mini-ranking-item ${i < 3 ? 'highlight' : ''}" style="animation: slideInRankings 0.4s ease-out ${i * 0.1}s backwards;">
+        <div class="mini-ranking-item ${i < 3 ? 'highlight' : ''}" data-player-id="${p.id}" style="animation: slideInRankings 0.5s ease-out ${i * 0.15}s backwards;">
           <span class="rank-badge">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1)}</span>
           <span class="rank-avatar">${p.avatar || '👤'}</span>
           <span class="rank-name">${escapeHtml(p.name || '未知')}</span>
@@ -2318,13 +2351,28 @@
       overlay.style.display = 'block';
       popup.style.display = 'block';
       popup.style.animation = 'slideInRankings 0.5s ease-out';
-      setTimeout(() => {
-        container.querySelectorAll('.roll-score').forEach(el => {
+
+      // Step 2: 弹出后逐个滚动分数
+      setTimeout(function() {
+        const items = container.querySelectorAll('.mini-ranking-item');
+        items.forEach(function(item, index) {
+          const el = item.querySelector('.roll-score');
+          if (!el) return;
           const start = parseInt(el.dataset.start);
           const target = parseInt(el.dataset.target);
-          animateScoreRoll(el, target, 700 + Math.random() * 300, start);
+          setTimeout(function() {
+            animateScoreRoll(el, target, 1500, start);
+          }, index * 800);
         });
-      }, 150);
+
+        // Step 3: 分数滚动完成后动画切换排名
+        const totalDelay = items.length * 800 + 1600;
+        setTimeout(function() {
+          animateRankingOrder(container, sorted.slice(0, 5));
+        }, totalDelay);
+      }, 600);
+
+      sorted.forEach(p => { prevScores[p.id] = p.score || 0; });
     }
 
     function hideMiniRanking() {
