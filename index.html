@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.74</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.75</p>
   </div>
 
   <style>
@@ -2908,7 +2908,7 @@
 
       container.innerHTML = `
         <div style="text-align:center;margin-bottom:10px;font-size:2rem;font-weight:700;background:linear-gradient(135deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0;animation:fadeIn 0.8s ease-out 0.5s forwards;">🏆 ${escapeHtml(top3[0]?.name || '冠军')} — ${top3[0]?.score || 0} 分 🏆</div>
-        <div class="podium-container" style="margin-top:10px;">
+        <div class="podium-container" style="margin-top:10px;width:100%;">
           <div class="podium-item rank-2" id="podium-rank-2" style="opacity:0;transform:translateY(40px);">
             <div class="podium-avatar">${top3[1]?.avatar || '🥈'}</div>
             <div class="podium-name">${escapeHtml(top3[1]?.name || '未知')}</div>
@@ -2933,6 +2933,11 @@
           </div>
         </div>
       `;
+
+      // Disable CSS animation to prevent auto-play flash before JS reveal
+      container.querySelectorAll('.podium-item').forEach(function(el) {
+        el.style.animation = 'none';
+      });
 
       // Light confetti on entry
       showConfetti();
