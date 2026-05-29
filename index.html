@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.60</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.61</p>
   </div>
 
   <style>
@@ -970,28 +970,6 @@
 
     <!-- 游戏控制 -->
     <div id="teacherControl" class="card hidden">
-      <!-- 全屏题目展示层 -->
-      <div id="teacherQuestionFullscreen" class="question-fullscreen hidden">
-        <div class="fullscreen-top-bar">
-          <span id="fullscreenQuestionNumber">第 1 题 / 共 10 题</span>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <span id="fullscreenPlayerBadge" style="font-size: 0.9rem; background: var(--glass); padding: 6px 14px; border-radius: 20px;">👥 <span id="fullscreenPlayerCount">0</span></span>
-            <button class="btn btn-secondary" onclick="exitQuestionFullscreen()" style="padding: 8px 16px; font-size: 0.9rem;">✕ 退出全屏</button>
-          </div>
-        </div>
-        <div class="fullscreen-question-body">
-          <div class="question-text" id="fullscreenQuestionText" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">等待发题...</div>
-          <div class="timer-display timer-normal" id="fullscreenTimerDisplay" style="font-size: clamp(2.5rem, 6vw, 5rem); margin: 20px 0;">--</div>
-          <div class="options-grid" id="fullscreenOptionsDisplay"></div>
-          <div id="fullscreenAnswerDisplay" style="margin-top: 24px; font-size: 1.6rem; font-weight: bold; color: #f59e0b; text-align: center;"></div>
-          <div id="fullscreenSubmitStatus" style="text-align: center; font-size: 1.2rem; font-weight: 600; margin-top: 12px; color: #6366f1; min-height: 28px;"></div>
-        </div>
-        <div class="fullscreen-bottom-bar">
-          <button class="btn btn-primary" id="fsNextQuestionBtn" onclick="nextQuestion()">下一题</button>
-          <button class="btn btn-danger" id="fsStopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
-          <button class="btn btn-success" id="fsShowRankingBtn" onclick="showRanking()" disabled>显示排名</button>
-        </div>
-      </div>
 
       <!-- 普通模式 -->
       <div id="teacherNormalMode">
@@ -1103,6 +1081,29 @@
       <div style="text-align: center; margin-top: 30px;">
         <button class="btn btn-primary" onclick="playAgain()">再来一轮</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 教师全屏题目展示（独立于container，避免backdrop-filter干扰position:fixed） -->
+  <div id="teacherQuestionFullscreen" class="question-fullscreen hidden">
+    <div class="fullscreen-top-bar">
+      <span id="fullscreenQuestionNumber">第 1 题 / 共 10 题</span>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span id="fullscreenPlayerBadge" style="font-size: 0.9rem; background: rgba(255,255,255,0.4); padding: 6px 14px; border-radius: 20px;">👥 <span id="fullscreenPlayerCount">0</span></span>
+        <button class="btn btn-secondary" onclick="exitQuestionFullscreen()" style="padding: 8px 16px; font-size: 0.9rem;">✕ 退出全屏</button>
+      </div>
+    </div>
+    <div class="fullscreen-question-body">
+      <div class="question-text" id="fullscreenQuestionText" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">等待发题...</div>
+      <div class="timer-display timer-normal" id="fullscreenTimerDisplay" style="font-size: clamp(2.5rem, 6vw, 5rem); margin: 20px 0;">--</div>
+      <div class="options-grid" id="fullscreenOptionsDisplay"></div>
+      <div id="fullscreenAnswerDisplay" style="margin-top: 24px; font-size: 1.6rem; font-weight: bold; color: #f59e0b; text-align: center;"></div>
+      <div id="fullscreenSubmitStatus" style="text-align: center; font-size: 1.2rem; font-weight: 600; margin-top: 12px; color: #6366f1; min-height: 28px;"></div>
+    </div>
+    <div class="fullscreen-bottom-bar">
+      <button class="btn btn-primary" id="fsNextQuestionBtn" onclick="nextQuestion()">下一题</button>
+      <button class="btn btn-danger" id="fsStopAnswerBtn" onclick="stopAnswer()" disabled>停止答题</button>
+      <button class="btn btn-success" id="fsShowRankingBtn" onclick="showRanking()" disabled>显示排名</button>
     </div>
   </div>
 
@@ -2074,10 +2075,9 @@
       const fs = $('teacherQuestionFullscreen');
       if (!fs || !fs.classList.contains('hidden')) return; // already fullscreen
       fs.classList.remove('hidden');
-      // Hide the normal mode content
-      const normal = $('teacherNormalMode');
-      if (normal) normal.style.display = 'none';
-      // Hide player list and back button (they're inside normal mode)
+      // 隐藏非答题模块（teacherControl、teacherJoin等）
+      hide('teacherControl');
+      hide('teacherJoin');
       // Sync player count badge
       const studentCount = players.filter(p => p.id !== myPlayerId).length;
       const badge = $('fullscreenPlayerCount');
@@ -2089,8 +2089,10 @@
     function exitQuestionFullscreen() {
       const fs = $('teacherQuestionFullscreen');
       if (fs) fs.classList.add('hidden');
-      const normal = $('teacherNormalMode');
-      if (normal) normal.style.display = '';
+      // 恢复非答题模块
+      show('teacherControl');
+      show('teacherJoin');
+      show('roomInfoCollapsedBar');
     }
 
     function startGame() {
@@ -2117,6 +2119,8 @@
       publishEvent('game-start', { type: 'game-start' });
 
       nextQuestion();
+      // 自动进入全屏题目展示
+      setTimeout(() => enterQuestionFullscreen(), 300);
     }
 
     function nextQuestion() {
