@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.68</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.69</p>
   </div>
 
   <style>
@@ -2262,11 +2262,11 @@
         correctAnswer: q.correctAnswer
       });
 
-      // Auto-close ranking popup after 5s and advance to next question
+      // Auto-close ranking popup after 5.5s and advance to next question
       if (window._autoAdvanceTimer) clearTimeout(window._autoAdvanceTimer);
       window._autoAdvanceTimer = setTimeout(function() {
         nextQuestion();
-      }, 5000);
+      }, 5500);
     }
 
     function showRanking() {
@@ -2295,7 +2295,7 @@
         container.querySelectorAll('.roll-score').forEach(el => {
           const start = parseInt(el.dataset.start);
           const target = parseInt(el.dataset.target);
-          animateScoreRoll(el, target, 800 + Math.random() * 400, start);
+          animateScoreRoll(el, target, 2500 + Math.random() * 500, start);
         });
       }, 100);
       // Save current scores for next roll
@@ -2371,7 +2371,7 @@
           animList.push({ item: item, scoreEl: scoreEl, start: start, target: target, current: start });
         });
 
-        var DURATION = 3500;
+        var DURATION = 4000;
         var animStart = performance.now();
         var lastReorder = -1;
 
@@ -2462,7 +2462,7 @@
         container.querySelectorAll('.roll-score').forEach(el => {
           const start = parseInt(el.dataset.start);
           const target = parseInt(el.dataset.target);
-          animateScoreRoll(el, target, 800 + Math.random() * 400, start);
+          animateScoreRoll(el, target, 2500 + Math.random() * 500, start);
         });
       }, 100);
       // Save current scores for next roll
@@ -2738,6 +2738,7 @@
       const startVal = (forceStart !== undefined) ? forceStart : (parseInt(el.textContent.replace(/[^0-9]/g, '')) || 0);
       if (startVal === endVal) { el.textContent = endVal + ' 分'; return; }
       const startTime = performance.now();
+      var lastTickGroup = Math.floor(startVal / 50);
       function step(now) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -2745,7 +2746,13 @@
         const eased = 1 - Math.pow(1 - progress, 3);
         const current = Math.round(startVal + (endVal - startVal) * eased);
         el.textContent = current + ' 分';
-        if (current > startVal && current % 50 === 0) playTickSound();
+        if (current > startVal) {
+          var tickGroup = Math.floor(current / 50);
+          if (tickGroup > lastTickGroup) {
+            lastTickGroup = tickGroup;
+            playTickSound();
+          }
+        }
         if (progress < 1) {
           requestAnimationFrame(step);
         } else {
