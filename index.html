@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.73</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.74</p>
   </div>
 
   <style>
@@ -2710,6 +2710,66 @@
       }
     }
 
+    function playBronzeSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const t = ctx.currentTime;
+        // Short low thud + soft chime
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(440, t);
+        osc1.frequency.exponentialRampToValueAtTime(660, t + 0.2);
+        gain1.gain.setValueAtTime(0.12, t);
+        gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(t);
+        osc1.stop(t + 0.4);
+      } catch(e) {}
+    }
+
+    function playSilverSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const t = ctx.currentTime;
+        // Double chime ascending
+        [660, 880].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.12, t + i * 0.15);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.15 + 0.35);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t + i * 0.15);
+          osc.stop(t + i * 0.15 + 0.35);
+        });
+      } catch(e) {}
+    }
+
+    function playGoldSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const t = ctx.currentTime;
+        // Triumphant fanfare: C5 → E5 → G5 → C6 (arpeggio)
+        const notes = [523, 659, 784, 1047];
+        notes.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.15, t + i * 0.2);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.2 + 0.5);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t + i * 0.2);
+          osc.stop(t + i * 0.2 + 0.5);
+        });
+      } catch(e) {}
+    }
+
     function playTickSound() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2877,21 +2937,29 @@
       // Light confetti on entry
       showConfetti();
 
-      // Reveal sequence: 3rd -> 2nd with quick animations
-      const revealPodium = (id, delay, scale) => {
+      // Dramatic one-by-one podium reveal sequence
+      const revealPodium = (id, delay, soundFn) => {
         setTimeout(() => {
           const el = $(id);
           if (el) {
             el.style.opacity = '1';
             el.style.transform = 'translateY(0)';
-            el.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            el.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
           }
+          if (soundFn) soundFn();
         }, delay);
       };
 
-      revealPodium('podium-rank-3', 500);
-      revealPodium('podium-rank-2', 1200);
-      revealPodium('podium-rank-1', 2000);
+      // Rank 3 bronze reveal
+      revealPodium('podium-rank-3', 600, playBronzeSound);
+      // Rank 2 silver reveal
+      revealPodium('podium-rank-2', 2600, playSilverSound);
+      // Champion grand reveal with golden fanfare + confetti
+      revealPodium('podium-rank-1', 5000, playGoldSound);
+      setTimeout(() => {
+        showConfetti();
+        setTimeout(() => showConfetti(), 800);
+      }, 5000);
 
       // Animate 2nd/3rd scores
       setTimeout(() => {
@@ -2901,27 +2969,21 @@
           const scoreEl = el.querySelector('.roll-score');
           if (scoreEl) {
             const target = parseInt(scoreEl.dataset.target);
-            animateScoreRoll(scoreEl, target, 1000);
+            animateScoreRoll(scoreEl, target, 1200);
           }
         });
-      }, 2500);
+      }, 6200);
 
-      // Champion podium reveal with confetti
-      setTimeout(() => {
-        showConfetti();
-        setTimeout(() => showConfetti(), 600);
-      }, 2000);
-
-      // Champion score roll
+      // Champion score roll (longer, more dramatic)
       setTimeout(() => {
         const rank1Podium = $('podium-rank-1');
         if (rank1Podium) {
           const pScoreEl = rank1Podium.querySelector('.roll-score');
           if (pScoreEl) {
-            animateScoreRoll(pScoreEl, parseInt(pScoreEl.dataset.target), 1800);
+            animateScoreRoll(pScoreEl, parseInt(pScoreEl.dataset.target), 2500);
           }
         }
-      }, 4500);
+      }, 8000);
     }
 
     function backToHome() {
