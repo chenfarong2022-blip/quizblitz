@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.72</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.73</p>
   </div>
 
   <style>
@@ -2847,18 +2847,8 @@
       }).join('');
 
       container.innerHTML = `
-        <div style="position:relative;display:flex;flex-direction:column;align-items:center;min-height:280px;">
-          <!-- Champion area with suspense reveal -->
-          <div id="championReveal" style="display:flex;flex-direction:column;align-items:center;opacity:0;transform:scale(0.3);">
-            <div style="font-size:5rem;animation: trophyBounce 0.8s ease-out, trophyBounce 1.8s 0.8s ease-in-out infinite;filter:drop-shadow(0 0 40px rgba(255,215,0,0.6));">👑</div>
-            <div class="winner-trophy" style="font-size:4rem;animation: trophyBounce 0.6s ease-out 0.3s, trophyBounce 1.5s 0.9s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(255,215,0,0.4));">🏆</div>
-            <div class="champion-avatar" style="width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:3.5rem;margin-top:8px;border:3px solid #ffd700;box-shadow:0 0 30px rgba(255,215,0,0.3);">${top3[0]?.avatar || '👑'}</div>
-            <div class="winner-title" style="font-size:2.8rem;margin-top:10px;background:linear-gradient(135deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 15px rgba(255,215,0,0.5));">${top3[0]?.name || '🏅'}</div>
-            <div class="podium-score roll-score" data-start="0" data-target="${top3[0]?.score || 0}" style="font-size:2.2rem;font-family:'SF Mono','Menlo','Consolas',monospace;color:#f59e0b;margin-top:8px;">0</div>
-            ${sparkles}
-          </div>
-        </div>
-        <div class="podium-container" style="margin-top:20px;">
+        <div style="text-align:center;margin-bottom:10px;font-size:2rem;font-weight:700;background:linear-gradient(135deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0;animation:fadeIn 0.8s ease-out 0.5s forwards;">🏆 ${escapeHtml(top3[0]?.name || '冠军')} — ${top3[0]?.score || 0} 分 🏆</div>
+        <div class="podium-container" style="margin-top:10px;">
           <div class="podium-item rank-2" id="podium-rank-2" style="opacity:0;transform:translateY(40px);">
             <div class="podium-avatar">${top3[1]?.avatar || '🥈'}</div>
             <div class="podium-name">${escapeHtml(top3[1]?.name || '未知')}</div>
@@ -2866,10 +2856,14 @@
             <div class="podium-base rank-2"></div>
           </div>
           <div class="podium-item rank-1" id="podium-rank-1" style="opacity:0;transform:translateY(40px);">
-            <div class="podium-avatar">${top3[0]?.avatar || '🏆'}</div>
-            <div class="podium-name">${escapeHtml(top3[0]?.name || '未知')}</div>
-            <div class="podium-score roll-score" data-start="0" data-target="${top3[0]?.score || 0}">0</div>
-            <div class="podium-base rank-1"></div>
+            <div style="font-size:2.5rem;margin-bottom:4px;filter:drop-shadow(0 0 20px rgba(255,215,0,0.6));">👑</div>
+            <div class="podium-avatar" style="width:100px;height:100px;font-size:3.2rem;">${top3[0]?.avatar || '🏆'}</div>
+            <div class="podium-name" style="font-size:1.3rem;color:#ffd700;">${escapeHtml(top3[0]?.name || '未知')}</div>
+            <div class="podium-score roll-score" data-start="0" data-target="${top3[0]?.score || 0}" style="color:#f59e0b;">0</div>
+            <div class="podium-base rank-1" style="position:relative;">
+              <div style="font-size:0.9rem;color:#ffd700;margin-top:-5px;">🏆 冠军</div>
+              ${sparkles}
+            </div>
           </div>
           <div class="podium-item rank-3" id="podium-rank-3" style="opacity:0;transform:translateY(40px);">
             <div class="podium-avatar">${top3[2]?.avatar || '🥉'}</div>
@@ -2897,7 +2891,7 @@
 
       revealPodium('podium-rank-3', 500);
       revealPodium('podium-rank-2', 1200);
-      revealPodium('podium-rank-1', 3200);
+      revealPodium('podium-rank-1', 2000);
 
       // Animate 2nd/3rd scores
       setTimeout(() => {
@@ -2910,31 +2904,16 @@
             animateScoreRoll(scoreEl, target, 1000);
           }
         });
-      }, 2000);
+      }, 2500);
 
-      // CHAMPION reveal after 3.5 seconds of anticipation
+      // Champion podium reveal with confetti
       setTimeout(() => {
-        const champion = $('championReveal');
-        if (champion) {
-          champion.style.opacity = '1';
-          champion.style.transform = 'scale(1)';
-          champion.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        }
-        // Big confetti burst for champion
         showConfetti();
         setTimeout(() => showConfetti(), 600);
-      }, 3500);
+      }, 2000);
 
       // Champion score roll
       setTimeout(() => {
-        const champion = $('championReveal');
-        if (!champion) return;
-        const scoreEl = champion.querySelector('.roll-score');
-        if (scoreEl) {
-          const target = parseInt(scoreEl.dataset.target);
-          animateScoreRoll(scoreEl, target, 1800);
-        }
-        // Also animate podium rank-1 score
         const rank1Podium = $('podium-rank-1');
         if (rank1Podium) {
           const pScoreEl = rank1Podium.querySelector('.roll-score');
