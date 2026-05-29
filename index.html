@@ -496,7 +496,6 @@
       animation: fullscreenIn 0.3s ease-out;
     }
 
-    @keyframes slideInRankings {
     @keyframes highlightPulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
       50% { box-shadow: 0 0 20px 5px rgba(245,158,11,0.5); }
@@ -821,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.59</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.60</p>
   </div>
 
   <style>
@@ -1893,19 +1892,8 @@
       questions = [];
       players = [{ id: myPlayerId, name: '老师', avatar: '👨‍🏫', score: 0 }];
 
-      // 设置房间码
-      const codeEl = $('teacherRoomCode');
-      codeEl.textContent = roomCode;
-      codeEl.style.cssText = 'font-family:monospace;font-size:clamp(2.5rem,10vw,4.5rem);font-weight:900;' +
-        'padding:20px;margin:10px 0;border-radius:16px;' +
-        'background:#ffffff;border:2px solid rgba(99,102,241,0.3);color:#4f46e5;' +
-        'text-align:center;min-height:60px;display:block;position:relative;z-index:1;' +
-        'letter-spacing:12px;';
-
-      // 移除上次的横幅（如有）
-      const oldBanner = document.getElementById('roomCodeBanner');
-      if (oldBanner) oldBanner.remove();
-
+      // 设置房间码（HTML已含完整inline样式）
+      $('teacherRoomCode').textContent = roomCode;
       $('miniRoomCode').textContent = roomCode;
       hide('teacherCreate');
       show('teacherRoomInfo');
