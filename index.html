@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.66</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.67</p>
   </div>
 
   <style>
@@ -2137,6 +2137,7 @@
         $('fsStopAnswerBtn').disabled = true;
         exitQuestionFullscreen();
         hideMiniRanking();
+        window._stopAnswerGuard = false;
         showTransitionPage();
         return;
       }
@@ -2167,6 +2168,7 @@
       $('fsShowRankingBtn').disabled = true;
       hide('teacherRankings');
       hideMiniRanking();
+      window._stopAnswerGuard = false;
     }
 
     function showQuestionToTeacher(qIndex, q) {
@@ -2208,6 +2210,8 @@
     }
 
     function stopAnswer() {
+      if (window._stopAnswerGuard) return;
+      window._stopAnswerGuard = true;
       const q = questions[currentQuestionIndex];
       if (!q) return;
 
@@ -2474,6 +2478,7 @@
 
       showTeacherRoom();
       hide('teacherRankings');
+      window._stopAnswerGuard = false;
 
       publishEvent('game-reset', { type: 'game-reset' });
     }
@@ -2903,6 +2908,7 @@
     function backToHome() {
       const finalMusic = document.getElementById('finalMusic');
       if (finalMusic) finalMusic.pause();
+      window._stopAnswerGuard = false;
       hide('finalRankingPage');
       if (isHost) {
         showTeacherRoom();
