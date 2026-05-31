@@ -820,7 +820,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.76</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.77</p>
   </div>
 
   <style>
@@ -1480,6 +1480,37 @@
       { question: `The "麻" in 麻婆豆腐 (má pó dòu fu) means "numbing-spicy".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
       { question: `"开水白菜" is the name of a Chinese dish.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
       { question: `"你要牛肉包子还是猪肉包子？" means you are asking the person to choose one.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
+    ],
+
+    "第十二课词汇语法 (Lesson 12 Vocab & Grammar)": [
+      // ===== Multiple Choice (16 questions) =====
+      { question: `The teacher said: "这个字有两个发音：chéng 和 shèng，在这儿应该念 shèng，你念成 chéng 了。" The character "盛" is:`, options: ["A character with only one fixed pronunciation", "A polyphonic character (多音字) with two different readings", "A character that cannot be pronounced alone", "A character always pronounced as chéng"], correctAnswer: 1, timeLimit: 45 },
+      { question: `Which of the following measure word + noun combinations is CORRECT?`, options: ["一条裤子", "一张裙子", "一套花", "一束工具"], correctAnswer: 0, timeLimit: 45 },
+      { question: `Which pair of location words are OPPOSITES in meaning?`, options: ["前边 ↔ 后边", "里边 ↔ 前边", "后边 ↔ 里边", "外边 ↔ 后边"], correctAnswer: 0, timeLimit: 45 },
+      { question: `"报名时间延长了一个月。" The word "延长" (yáncháng) means:`, options: ["To cancel", "To extend or lengthen", "To shorten", "To announce"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"我知道你有中午睡觉的习惯。" The word "习惯" (xíguàn) means:`, options: ["An occasional one-time activity", "A habit or regular routine", "A required assignment", "A surprising event"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"我昨天晚上一直想今天考试的事儿，很紧张，没休息好。" The word "紧张" (jǐnzhāng) describes feeling:`, options: ["Excited and joyful", "Relaxed and calm", "Nervous and anxious", "Bored and tired"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"旁边的一套房子里搬来了一个女人。" The phrase "搬来" (bān lái) means:`, options: ["Moved away from here", "Moved in / came to live here", "Brought some furniture over", "Went out for a walk"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"他不住在原来的地方了。" Here, "原来" (yuánlái) means:`, options: ["In the future", "Original / former", "Better than before", "Brand new"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"参加太极拳比赛的报名时间延长了一个月。" What does "报名" (bàomíng) mean?`, options: ["To win a competition", "To sign up / register", "To quit halfway", "To give a name to something"], correctAnswer: 1, timeLimit: 45 },
+      { question: `"电影票在我的大衣口袋里呢。" What is "口袋" (kǒudài)?`, options: ["A handbag", "A pocket", "A drawer", "A wallet"], correctAnswer: 1, timeLimit: 45 },
+      { question: `In "我这条蓝色的裙子快洗成白色的了", the pattern "洗成" (xǐ chéng) indicates:`, options: ["The washing hasn't started yet", "The washing resulted in a change of state (became white)", "The washing was unsuccessful", "The washing will happen tomorrow"], correctAnswer: 1, timeLimit: 45 },
+      { question: `In "我找着了！" (Wǒ zhǎo zháo le!), the "着" (zháo) after the verb indicates:`, options: ["The action is in progress (like 着 zhe)", "The action was successfully completed / the goal was achieved", "The action has just begun", "The action must be done urgently"], correctAnswer: 1, timeLimit: 45 },
+      { question: `In "还是放在客厅里吧", the structure "还是…吧" (háishì…ba) expresses:`, options: ["A question asking for information", "A strong command or order", "A suggestion or mild recommendation", "A complaint about something"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"躺在床上半天也没睡着" means the speaker:`, options: ["Fell asleep very quickly", "Slept for exactly half a day", "Lay in bed for a long time but still couldn't fall asleep", "Didn't want to sleep at all"], correctAnswer: 2, timeLimit: 45 },
+      { question: `"现在比以前快多了。" This means:`, options: ["Now is about the same speed as before", "Now is much faster than before", "Before was much faster than now", "Now is slightly slower than before"], correctAnswer: 1, timeLimit: 45 },
+      { question: `In "这时我们才突然想到…", the word "才" (cái) tells us that:`, options: ["They realized it very early", "The realization came later than expected", "They never realized it at all", "They realized it immediately"], correctAnswer: 1, timeLimit: 45 },
+      // ===== True/False (10 questions) =====
+      { question: `In "我找着了", "着" is pronounced "zhe" and marks an ongoing action, the same as in "看着书".`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"我昨天晚上一直想考试的事儿" — here "一直" can be replaced by "从来" without changing the meaning.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"还是放在客厅里吧" and "或者放在客厅里吧" express the same meaning.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `In "躺在床上半天也没睡着", "半天" literally means exactly 12 hours.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"这条裙子快洗成白色的了" — "快…了" indicates that the change has already fully completed.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"报名时间延长了一个月" — "了" here marks a change of state (the deadline has been extended), not past tense.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `In "老李，你别找了", "别" and "不要" are always interchangeable in any context.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `"她才起床" and "她就起床了" express the same time relationship — both mean she got up early.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 },
+      { question: `In "搬来了一个女人", "来" is a directional complement indicating movement toward the speaker, while "搬去了一个女人" would indicate movement away.`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 },
+      { question: `"他知道这事儿" and "他知道了吗" — the first means "he knows this" and the second means "did he find out/learn about this?" The meaning of "知道" shifts between a state and a change-of-state depending on "了".`, options: ["T", "F"], correctAnswer: 0, timeLimit: 20 }
     ]
   };
 
