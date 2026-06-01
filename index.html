@@ -774,6 +774,37 @@
     }
     .avatar-option:hover { transform: scale(1.1); border-color: #6366f1; box-shadow: 0 0 12px rgba(99,102,241,0.2); }
     .avatar-option.selected { border-color: #f59e0b; transform: scale(1.15); box-shadow: 0 0 20px rgba(245,158,11,0.3); }
+
+    /* Connection status indicator */
+    #connectionStatus {
+      position: fixed; top: 10px; right: 10px; z-index: 9999;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    #connectionDot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #10b981; transition: background 0.3s ease;
+    }
+    #connectionDot.disconnected { background: #ef4444; animation: blinkDot 0.8s infinite; }
+    #connectionDot.reconnecting { background: #f59e0b; animation: blinkDot 0.5s infinite; }
+    @keyframes blinkDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* Connection lost overlay */
+    #connectionLostOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 9998;
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px;
+    }
+    #connectionLostOverlay.show { display: flex; }
+    #connectionLostOverlay .msg {
+      background: white; padding: 30px 40px; border-radius: 16px;
+      text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
@@ -1579,6 +1610,17 @@
     // ===== GoEasy 初始化 =====
     let goEasyConnected = false;
 
+    // ===== 连接监控 (Connection Monitor) =====
+    let lastMessageTime = Date.now();
+    let heartbeatTimer = null;
+    let connectionCheckTimer = null;
+    let reconnectAttempts = 0;
+    let reconnectTimeout = null;
+    const MAX_RECONNECT_ATTEMPTS = 10;
+    const HEARTBEAT_INTERVAL = 30000;      // 30s send heartbeat
+    const CONNECTION_TIMEOUT = 50000;      // 50s no message = disconnected
+    let isConnectionMonitorActive = false;
+
     function initGoEasy() {
       if (goEasy) {
         goEasyConnected = false;
@@ -1663,6 +1705,151 @@
       return goEasyChannel;
     }
 
+    // ===== 连接监控：心跳 + 断线重连 =====
+    function startConnectionMonitor() {
+      if (isConnectionMonitorActive) return;
+      if (isHost) return; // Only monitor on student side
+      isConnectionMonitorActive = true;
+      lastMessageTime = Date.now();
+      reconnectAttempts = 0;
+      $('connectionStatus').style.display = 'flex';
+      updateConnectionUI('connected');
+
+      // Heartbeat: send ping every 30s
+      heartbeatTimer = setInterval(function() {
+        if (!isHost && currentChannelName) {
+          publishEvent('heartbeat', { playerId: myPlayerId });
+        }
+      }, HEARTBEAT_INTERVAL);
+
+      // Check for timeout every 5s
+      connectionCheckTimer = setInterval(function() {
+        const elapsed = Date.now() - lastMessageTime;
+        if (elapsed > CONNECTION_TIMEOUT * 2) {
+          // Very long disconnect — show overlay
+          updateConnectionUI('disconnected');
+          $('connectionLostOverlay').classList.add('show');
+          attemptReconnect();
+        } else if (elapsed > CONNECTION_TIMEOUT) {
+          updateConnectionUI('reconnecting');
+          attemptReconnect();
+        }
+      }, 5000);
+    }
+
+    function stopConnectionMonitor() {
+      isConnectionMonitorActive = false;
+      if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+      if (connectionCheckTimer) { clearInterval(connectionCheckTimer); connectionCheckTimer = null; }
+      if (reconnectTimeout) { clearTimeout(reconnectTimeout); reconnectTimeout = null; }
+      $('connectionStatus').style.display = 'none';
+      $('connectionLostOverlay').classList.remove('show');
+    }
+
+    function updateConnectionUI(state) {
+      const dot = $('connectionDot');
+      const text = $('connectionText');
+      if (!dot || !text) return;
+      dot.className = '';
+      switch(state) {
+        case 'connected':
+          text.textContent = 'Connected';
+          break;
+        case 'reconnecting':
+          dot.className = 'reconnecting';
+          text.textContent = 'Reconnecting...';
+          break;
+        case 'disconnected':
+          dot.className = 'disconnected';
+          text.textContent = 'Disconnected';
+          break;
+      }
+    }
+
+    function attemptReconnect() {
+      if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+        updateConnectionUI('disconnected');
+        return;
+      }
+      reconnectAttempts++;
+      console.log('Reconnect attempt', reconnectAttempts, 'of', MAX_RECONNECT_ATTEMPTS);
+
+      // Pause the connection check timer during reconnect to avoid race
+      if (connectionCheckTimer) { clearInterval(connectionCheckTimer); connectionCheckTimer = null; }
+
+      // Reinitialize GoEasy connection
+      initGoEasy();
+
+      // Wait for connection, then resubscribe
+      const delay = Math.min(2000 * reconnectAttempts, 15000);
+      reconnectTimeout = setTimeout(function() {
+        if (goEasyConnected && roomCode) {
+          subscribeToRoom(roomCode);
+          reconnectAttempts = 0; // Reset on success
+          lastMessageTime = Date.now(); // Reset heartbeat timer
+          updateConnectionUI('connected');
+          $('connectionLostOverlay').classList.remove('show');
+
+          // Re-announce presence to teacher for state sync
+          setTimeout(function() {
+            var pName = $('playerName') ? $('playerName').value.trim() : '';
+            publishEvent('player-joined', {
+              player: {
+                id: myPlayerId,
+                name: pName || 'Player',
+                avatar: selectedAvatar,
+                score: myScore || 0,
+                isReconnecting: true
+              }
+            });
+          }, 1500);
+
+          // Restart the connection check timer
+          if (isConnectionMonitorActive && !connectionCheckTimer) {
+            connectionCheckTimer = setInterval(function() {
+              const elapsed = Date.now() - lastMessageTime;
+              if (elapsed > CONNECTION_TIMEOUT * 2) {
+                updateConnectionUI('disconnected');
+                $('connectionLostOverlay').classList.add('show');
+                attemptReconnect();
+              } else if (elapsed > CONNECTION_TIMEOUT) {
+                updateConnectionUI('reconnecting');
+                attemptReconnect();
+              }
+            }, 5000);
+          }
+        } else {
+          // Still not connected, try again
+          attemptReconnect();
+        }
+      }, delay);
+    }
+
+    function manualReconnect() {
+      reconnectAttempts = 0;
+      lastMessageTime = Date.now();
+      $('connectionLostOverlay').classList.remove('show');
+      updateConnectionUI('reconnecting');
+      attemptReconnect();
+    }
+
+    // ===== 状态同步：教师端响应重连学生 =====
+    function sendStateSync(targetPlayerId) {
+      // Only teacher sends state sync
+      if (!isHost) return;
+      const state = {
+        type: 'sync-state',
+        gameStatus: gameStatus,
+        currentQuestionIndex: currentQuestionIndex,
+        players: players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
+      };
+      // If currently showing a question, include it
+      if (gameStatus === 'playing' && currentQuestionIndex >= 0 && questions[currentQuestionIndex]) {
+        state.currentQuestion = questions[currentQuestionIndex];
+      }
+      publishEvent('sync-state', state);
+    }
+
     function publishEvent(eventName, data) {
       if (!currentChannelName) {
         console.error('No GoEasy channel subscribed');
@@ -1704,6 +1891,7 @@
 
     function handleGoEasyEvent(data) {
       console.log('handleGoEasyEvent:', data);
+      lastMessageTime = Date.now(); // Update last message time for connection monitor
 
       switch(data.type) {
         case 'game-start':
@@ -1792,6 +1980,7 @@
             // Merge new player into existing players list
             const existingIndex = players.findIndex(p => p.id === data.player.id);
             const isNew = existingIndex === -1;
+            const isReconnecting = data.player.isReconnecting === true;
             if (isNew) {
               players.push(data.player);
               if (isHost) playJoinSound();
@@ -1800,7 +1989,45 @@
             }
             updatePlayerList(players);
             updateJoinedStudentsList(players);
+            // If a student is reconnecting mid-game, send them current state
+            if (isHost && isReconnecting && gameStatus === 'playing') {
+              console.log('Reconnecting student detected, sending state sync to:', data.player.id);
+              setTimeout(function() {
+                sendStateSync(data.player.id);
+              }, 500);
+            }
           }
+          break;
+
+        case 'sync-state':
+          // Student receives full game state after reconnecting
+          if (!isHost && data.gameStatus) {
+            console.log('Received state sync:', data);
+            gameStatus = data.gameStatus;
+            currentQuestionIndex = data.currentQuestionIndex;
+            if (data.players) {
+              // Update local player list and myScore
+              const me = data.players.find(p => p.id === myPlayerId);
+              if (me) myScore = me.score;
+              players = data.players;
+            }
+            // If mid-game, show the current question
+            if (gameStatus === 'playing' && data.currentQuestion) {
+              questions[currentQuestionIndex] = data.currentQuestion;
+              hide('studentWaiting');
+              show('studentQuiz');
+              hide('studentMode');
+              showQuestionToStudent(currentQuestionIndex, data.currentQuestion);
+              // Update score display
+              var scoreEl = $('myScore');
+              if (scoreEl) scoreEl.textContent = myScore;
+              $('scoreDisplay').style.display = 'block';
+            }
+          }
+          break;
+
+        case 'heartbeat':
+          // Heartbeat acknowledged — no action needed, lastMessageTime already updated
           break;
 
         case 'answer-submitted':
@@ -2038,6 +2265,8 @@
       if (goEasyConnected) {
         publishEvent('player-joined', { player: player, players: players });
         updateWaitingStatus('Joined room, waiting for game to start...');
+        // Start connection monitor once joined
+        startConnectionMonitor();
         return;
       }
       if (attempt > 100) {
@@ -3099,6 +3328,7 @@
       if (isHost) {
         showTeacherRoom();
       } else {
+        stopConnectionMonitor();
         showModeSelection();
       }
     }
@@ -3231,5 +3461,7 @@
     }
     init();
   </script>
+  <div id="connectionStatus" style="display:none;"><span id="connectionDot"></span><span id="connectionText">Connected</span></div>
+  <div id="connectionLostOverlay"><div class="msg"><div style="font-size:3rem;margin-bottom:10px;">🔌</div><div style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">Connection Lost</div><div style="color:#64748b;margin-bottom:16px;">Trying to reconnect...</div><button class="btn btn-primary" onclick="manualReconnect()" style="padding:10px 24px;">Retry Now</button></div></div>
 </body>
 </html>
