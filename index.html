@@ -2587,11 +2587,11 @@
         correctAnswer: q.correctAnswer
       });
 
-      // Auto-close ranking popup after 5.5s and advance to next question
+      // Auto-close ranking popup after 8.5s and advance to next question
       if (window._autoAdvanceTimer) clearTimeout(window._autoAdvanceTimer);
       window._autoAdvanceTimer = setTimeout(function() {
         nextQuestion();
-      }, 5500);
+      }, 8500);
     }
 
     function showRanking() {
