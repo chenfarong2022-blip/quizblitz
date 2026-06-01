@@ -2726,7 +2726,14 @@
               d.scoreEl.textContent = current + ' 分';
             }
           });
-          if (anyCrossed50) playTickSound();
+          if (anyCrossed50) {
+            // Throttle tick sound: skip if last tick was < 80ms ago
+            var nowMs = Date.now();
+            if (!window._lastTickTime || nowMs - window._lastTickTime > 80) {
+              window._lastTickTime = nowMs;
+              playTickSound();
+            }
+          }
 
           // Real-time reorder every ~220ms
           var reorderTick = Math.floor(progress * 10);
@@ -2985,7 +2992,7 @@
     // ===== 提交提示音效 =====
     function playBeepSound() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioCtx();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
@@ -2996,16 +3003,13 @@
         gain.connect(ctx.destination);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.15);
-      } catch(e) {
-        // Silently fail if audio context isn't available
-      }
+      } catch(e) {}
     }
 
     function playJoinSound() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioCtx();
         const t = ctx.currentTime;
-        // First tone: pleasant mid "ding"
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = 'sine';
@@ -3016,7 +3020,6 @@
         gain1.connect(ctx.destination);
         osc1.start(t);
         osc1.stop(t + 0.2);
-        // Second tone: higher "dong"
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
         osc2.type = 'sine';
@@ -3027,16 +3030,13 @@
         gain2.connect(ctx.destination);
         osc2.start(t + 0.12);
         osc2.stop(t + 0.35);
-      } catch(e) {
-        // Silently fail if audio context isn't available
-      }
+      } catch(e) {}
     }
 
     function playBronzeSound() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioCtx();
         const t = ctx.currentTime;
-        // Short low thud + soft chime
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = 'triangle';
@@ -3053,9 +3053,8 @@
 
     function playSilverSound() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioCtx();
         const t = ctx.currentTime;
-        // Double chime ascending
         [660, 880].forEach((freq, i) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -3073,7 +3072,7 @@
 
     function playGoldSound() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioCtx();
         const t = ctx.currentTime;
         // Triumphant fanfare: C5 → E5 → G5 → C6 (arpeggio)
         const notes = [523, 659, 784, 1047];
@@ -3092,9 +3091,21 @@
       } catch(e) {}
     }
 
+    // ===== 音效（共享 AudioContext 避免卡顿）=====
+    var sharedAudioCtx = null;
+    function getAudioCtx() {
+      if (!sharedAudioCtx) {
+        sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (sharedAudioCtx.state === 'suspended') {
+        sharedAudioCtx.resume();
+      }
+      return sharedAudioCtx;
+    }
+
     function playTickSound() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioCtx();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'square';
