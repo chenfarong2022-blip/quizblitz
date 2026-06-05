@@ -2324,6 +2324,7 @@
       if (!code || code.length < 4) { showToast('Please enter a valid room code'); return; }
 
       roomCode = code;
+      currentChannelName = 'quizblitz-' + roomCode; // Set early so publishEvent works immediately
       myRole = 'student';
       isHost = false;
       myPlayerId = 'player_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
@@ -2342,14 +2343,14 @@
     }
 
     function waitForConnectionAndJoin(player, attempt) {
-      if (goEasyConnected) {
+      if (goEasyConnected && currentChannelName) {
         publishEvent('player-joined', { player: player, players: players });
         updateWaitingStatus('Joined room, waiting for game to start...');
         // Start connection monitor once joined
         startConnectionMonitor();
         return;
       }
-      if (attempt > 100) {
+      if (attempt > 150) {  // 150 * 200ms = 30s timeout
         updateWaitingStatus('Connection failed. Please refresh and try again.');
         showToast('Connection failed! Please refresh the page and try again.');
         return;
