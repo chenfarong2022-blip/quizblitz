@@ -851,7 +851,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.81</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.82</p>
   </div>
 
   <style>
@@ -1607,6 +1607,35 @@
       { question: `"据说是飞机出了问题" — if "据说" were removed, the sentence would still express the same level of certainty about what happened.`, options: ["T", "F"], correctAnswer: 1, timeLimit: 20 }
     ]
   };
+
+    const LISTENING_LESSONS_8_TO_14 = [
+      "听力第八课 (Lesson 8 Listening)",
+      "听力第九课 (Lesson 9 Listening)",
+      "听力第十课 (Lesson 10 Listening)",
+      "听力第十一课 (Lesson 11 Listening)",
+      "听力第十二课",
+      "听力第十三课",
+      "听力第十四课"
+    ];
+
+    function buildBalancedCombinedBank(bankNames, targetCount) {
+      const combined = [];
+      for (let index = 0; combined.length < targetCount; index++) {
+        let addedThisRound = false;
+        for (const bankName of bankNames) {
+          const bank = BUILT_IN_BANKS[bankName] || [];
+          if (bank[index]) {
+            combined.push(bank[index]);
+            addedThisRound = true;
+            if (combined.length >= targetCount) break;
+          }
+        }
+        if (!addedThisRound) break;
+      }
+      return combined;
+    }
+
+    BUILT_IN_BANKS["听力第八-十四课大合集 (100题)"] = buildBalancedCombinedBank(LISTENING_LESSONS_8_TO_14, 100);
 
     // ===== GoEasy 初始化 =====
     let goEasyConnected = false;
