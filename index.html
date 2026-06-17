@@ -851,7 +851,7 @@
     <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 60px;">页面作者：浙江大学 陈法榕</p>
     <button onclick="enterApp()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 18px 60px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(99,102,241,0.3);">✨ 进入游戏 ✨</button>
     <p style="position: absolute; bottom: 30px; font-size: 0.8rem; color: #94a3b8;">"所有的大人都曾经是小孩，虽然，只有少数人记得。"</p>
-    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.80</p>
+    <p style="position: absolute; bottom: 10px; font-size: 0.75rem; color: #cbd5e1;">v1.81</p>
   </div>
 
   <style>
@@ -1145,6 +1145,7 @@
     let goEasy = null;
     let goEasyChannel = null;
     let currentChannelName = null;
+    let goEasySubscribed = false;
 
     // ===== 状态 =====
     let myRole = null;
@@ -1609,6 +1610,10 @@
 
     // ===== GoEasy 初始化 =====
     let goEasyConnected = false;
+    let goEasyConnecting = false;
+    let initialConnectAttempts = 0;
+    let initialConnectTimer = null;
+    const MAX_INITIAL_CONNECT_ATTEMPTS = 8;
 
     // ===== 连接监控 (Connection Monitor) =====
     let lastMessageTime = Date.now();
@@ -1616,24 +1621,18 @@
     let connectionCheckTimer = null;
     let reconnectAttempts = 0;
     let reconnectTimeout = null;
+    let joinAnnounceTimer = null;
+    let joinAnnounceCount = 0;
+    let joinAckReceived = false;
     const MAX_RECONNECT_ATTEMPTS = 10;
     const HEARTBEAT_INTERVAL = 30000;      // 30s send heartbeat
     const CONNECTION_TIMEOUT = 50000;      // 50s no message = disconnected
+    const JOIN_ANNOUNCE_INTERVAL = 2500;   // Keep announcing until teacher confirms
     let isConnectionMonitorActive = false;
 
     function initGoEasy() {
       if (goEasy) {
-        goEasyConnected = false;
-        goEasy.connect({
-          onSuccess: function() {
-            console.log('GoEasy reconnected!');
-            goEasyConnected = true;
-          },
-          onFailed: function(error) {
-            console.error('GoEasy reconnect failed:', error);
-            goEasyConnected = false;
-          }
-        });
+        connectGoEasyWithRetry();
         return goEasy;
       }
 
@@ -1643,24 +1642,49 @@
         modules: ['PUBSUB']
       });
 
-      goEasy.connect({
-        onSuccess: function() {
-          console.log('GoEasy connected!');
-          goEasyConnected = true;
-        },
-        onFailed: function(error) {
-          console.error('GoEasy connect failed:', error);
-          goEasyConnected = false;
-        }
-      });
+      connectGoEasyWithRetry();
 
       console.log('GoEasy initializing...');
       return goEasy;
     }
 
+    function connectGoEasyWithRetry() {
+      if (!goEasy || goEasyConnected || goEasyConnecting) return;
+      if (initialConnectTimer) {
+        clearTimeout(initialConnectTimer);
+        initialConnectTimer = null;
+      }
+      if (initialConnectAttempts >= MAX_INITIAL_CONNECT_ATTEMPTS) {
+        initialConnectAttempts = 0;
+      }
+
+      goEasyConnecting = true;
+      initialConnectAttempts++;
+      console.log('GoEasy connecting, attempt:', initialConnectAttempts);
+
+      goEasy.connect({
+        onSuccess: function() {
+          console.log('GoEasy connected!');
+          goEasyConnecting = false;
+          goEasyConnected = true;
+          initialConnectAttempts = 0;
+        },
+        onFailed: function(error) {
+          console.error('GoEasy connect failed:', error);
+          goEasyConnecting = false;
+          goEasyConnected = false;
+          if (initialConnectAttempts < MAX_INITIAL_CONNECT_ATTEMPTS) {
+            var delay = Math.min(1000 * Math.pow(2, initialConnectAttempts - 1), 10000);
+            initialConnectTimer = setTimeout(connectGoEasyWithRetry, delay);
+          }
+        }
+      });
+    }
+
     function subscribeToRoom(room) {
       if (goEasyChannel) {
         goEasyChannel.unsubscribe();
+        goEasySubscribed = false;
       }
 
       initGoEasy();
@@ -1672,17 +1696,19 @@
         if (goEasyConnected) {
           clearInterval(subscribeInterval);
           doSubscribe(room);
-        } else if (attempts > 100) {
+        } else if (attempts > 250) {
           clearInterval(subscribeInterval);
-          console.error('GoEasy connection timeout after 20s');
+          console.error('GoEasy connection timeout after 50s');
           updateWaitingStatus('Connection failed. Please refresh and try again.');
           showToast('Connection failed! Please refresh the page and try again.');
         }
       }, 200);
     }
 
-    function doSubscribe(room) {
+    function doSubscribe(room, attempt) {
+      attempt = attempt || 0;
       currentChannelName = 'quizblitz-' + room;
+      goEasySubscribed = false;
       goEasyChannel = goEasy.pubsub.subscribe({
         channel: currentChannelName,
         onMessage: function(message) {
@@ -1696,9 +1722,19 @@
         },
         onSuccess: function() {
           console.log('Subscribed to channel:', currentChannelName);
+          goEasySubscribed = true;
         },
         onFailed: function(error) {
           console.error('Subscribe failed:', error);
+          goEasySubscribed = false;
+          if (attempt < 8) {
+            setTimeout(function() {
+              doSubscribe(room, attempt + 1);
+            }, Math.min(1000 * (attempt + 1), 5000));
+          } else {
+            updateWaitingStatus('Channel subscription failed. Please refresh and try again.');
+            showToast('Channel subscription failed! Please refresh the page and try again.');
+          }
         }
       });
 
@@ -1750,6 +1786,7 @@
       if (connectionCheckTimer) { clearInterval(connectionCheckTimer); connectionCheckTimer = null; }
       if (reconnectTimeout) { clearTimeout(reconnectTimeout); reconnectTimeout = null; }
       if (_reconnectScheduled) { clearTimeout(_reconnectScheduled); _reconnectScheduled = null; }
+      stopJoinAnnouncer();
       var statusEl = $('connectionStatus');
       if (statusEl) statusEl.style.display = 'none';
       $('connectionLostOverlay').classList.remove('show');
@@ -1854,6 +1891,7 @@
       // Resubscribe
       if (roomCode) {
         currentChannelName = 'quizblitz-' + roomCode;
+        goEasySubscribed = false;
         goEasyChannel = goEasy.pubsub.subscribe({
           channel: currentChannelName,
           onMessage: function(message) {
@@ -1865,6 +1903,7 @@
           },
           onSuccess: function() {
             console.log('Resubscribed to channel:', currentChannelName);
+            goEasySubscribed = true;
             // Success! Reset state
             reconnectAttempts = 0;
             _reconnecting = false;
@@ -1872,22 +1911,21 @@
             updateConnectionUI('connected');
             $('connectionLostOverlay').classList.remove('show');
 
-            // Re-announce to teacher for state sync
+            // Re-announce until the teacher confirms and sends fresh state.
             setTimeout(function() {
               var pName = $('playerName') ? $('playerName').value.trim() : '';
-              publishEvent('player-joined', {
-                player: {
-                  id: myPlayerId,
-                  name: pName || 'Player',
-                  avatar: selectedAvatar,
-                  score: myScore || 0,
-                  isReconnecting: true
-                }
+              startJoinAnnouncer({
+                id: myPlayerId,
+                name: pName || 'Player',
+                avatar: selectedAvatar,
+                score: myScore || 0,
+                isReconnecting: true
               });
             }, 1000);
           },
           onFailed: function(err) {
             console.error('Resubscribe failed:', err);
+            goEasySubscribed = false;
             scheduleReconnect();
           }
         });
@@ -1907,6 +1945,7 @@
     function sendStateSync(targetPlayerId) {
       if (!isHost) return;
       var payload = {
+        targetPlayerId: targetPlayerId || null,
         gameStatus: gameStatus,
         currentQuestionIndex: currentQuestionIndex,
         players: players.map(function(p) { return { id: p.id, name: p.name, avatar: p.avatar, score: p.score }; })
@@ -1921,6 +1960,10 @@
     function publishEvent(eventName, data) {
       if (!currentChannelName) {
         console.error('No GoEasy channel subscribed');
+        return;
+      }
+      if (!goEasy || !goEasy.pubsub || !goEasyConnected) {
+        console.error('GoEasy is not ready for publish:', eventName);
         return;
       }
 
@@ -1955,6 +1998,40 @@
       }
 
       doPublish(eventName === 'player-joined' && !isHost ? 5 : 0);
+    }
+
+    function stopJoinAnnouncer() {
+      if (joinAnnounceTimer) {
+        clearInterval(joinAnnounceTimer);
+        joinAnnounceTimer = null;
+      }
+    }
+
+    function startJoinAnnouncer(player) {
+      stopJoinAnnouncer();
+      joinAnnounceCount = 0;
+      joinAckReceived = false;
+
+      function announceJoin() {
+        if (joinAckReceived || isHost) {
+          stopJoinAnnouncer();
+          return;
+        }
+        if (!goEasyConnected || !goEasySubscribed || !currentChannelName) {
+          updateWaitingStatus('Connecting to room...');
+          return;
+        }
+        joinAnnounceCount++;
+        publishEvent('player-joined', { player: player, players: players });
+        if (joinAnnounceCount === 1) {
+          updateWaitingStatus('Finding teacher...');
+        } else if (joinAnnounceCount >= 12) {
+          updateWaitingStatus('Still trying to reach the teacher. Please check the room code or ask the teacher to refresh.');
+        }
+      }
+
+      announceJoin();
+      joinAnnounceTimer = setInterval(announceJoin, JOIN_ANNOUNCE_INTERVAL);
     }
 
     function handleGoEasyEvent(data) {
@@ -2057,20 +2134,24 @@
             }
             updatePlayerList(players);
             updateJoinedStudentsList(players);
-            // If a student is reconnecting mid-game, send them current state
-            if (isHost && isReconnecting && gameStatus === 'playing') {
-              console.log('Reconnecting student detected, sending state sync to:', data.player.id);
+            // Confirm every join so students can retry until the teacher actually sees them.
+            if (isHost && data.player.id !== myPlayerId) {
+              if (isReconnecting && gameStatus === 'playing') {
+                console.log('Reconnecting student detected, sending state sync to:', data.player.id);
+              }
               setTimeout(function() {
                 sendStateSync(data.player.id);
-              }, 500);
+              }, isReconnecting ? 500 : 250);
             }
           }
           break;
 
         case 'sync-state':
           // Student receives full game state after reconnecting
-          if (!isHost && data.gameStatus) {
+          if (!isHost && data.gameStatus && (!data.targetPlayerId || data.targetPlayerId === myPlayerId)) {
             console.log('Received state sync:', data);
+            joinAckReceived = true;
+            stopJoinAnnouncer();
             gameStatus = data.gameStatus;
             currentQuestionIndex = data.currentQuestionIndex >= 0 ? data.currentQuestionIndex : currentQuestionIndex;
             if (data.players) {
@@ -2093,15 +2174,18 @@
               hide('studentMode');
               show('studentWaiting');
               hide('studentQuiz');
+              updateWaitingStatus('Joined room, waiting for the next question...');
             } else if (gameStatus === 'waiting') {
               hide('studentMode');
               show('studentWaiting');
               hide('studentQuiz');
+              updateWaitingStatus('Joined room, waiting for game to start...');
             } else if (gameStatus === 'finished') {
               // Game finished — nothing to do, final ranking will come separately
               hide('studentMode');
               show('studentWaiting');
               hide('studentQuiz');
+              updateWaitingStatus('This game has already finished.');
             }
           }
           break;
@@ -2323,6 +2407,7 @@
       const name = $('playerName').value.trim() || '玩家' + Math.floor(Math.random() * 1000);
       if (!code || code.length < 4) { showToast('Please enter a valid room code'); return; }
 
+      stopJoinAnnouncer();
       roomCode = code;
       currentChannelName = 'quizblitz-' + roomCode; // Set early so publishEvent works immediately
       myRole = 'student';
@@ -2343,14 +2428,13 @@
     }
 
     function waitForConnectionAndJoin(player, attempt) {
-      if (goEasyConnected && currentChannelName) {
-        publishEvent('player-joined', { player: player, players: players });
-        updateWaitingStatus('Joined room, waiting for game to start...');
-        // Start connection monitor once joined
+      if (goEasyConnected && goEasySubscribed && currentChannelName) {
+        updateWaitingStatus('Connected. Waiting for teacher confirmation...');
+        startJoinAnnouncer(player);
         startConnectionMonitor();
         return;
       }
-      if (attempt > 150) {  // 150 * 200ms = 30s timeout
+      if (attempt > 250) {  // 250 * 200ms = 50s timeout
         updateWaitingStatus('Connection failed. Please refresh and try again.');
         showToast('Connection failed! Please refresh the page and try again.');
         return;
